@@ -1,0 +1,257 @@
+@import url('https://fonts.googleapis.com/css2?family=Arimo:wght@400;500;600&family=Barlow+Condensed:wght@400;500;600&family=Josefin+Sans:wght@400;500;600&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;600&display=swap');
+
+:root {
+  --primary-color: #047857;
+  --secondary-color: #059669;
+  --tertiary-color: #a7f3d0;
+  --text-color: #a3a3a3;
+  --bg-color: white;
+}
+
+html, body {
+  background:var(--bg-color);
+}
+
+.navbar {
+  margin-bottom:0px;
+}
+
+
+.navbar-default {
+   background: var(--primary-color);
+   color:white;
+}
+
+.navbar-default .navbar-brand {
+  color:white;
+}
+
+.navbar-default .navbar-brand:hover {
+  color:white;
+}
+
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:focus, .navbar-default .navbar-nav>.active>a:hover {
+  color: white;
+  background: var(--secondary-color);
+}
+
+.navbar-default .navbar-nav>li>a {
+  color:white;
+}
+
+.navbar-default .navbar-nav>li>a:hover {
+  color: white;
+  font-weight:bold;
+}
+
+.tab-content>.active {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+
+.modal.in .modal-dialog {
+    display: flex;
+    align-items: center; /* Vertically center */
+    justify-content: center; /* Horizontally center (optional) */
+    height: 80vh; /* Make it full screen vertically */
+    transform: none; /* Remove the translate transform */
+
+}
+
+.modal-content {
+  min-width:500px;
+}
+
+#glider {
+  margin-top:50px;
+}
+
+body {
+  font-family: Poppins;
+}
+
+label {
+   color: var(--primary-color);
+}
+
+.slides {
+  margin-top:25px;
+}
+
+
+    .next-button, .prev-button {
+    padding: 10px 15px;
+    width:150px;
+    border-radius:5px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .next-button, #downloadData.btn.btn-deault,  #generateReport.btn.btn-default {
+    background: var(--primary-color)!important;
+    color: white!important;
+    border:none;
+  }
+  
+.btn .radiobtn .btn-default.active, 
+.btn .radiobtn .btn-default:active, 
+.btn .radiobtn .btn-default.active:focus, 
+.btn .radiobtn .btn-default:focus, 
+.btn .radiobtn .open > .dropdown-toggle.btn-default, 
+.btn .radiobtn .btn-default:focus-visible {
+  background: var(--primary-color); /* Set your desired background color */
+  color: white; /* Ensure text color is white */
+  box-shadow: none; /* Remove any default box shadow */
+  border-color: var(--primary-color); /* Set the border to match the button */
+}
+
+/* Optional: Customize the hover state */
+.btn .radiobtn .btn-default:hover {
+  background: var(--primary-color-hover); /* Set a hover color if needed */
+  color: white;
+}
+
+/* To prevent the default grey focus ring */
+.btn .radiobtn .btn-default:focus {
+  outline: none; /* Remove the grey outline (browser default focus ring) */
+}
+
+/* Hover state for inactive button */
+.btn .radiobtn .btn-default:not(.active) {
+  color: var(--primary-color); /* Change text color to primary color */
+  background-color: transparent; /* Ensure background stays transparent */
+  border-color: var(--primary-color); /* Optional: Change border color on hover */
+}
+
+  .prev-button {
+    background: #EEEEEE;
+    color: black;
+  }
+  
+  .slides .slide {
+    visibility: hidden;
+    height:0px;
+    position: relative; /* For buttons to be positioned */
+
+  }
+  
+  .slides .active-slide {
+   visibility: visible;
+   height:100%;
+    padding: 20px;
+  }
+
+.slider {
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  border-radius:10px;
+  padding:40px;
+  background:white;
+  margin:0px 40px;
+  max-width:950px;
+  width:92%;
+}
+
+.progress-bar {
+  background: var(--primary-color);
+}
+
+.slide-container {
+  height:300px;
+}
+
+.slide-title {
+  margin:0px;
+  padding:0px;
+  color: var(--primary-color);
+}
+
+.slide-content {
+  margin-top:20px;
+}
+
+.slide-content p {
+  color: var(--text-color);
+  font-size:18px;
+}
+
+p  {
+    color: var(--text-color);
+
+}
+
+.btn-primary {
+  background: var(--primary-color);
+}
+
+  .slider-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px; /* Adjust to give space between content and buttons */
+  }
+
+.steplist {
+    position: relative;
+    display: flex;
+    width:100%;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    list-style-type: none;
+    overflow-x: auto;
+}
+
+.step-button {
+  border-radius:100%;
+  height:50px;
+  width:50px;
+  border:none;
+  border: 2px var(--primary-color) solid;
+  color:var(--primary-color);
+  background: transparent;
+  font-size:20px;
+}
+
+.step-button.active {
+  border: 2px var(--primary-color) solid!important;
+  background: var(--primary-color)!important;
+  color:white!important;
+}
+
+.step {
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap:5px;
+    padding: 20px;
+    font-weight:bold;
+}
+
+.step-part {
+  display:flex;
+  flex-direction: row;
+  flex: 1 1 auto;
+  gap: 2px;
+}
+
+.step-divider::before {
+    position: absolute;
+    display: block;
+    top: 50%;
+    left: 0;
+    width: calc(100%);
+    content: "";
+    border-top: 2px solid #CECFCE;
+}
+
+
+.step-divider {
+    display: flex;
+    width: calc(100% - 80px);
+    position: relative;
+    align-items: center;
+    padding: 0px 1;
+    margin: 10px;
+}
