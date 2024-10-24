@@ -8,8 +8,77 @@
   --bg-color: white;
 }
 
+.navbar-brand a, .navbar-brand a:focus, .navbar-brand a:hover {
+  text-decoration:none;
+  color:white;
+}
+
 html, body {
   background:var(--bg-color);
+  height:100%;
+}
+
+.navbar-default .navbar-nav>li>a[data-value="home"] {
+    display: none;
+}
+
+
+
+
+.tab-content, .tab-pane, .container-fluid {
+  height:100%;
+}
+
+.banner {
+      width:100%;
+      color:white;
+      padding:10px 25px;
+      height:125px;
+      display: flex;
+      align-items: center;
+}
+
+
+.bg {
+      background-image: url('soil-2.webp');
+      height: 100%;
+      width:100%;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+    
+.overlay {
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7); /* Slight black overlay */
+      }
+      .content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        text-align: center;
+      }
+      .home-btn {
+        margin: 10px;
+        padding: 10px 20px;
+        background-color: var(--primary-color); /* Button color */
+        color: white;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 16px;
+      }
+
+.navbar > .container-fluid:first-child {
+  padding:0px 15px;}
+  
+.container-fluid {
+  padding:0px;
 }
 
 .navbar {
@@ -20,6 +89,7 @@ html, body {
 .navbar-default {
    background: var(--primary-color);
    color:white;
+   border-color:  var(--primary-color);
 }
 
 .navbar-default .navbar-brand {
@@ -176,8 +246,10 @@ label {
   font-size:18px;
 }
 
-p  {
+.content-p {
     color: var(--text-color);
+    font-size:18px;
+    padding: 0rem 4rem;
 
 }
 

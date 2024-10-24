@@ -7,173 +7,167 @@ library(readxl)
 library(glue)
 library(rmarkdown)
 
+
+source("utils/functions.R")
+
 # Define UI for application that draws a histogram
-ui <-navbarPage(tags$div(style='display:flex;gap:8px;align-items:center', shiny::icon("seedling", style='font-size:15px'),
-tags$div(style='font-size:16px', "Soil Health Reports")),
+ui <-navbarPage(
+  title = actionLink(inputId="title", 
+                    tags$div(style='display:flex;gap:8px;align-items:center', shiny::icon("seedling", style='font-size:15px'),
+                             tags$div(style='font-size:16px', "Soil Health Reports"))
+                    ),
           header = tags$head(
             tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
             tags$script(src="script.js"),
             shinyjs::useShinyjs()
           ),
-          tabPanel("Generate Report",
-                   tags$div(style='padding:20px 40px;margin-bottom:20px',
-                     tags$h1("Report Generator"),
-                     tags$p("Follow the steps below to generate your report")
+  id = "main_page",
+          tabPanel("Home",
+                   value = "home",
+                   div(class = "bg",
+                       div(class = "overlay"),
+                       div(class = "content",
+                           h1("Soil Health Report", style='font-size:40px'),
+                           p("Brought to you by the Washington State Department of Agriculture. Generate reports to analyze your soil health.", style='font-size:20px;'),
+                           actionButton("learn_more", "Learn More", class='home-btn'),
+                           actionButton("generate_report", "Build Report", class='home-btn')
+                       )                   
+                   )),
+          tabPanel("Learn More", 
+                   value = "learn_more",
+                   create_hero("Learn More", 'default-hero.png'),
+                   tags$div(class='content-p', 
+                            tags$p("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum.")
+                   )
                    ),
+          tabPanel("Generate Report",
+                   value = "generate_report",
+                   create_hero("Generate Report", 'default-hero.png'),
                    tags$div(class='slider',
-                            tags$div(class='steplist',
-                                     tags$div(
-                                       class='step-part',
-                                       tags$button(id='step1', class='step-button active', 
-                                                   tags$span(shiny::icon("file-arrow-down")), 
-                                                   onclick = "activateSteps(1)"),
-                                       tags$div(class='step-divider')
-                                     ),
-                                     tags$div(
-                                       class='step-part',
-                                       tags$button(id='step2', class='step-button', 
-                                                   tags$span(shiny::icon("file-arrow-up")), 
-                                                   onclick = "activateSteps(2)"),
-                                       tags$div(class='step-divider')
-                                     ),
-                                     tags$div(
-                                       class='step-part',
-                                       tags$button(id='step3', class='step-button', 
-                                                   tags$span(shiny::icon("paint-roller")), 
-                                                   onclick = "activateSteps(3)"),
-                                       tags$div(class='step-divider')
-                                     ),
-                                     tags$div(
-                                       class='step-part-l',
-                                       tags$button(id='step4', class='step-button', 
-                                                   tags$span(shiny::icon("file-export")), 
-                                                   onclick = "activateSteps(4)")
-                                     )
+                            create_stepper(
+                              list(
+                                list(icon = "file-arrow-down"),
+                                list(icon = "file-arrow-up"),
+                                list(icon = "paint-roller"),
+                                list(icon = "file-export")
+                              )
                             ),
                             # Glider/Slides for each step
-                            tags$div(class='slides',
-                                     tags$div(id='slide1', class='slide active-slide', 
-                                              tags$div(class='slide-container',
-                                                tags$h3(class='slide-title', "Step 1"),
-                                                tags$div(class='slide-content',
-                                                         tags$p("Specify report type and language setting. Download and fill out template.", style='margin-bottom:20px'),
-                                                         tags$div(style='display:flex;justify-content:space-between',
-                                                                  pickerInput(
-                                                                    inputId = "selectReportType",
-                                                                    label = "Report Type", 
-                                                                    choices = c("Soil Health Report"),
-                                                                  ),
-                                                                  radioGroupButtons(
-                                                                     inputId = "selectLanguage",
-                                                                     label = "Language",
-                                                                     choices = c("English", "Spanish"),
-                                                                     individual = TRUE,
-                                                                     checkIcon = list(
-                                                                       checkIcon = list(
-                                                                         yes = icon("ok", 
-                                                                                    lib = "glyphicon"))
-                                                                     )
-                                                                   ),
-                                                                   radioGroupButtons(
-                                                                     inputId = "selectOutputType",
-                                                                     label = "Report Type",
-                                                                     choices = c("Word", "HTML"),
-                                                                     selected = 'HTML',
-                                                                     individual = TRUE,
-                                                                     checkIcon = list(
-                                                                       checkIcon = list(
-                                                                         yes = icon("ok", 
-                                                                                    lib = "glyphicon"))
-                                                                     )
-                                                                   )
-                                                         ),
-                                                         downloadButton('downloadData', 'Download Template')
-                                                )
-                                              ),
-                                              tags$div(class='slider-button', style="display:flex;justify-content:end;margin-top: 20px",
-                                                tags$button(id='next1', class='next-button', "Next", onclick="nextSlide(2)")
-                                              )
-                                     ),
-                                     tags$div(id='slide2', class='slide', 
-                                              tags$div(class='slide-container',
-                                                       tags$h3(class='slide-title', "Step 2"),
-                                                       tags$div(class='slide-content',
-                                                                tags$p("Upload and validate data file.", style='margin-bottom:20px'),
-                                                                fileInput("uploadFile", "Upload Data",
-                                                                          multiple = FALSE,
-                                                                          accept = c("text/xlsx",
-                                                                                     "text/comma-separated-values,text/plain",
-                                                                                     ".xlsx"))
-                                                                
-                                                                )
-                                              ),
-                                              tags$div(class='slider-buttons',
-                                              tags$button(id='prev3', class='prev-button', "Previous", onclick="activateSteps(1)"),
-                                              tags$button(id='next3', class='next-button', "Next", onclick="nextSlide(3)")
-                                              )
-                                     ),
-                                     tags$div(id='slide3', class='slide', 
-                                              tags$div(class='slide-container',
-                                                       tags$h3(class='slide-title', "Step 3"),
-                                                       tags$div(class='slide-content',
-                                                                tags$p("Customize your report with descriptive text and/or include branded colors.", style='margin-bottom:20px'),
-                                                                pickerInput(
-                                                                  inputId = "fontOption",
-                                                                  label = "Font", 
-                                                                  choices = c("Poppins", "Roboto", "Arimo", "Josefin Sans", "Barlow Condensed"),
-                                                                  choicesOpt = list(
-                                                                    style = c("font-family: Poppins;", 
-                                                                              "font-family: Roboto;", 
-                                                                              "font-family: Arimo;", 
-                                                                              "font-family: 'Josefin Sans';",
-                                                                              "font-family: 'Barlow Condensed';"))
-                                                                ),
-                                                                tags$div(style='display:flex;gap:2px;justify-content:space-between;',
-                                                                    colourpicker::colourInput(
-                                                                    "primaryColor",
-                                                                    "Primary Color",
-                                                                    value = "#3DA35D",
-                                                                    showColour = c("both", "text", "background"),
-                                                                    palette = c("square", "limited")
-                                                                  ),
-                                                                  colourpicker::colourInput(
-                                                                    "secondaryColor",
-                                                                    "Secondary Color",
-                                                                    value = "#C5DD6E",
-                                                                    showColour = c("both", "text", "background"),
-                                                                    palette = c("square", "limited")
-                                                                  )
-                                                                )
-                                                                )
-                                              ),
-                                              tags$div(class='slider-buttons',
-                                              tags$button(id='prev4', class='prev-button', "Previous", onclick="activateSteps(2)"),
-                                              tags$button(id='next4', class='next-button', "Next", onclick="nextSlide(4)")
-                                              )
-                                     ),
-                                     tags$div(id='slide4', class='slide', 
-                                              tags$div(class='slide-container',
-                                                       tags$h3(class='slide-title', "Step 4"),
-                                                       tags$div(class='slide-content',
-                                                                tags$p("Some text explaining this step in more detail.", style='margin-bottom:20px'),
-                                                                downloadButton("downloadReport", label="Generate Report")
-                                                                
-                                                       )
-                                              ),
-                                              tags$div(class='slider-buttons',
-                                              tags$button(id='prev5', class='prev-button', "Previous", onclick="activateSteps(3)")
-                                              )
-                                     )
-                            ),
+                            create_slides(
+                              slides_content <- list(
+                                list(
+                                  title = "Step 1",
+                                  content = tags$div(
+                                    tags$p("Specify report type and language setting. Download and fill out template.", style='margin-bottom:20px'),
+                                    tags$div(
+                                      style = 'display:flex;justify-content:space-between;',
+                                      pickerInput(
+                                        inputId = "selectReportType",
+                                        label = "Report Type", 
+                                        choices = c("Soil Health Report")
+                                      ),
+                                      radioGroupButtons(
+                                        inputId = "selectLanguage",
+                                        label = "Language",
+                                        choices = c("English", "Spanish"),
+                                        individual = TRUE,
+                                        checkIcon = list(
+                                          checkIcon = list(
+                                            yes = icon("ok", lib = "glyphicon")
+                                          )
+                                        )
+                                      ),
+                                      radioGroupButtons(
+                                        inputId = "selectOutputType",
+                                        label = "Report Type",
+                                        choices = c("Word", "HTML"),
+                                        selected = 'HTML',
+                                        individual = TRUE,
+                                        checkIcon = list(
+                                          checkIcon = list(
+                                            yes = icon("ok", lib = "glyphicon")
+                                          )
+                                        )
+                                      )
+                                    ),
+                                    downloadButton('downloadData', 'Download Template')
+                                  )
+                                ),
+                                list(
+                                  title = "Step 2",
+                                  content = tags$div(
+                                    tags$p("Upload and validate data file.", style='margin-bottom:20px'),
+                                    fileInput("uploadFile", "Upload Data",
+                                              multiple = FALSE,
+                                              accept = c("text/xlsx", "text/comma-separated-values,text/plain", ".xlsx")
+                                    )
+                                  )
+                                ),
+                                list(
+                                  title = "Step 3",
+                                  content = tags$div(
+                                    tags$p("Customize your report with descriptive text and/or include branded colors.", style='margin-bottom:20px'),
+                                    pickerInput(
+                                      inputId = "fontOption",
+                                      label = "Font", 
+                                      choices = c("Poppins", "Roboto", "Arimo", "Josefin Sans", "Barlow Condensed"),
+                                      choicesOpt = list(
+                                        style = c(
+                                          "font-family: Poppins;", 
+                                          "font-family: Roboto;", 
+                                          "font-family: Arimo;", 
+                                          "font-family: 'Josefin Sans';",
+                                          "font-family: 'Barlow Condensed';"
+                                        )
+                                      )
+                                    ),
+                                    tags$div(
+                                      style = 'display:flex;gap:2px;justify-content:space-between;',
+                                      colourInput(
+                                        inputId = "primaryColor",
+                                        label = "Primary Color",
+                                        value = "#3DA35D",
+                                        showColour = c("both", "text", "background"),
+                                        palette = c("square", "limited")
+                                      ),
+                                      colourInput(
+                                        inputId = "secondaryColor",
+                                        label = "Secondary Color",
+                                        value = "#C5DD6E",
+                                        showColour = c("both", "text", "background"),
+                                        palette = c("square", "limited")
+                                      )
+                                    )
+                                  )
+                                ),
+                                list(
+                                  title = "Step 4",
+                                  content = tags$div(
+                                    tags$p("Some text explaining this step in more detail.", style='margin-bottom:20px'),
+                                    downloadButton("downloadReport", label = "Generate Report")
+                                  )
+                                )
+                              )
+                            )
           )
-          ),
-        tabPanel("Guide"),
-        tabPanel("About")
+          )
           
 )
 
 # Define server logic required to draw a histogram
-server <- function(input, output) {
+server <- function(input, output, session) {
+  
+  observeEvent(input$title, {
+    updateNavbarPage(session, "main_page", "home")
+  })
+  
+  observeEvent(input$learn_more, {
+    updateNavbarPage(session, "main_page", "learn_more")
+  })
+  
+  observeEvent(input$generate_report, {
+    updateNavbarPage(session, "main_page", "generate_report")
+  })
   
   #template file download
   output$downloadData <- downloadHandler(
