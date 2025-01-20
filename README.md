@@ -2,6 +2,8 @@
 
 This Shiny app, developed for the Washington State Department of Agriculture (WSDA), facilitates the generation of soil health reports. Users can interactively upload data, validate the uploaded content, configure report parameters, and generate reports in their preferred format.
 
+The application can be accesses here: [App](https://tshapiro.shinyapps.io/soil-health/)
+
 ------------------------------------------------------------------------
 
 ## Features
