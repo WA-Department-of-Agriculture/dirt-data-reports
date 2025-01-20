@@ -1,0 +1,12 @@
+var,var_type
+year,double
+sample_id,-
+farm_name,-
+producer_id,-
+field_name,char
+field_id,-
+county,char
+crop,char
+longitude,double
+latitude,double
+texture,char

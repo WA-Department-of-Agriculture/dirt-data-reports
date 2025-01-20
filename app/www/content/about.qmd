@@ -1,0 +1,19 @@
+---
+title: ""
+format: html
+editor: visual
+---
+
+## What is this tool?
+
+This interactive tool creates customized soil health reports for participants in your soil sampling project. These reports distill the latest soil health research and provide comparisons of each participant’s samples with others from the same crop and county. The goal is to make complex soils data more accessible and actionable, empowering participants to better understand and manage soil health.
+
+## How can it help me?
+
+Generating customized and comprehensive soil health reports for numerous participants can be complex, time-consuming, and require specialized expertise in soil science and data automation.This tool simplifies this process by offering a no-code solution to automatically create reports and provides technical assistance providers with a valuable resource to enhance soil health outreach and extension efforts within their communities.
+
+## How do I use it?
+
+Customized soil health reports can be generated in four steps.Be prepared to spend the most time on steps 1 and 2 as you adjust your data to match the template format.
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXeYboXCafVGtO5Za9eGLNnQWeLGBKitiUV_5SsZEDXxZBfa0Yy09RbZ2ctdKeQoFM51oMPLxO8OULKUekXE0aFY5QA1EYVQpSDqR6oviVzqKVyhPZHkweVZFvnpNRVVErjygp0FuQ?key=g9jXvHV0ja7FAgOz0RdrUMLb)
