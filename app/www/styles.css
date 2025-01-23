@@ -21,7 +21,14 @@ body {
 }
 
 .navbar-brand a {
-  color: var(--deep-green);
+  color: white;
+}
+
+
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:focus, .navbar-default .navbar-nav>.active>a:hover {
+    color: white;
+    background-color: var(--deep-green);
+    font-weight: bold;
 }
 
 .output-selection, .language-selection {
@@ -234,9 +241,14 @@ h1, h2, h3 {
   padding-bottom: 0;
   margin-bottom: 0;
   position: sticky;
+  background-color: var(--deep-green);
+    border-color: var(--deep-green);
   top: 0;
 }
 
+.navbar-default .navbar-nav>li>a {
+    color: white;
+}
 
 @media screen and (max-width: 768px) {
   .toc-scroll {
@@ -281,7 +293,7 @@ h1, h2, h3 {
 }
 
 .banner-bg {
-      background-image: url('soil-2.webp');
+      background-image: url('soil_v2.jpeg');
       height: 100vh;
       width:100%;
       background-position: center;
@@ -299,6 +311,7 @@ h1, h2, h3 {
       
  .banner-content {
     position: absolute;
+    width:65%;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

@@ -15,7 +15,7 @@ source("utils/data_validation.R")
 
 ui <- navbarPage(
   title = actionLink(inputId="title", 
-                     tags$div(style='display:flex;gap:8px;align-items:center', shiny::icon("seedling", style='font-size:15px'),
+                     tags$div(style='display:flex;gap:8px;align-items:center', tags$img(src="wshi.png", style='height:20px'),
                               tags$div(class='title-name', style='font-size:16px', "WSDA Soil Health Reports"))
   ),
   windowTitle = "WSDA Soil Health Reports",
@@ -35,31 +35,13 @@ ui <- navbarPage(
                div(class = "banner-content",
                    h1("Soil Health Report", style='font-size:40px'),
                    p(style="color:#acacac;", 
-                   "Brought to you by the Washington State Department of Agriculture. Generate reports to analyze your soil health.", style='font-size:20px;'),
-                   tags$div(style='display:flex;justify-content:center;gap:20px;width:100%;',
-                     actionButton("redirect_learn_more", "Learn More", class='home-btn'),
-                     actionButton("redirect_generate_report", "Build Report", class='home-btn')
+                   "Brought to you by the Washington State Department of Agriculture and the Washington Soil Health Initiative. Build custom soil health reports for each participant in your soil sampling project.", style='font-size:20px;'),
+                   tags$div(style='display:flex;justify-content:center;gap:20px;width:100%;margin-top:20px',
+                     actionButton("redirect_generate_report", "Build Report", class='home-btn'),
+                     actionButton("redirect_learn_more", "Learn More", class='home-btn')
                    )
                )                   
            )),  
-  tabPanel(
-    title = "Learn More",
-    value = "page_learn_more",
-    create_hero("Learn More", 'default-hero.png'),
-    div(
-      class = "content-container",
-      div(
-        class = "content",
-        id = "content-area",
-        includeMarkdown("www/content/learn_more.md") 
-      ),
-      div(
-        class = "toc-scroll",
-        id = "toc-container",
-        h5("FAQs")
-      )
-    )
-  ),
   tabPanel(
     title = "Generate Reports",
     value = "page_generate_report",
@@ -239,4 +221,23 @@ ui <- navbarPage(
         )
       )
     )
-  ))
+  ),
+  tabPanel(
+    title = "Learn More",
+    value = "page_learn_more",
+    create_hero("Learn More", 'default-hero.png'),
+    div(
+      class = "content-container",
+      div(
+        class = "content",
+        id = "content-area",
+        includeMarkdown("www/content/learn_more.md") 
+      ),
+      div(
+        class = "toc-scroll",
+        id = "toc-container",
+        h5("FAQs")
+      )
+    )
+  ),
+  )
