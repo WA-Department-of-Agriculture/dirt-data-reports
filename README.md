@@ -1,8 +1,8 @@
-# WSDA Soil Health Report Generator App
+# Soil Health Report Generator App
 
 This Shiny app, developed for the Washington State Department of Agriculture (WSDA), facilitates the generation of soil health reports. Users can interactively upload data, validate the uploaded content, configure report parameters, and generate reports in their preferred format.
 
-The application can be accesses here: [App](https://tshapiro.shinyapps.io/soil-health/)
+The application can be accessed here: [App](https://tshapiro.shinyapps.io/soil-health/)
 
 ------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ The app employs a `navbarPage` layout with the following tabs:
 
 -   **Learn More**: Displays a markdown-based FAQ and additional information.
 
--   **Generate Reports**: The core functionality of the app with a step-by-step process.
+-   **Build Reports**: The core functionality of the app with a step-by-step process.
 
 ### 2. **Server Logic**
 
@@ -65,42 +65,42 @@ The server script manages data processing, validation, user interactions, and re
 
 ### **1. Check for Required Sheets**
 
--   **Purpose**: Ensures the file contains two mandatory sheets: "Data" and "Data Dictionary."\
+-   **Purpose**: Ensures the file contains two mandatory sheets: "Data" and "Data Dictionary."
 -   **Failure**: If either sheet is missing, the function stops further checks and returns an error.
 
 ### **2. Check for Required Columns in "Data"**
 
--   **Purpose**: Validates that all required fields in `req_fields` exist in the "Data" sheet.\
+-   **Purpose**: Validates that all required fields in `req_fields` exist in the "Data" sheet.
 -   **Failure**: Missing columns are listed in the error message.
 
 ### **3. Check for Required Fields in "Data Dictionary"**
 
--   **Purpose**: Ensures the "Data Dictionary" sheet contains the fields: `measurement_group`, `measurement_group_label`, `column_name`, `abbr`, and `unit`.\
+-   **Purpose**: Ensures the "Data Dictionary" sheet contains the fields: `measurement_group`, `column_name`, `abbr`, and `unit`.
 -   **Failure**: Missing fields are reported.
 
-### **4. Check for Unique `sample_id` Values**
+### **4. Check for Unique `sample_id`, `field_id`, and `field_name` Values**
 
--   **Purpose**: Ensures the `sample_id` column (if present) contains unique values.\
+-   **Purpose**: Ensures the `sample_id` column contains unique values and `field_id` and `field_name` values are unique for each `producer_id`.
 -   **Failure**: Duplicate values are listed in the error message.
 
 ### **5. Check for Additional Columns in "Data"**
 
--   **Purpose**: Ensures that the "Data" sheet has at least one additional column beyond the required fields.\
+-   **Purpose**: Ensures that the "Data" sheet has at least one additional column (each additional column = one soil health measurement) beyond the required fields.
 -   **Failure**: Returns an error if no additional columns exist.
 
 ### **6. Validate Data Types of Required Columns**
 
--   **Purpose**: Compares the actual data types in the "Data" sheet with the expected types specified in `req_fields`.\
--   **Failure**: Columns with mismatched data types are listed.
+-   **Purpose**: Compares the actual data types in the "Data" sheet with the expected types specified in `app/files/required_fields.csv`.
+-   **Failure**: Columns with mismatched data types are listed with the actual and expected data types.
 
 ### **7. Check for Missing Values in Required Columns**
 
--   **Purpose**: Identifies missing values (`NA`) in the required columns of the "Data" sheet.\
+-   **Purpose**: Identifies missing values (`NA`) in the required columns where `missing_values_allowed == FALSE` as specified in `app/files/required_fields.csv`.
 -   **Failure**: Columns with missing values are listed.
 
 ### **8. Verify Additional Columns in "Data" Match "Data Dictionary"**
 
 -   **Purpose**: Ensures that:
-    -   All additional columns in "Data" exist in the "Data Dictionary" (`column_name`).\
-    -   All `column_name` values in the "Data Dictionary" are present in "Data."\
+    -   All additional columns in "Data" exist in the "Data Dictionary" (`column_name`).
+    -   All `column_name` values in the "Data Dictionary" are present in "Data."
 -   **Failure**: Missing or mismatched columns are reported.
