@@ -31,6 +31,18 @@ body {
     font-weight: bold;
 }
 
+.navbar-default .navbar-nav a:hover {   
+    color: white!important; 
+    background-color: var(--soil-brown)!important;
+}
+
+
+
+.shiny-input-container:not(.shiny-input-container-inline) {
+  width:100%;
+  max-width:800px;
+}
+
 .output-selection, .language-selection {
         display: flex;
         justify-content: center;
@@ -293,7 +305,7 @@ h1, h2, h3 {
 }
 
 .banner-bg {
-      background-image: url('soil_v2.jpeg');
+      background-image: url('pictures/soil_v2.jpeg');
       height: 100vh;
       width:100%;
       background-position: center;
@@ -519,7 +531,7 @@ p {
 .form-content {
   flex: 1;
   max-width: 600px;
-  min-height:480px;
+  min-height:600px;
   display: flex;
   flex-direction: column;
   height: 100%; /* Consistent height for the form */

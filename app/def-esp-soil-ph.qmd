@@ -1,0 +1,12 @@
+***El pH del suelo*** describe qué tan ácido (pH menor a 7.0) o alcalino (pH
+mayor que 7.0) es el suelo, y es una medida de la concentración de iones de
+hidrógeno en la solución del suelo. Muchos nutrientes esenciales como P, Fe, Mn,
+Zn, Cu, Co y B se vuelven menos disponibles para las plantas a pH alcalinos.
+Otros nutrientes como el Al o el B pueden volverse tóxicos a pH ácidos. El pH
+del suelo también afecta a las poblaciones microbianas que pueden vivir en el
+suelo. El pH del suelo se ve afectado por las cualidades inherentes del suelo,
+como su edad, mineralogía y zona de lluvia. También se ve afectado por la
+fertilización, el pH del agua de riego y el contenido de SOM. La mayoría de los
+cultivos agrícolas crecen mejor en pH neutros del suelo, dentro de un rango de 6
+a 8. El pH del suelo puede reducirse con azufre o aumentarse añadiendo cal
+agrícola.

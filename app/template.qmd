@@ -12,29 +12,228 @@ format:
   docx: 
     toc: false
     reference-doc: resources/word-template.docx
+execute:
+    echo: false
+    warning: false
 params:
   project: Test Project
   year: 2023
+  definition_file: "files/measurement_dictionary.csv"
+  measures: ["def-texture.qmd", "def-bulk-density.qmd", "def-soil-ph.qmd", "def-total-nitro.qmd"]
+  project_summary: "Example of a project summary"
+  looking_forward: "Example text for the looking forward section"
+  
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
 ```{r}
-1 + 1
+library(tidyverse)
+
+measures <- unlist(strsplit(params$measures, ","))
+definition_file<-read.csv(params$definition_file)
+#filtered dictionary
+measure_mapping<-definition_file|>filter(file_name %in% measures)
+#unique measure types, e.g. Biological, Phyisical, Etc
+distinct_measure_types<-measure_mapping|>distinct(section_name)|>pull(section_name)
 ```
 
-You can add options to executable code like this 
+
+## `r params$project`
+
+`r params$project_summary`
+
+
+## Soil Health
+
+Soil health is a term that describes how well a soil ecosystem supports plants,
+animals, and humans. It also recognizes the living nature of soils and the
+importance of soil microorganisms. Healthy soils can provide wildlife habitat,
+support biodiversity, reduce the effects of climate change, filter air and
+water, increase crop productivity and food security, and ensure thriving rural
+economies.
+
+::: {.content-visible when-format="html"}
+::: {.callout-tip icon="false"}
+## Qualities of a Healthy Agricultural Soil
+
+-   Good soil tilth allows roots to penetrate
+-   Near neutral pH (6--8) maximizes nutrient availability for most crops, and
+    minimizes Al and Mn toxicity
+-   Sufficient---but not excessive---nutrient supply for crop growth
+-   Small population of plant pathogens and pests
+-   Adequate soil drainage and infiltration
+-   Diverse and active microbial population
+-   Low weed seed bank
+-   No residual chemicals or toxins that may harm the crop, including salts
+-   Resistance to degradation such as from erosion or surface runoff
+:::
+:::
+
+
+## Soil Science 101
+
+A crucial part of the soil health journey is measuring changes in your soil and
+understanding how to interpret those measurements. We can measure soil health
+with a range of indicators describing a soil's physical, chemical, and
+biological properties, which can relate to important soil functions. Each
+indicator measures a different property of the soil and can be affected
+differently by management.
+
+To learn more about management practices that support healthy soil, check out
+these resources from the [Natural Resources Conservation Service (NRCS)
+principles of building soil
+health](https://www.nrcs.usda.gov/conservation-basics/natural-resource-concerns/soils/soil-health "NRCS principles of building soil health").
+
+
+## What We Measured in Your Soil
+
+::: {.content-visible when-format="html"}
+::: panel-tabset
+
+
+```{r, results='asis'}
+for (measure_type in distinct_measure_types) {
+  # Print the section header
+  cat("##", measure_type, "\n\n")
+  
+  # Get measures belonging to this type
+  measures_in_type <- measure_mapping |> 
+    filter(section_name == measure_type) |> 
+    pull(file_name)
+  
+  # Include each measure file
+  for (measure in measures_in_type) {
+    cat("{{< include ", measure, " >}}\n\n")
+  }
+}
+
+```
+:::
+:::
+
+::: {.content-visible unless-format="html"}
+
+```{r, results='asis'}
+for (measure_type in distinct_measure_types) {
+  # Print the section header
+  cat("##", measure_type, "\n\n")
+  
+  # Get measures belonging to this type
+  measures_in_type <- measure_mapping |> 
+    filter(type == measure_type) |> 
+    pull(file_name)
+  
+  # Include each measure file
+  for (measure in measures_in_type) {
+    cat("{{< include ", measure, " >}}\n\n")
+  }
+}
+
+```
+:::
+
+{{< pagebreak >}}
+
+## Soil Health Indicators
+
+The below table describes: 1. What each indicator helps measure in your soil; 2.
+Whether you want the measured value to be higher (more is better), lower (less
+is better), or in the middle (optimal range); and 3. How often to measure each
+indicator. Our understanding of these indicators is rapidly evolving as
+researchers measure them in diverse soils, cropping systems, and climates.
+
+![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-more.png){width="1.5in"
+fig-alt="More is better scoring curve"}![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-optimal.png){width="1.5in"
+fig-alt="Optimal range scoring curve"}![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-less.png){width="1.5in"
+fig-alt="Less is better scoring curve"}
 
 ```{r}
-#| echo: false
-2 * 2
+indicators <- data.frame(
+  "Soil Health Indicator" = c(
+    "ACE Soil Protein",
+    "Aggregate Stability",
+    "Electrical Conductivity (EC)",
+    "Mineralizable Carbon",
+    "Permanganate Oxidizable Carbon (POXC)",
+    "Potentially Mineralizable Nitrogen (PMN)",
+    "Soil pH",
+    "Total Nitrogen",
+    "Plant Essential Nutrients",
+    "Bulk Density",
+    "Cation Exchange Capacity",
+    "Infiltration",
+    "Soil Organic Matter (SOM)",
+    "Water Holding Capacity (WHC)"
+  ),
+  "Soil Function" = c(
+    "Nutrient cycling, biodiversity & habitat, filtering & resilience",
+    "Physical support, water relations, biodiversity & habitat, filtering & resilience",
+    "Physical support, nutrient cycling, filtering & resilience",
+    "Nutrient cycling, biodiversity & habitat, filtering & resilience",
+    "Biodiversity & habitat, nutrient cycling, filtering & resilience",
+    "Nutrient cycling, biodiversity & habitat, filtering & resilience",
+    "Nutrient cycling, filtering & resilience",
+    "Nutrient cycling, biodiversity & habitat, filtering & resilience",
+    "Nutrient cycling",
+    "Physical support, water relations, biodiversity & habitat, filtering & resilience",
+    "Nutrient cycling, filtering & resilience",
+    "Water relations, physical support",
+    "Nutrient cycling, filtering & resilience",
+    "Water relations, physical support"
+  ),
+  "Measure every" = c(
+    "1-3 years",
+    "1-3 years",
+    "1-3 years",
+    "1-3 years",
+    "1-3 years",
+    "1-3 years",
+    "1-3 years",
+    "1-3 years",
+    "1-3 years",
+    "3-5 years",
+    "3-5 years",
+    "3-5 years",
+    "3-5 years",
+    "3-5 years"
+  ),
+  "Scoring Curve Type" = c(
+    "More is better",
+    "More is better",
+    "Less is better",
+    "More is better",
+    "More is better",
+    "More is better",
+    "Optimal range",
+    "Optimal range",
+    "Optimal range",
+    "Optimal range",
+    "More is better",
+    "More is better",
+    "More is better",
+    "More is better"
+  ),
+  check.names = FALSE
+)
+
+flextable::as_grouped_data(indicators, groups = "Measure every") |>
+  flextable::as_flextable() |>
+  # soils::style_ft(
+  #   header_font = header_font,
+  #   body_font = body_font,
+  #   header_color = header_color,
+  #   header_text_color = header_text_color,
+  #   border_color = border_color
+  # ) |>
+#  flextable::bg(i = ~ !is.na(`Measure every`), bg = lighter_color) |> 
+  flextable::set_table_properties(layout = "autofit")
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+## Soil Health Testing
 
+![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/quality-results.png){width="6.5in"
+fig-alt="Infographic titled How to Get Quality Results. Be Consistent: sample at the same time each year; send samples to the same lab; keep samples cool and get them to the lab quickly; keep good records of lab results. Context matters: not all soils are created equal; indicators are impacted by inherent properties like climate and soil texture; as well as by management; don't be alarmed if your soil is below the optimal range fro some indicators, see how far you can take your soil with management but know there may be inherent limitations. Back to the Basics: old school measurements like pH, texture, and soil organic matter are still incredible important; new indicators are constantly being developed, don't feel you have to measure all of them, or let the process overwhelm you; have fun exploring through a soil health lens, but remember that you know your soil better than anyone! Be Patient: some measurements may not change as quickly as you'd like; sampling across time is very important, our scientific understanding of these measurements is evolving; we are all on this journey together."}
+
+
+## Looking Forward
+
+`r params$looking_forward`

@@ -1,21 +1,47 @@
 server <- function(input, output, session) {
   
+  #mapping file for data dictionary input, different ones for english & spanish
+  measure_mapping<-read.csv("files/measurement_dictionary.csv")
+  measure_mapping_esp<-read.csv("files/measurement_dictionary_esp.csv")
+  
+  
   # Disable Step 4 on app load
   shinyjs::runjs("document.getElementById('step-2').classList.add('disabled');")
   shinyjs::disable("report")
-    
+  shinyjs::enable("downloadTemplate")
+  shinyjs::runjs("document.getElementById('step-2').classList.remove('disabled');")
+  
+  #default language input value to english template (custom input)
   observe({
-    if(!is.null(input$language)){
-      shinyjs::enable("next1")
-      shinyjs::enable("downloadTemplate")
-      shinyjs::runjs("document.getElementById('step-2').classList.remove('disabled');")
-    }
-    else{
-      shinyjs::disable("next1")
-      shinyjs::disable("downloadTemplate")
-      shinyjs::runjs("document.getElementById('step-2').classList.add('disabled');")
+    if (is.null(input$language)) {
+      updateTextInput(session, "language", value = "template.qmd")
     }
   })
+  
+  
+  #UPDATE DICTIONARY SELECTION OPTIONS BASED ON LANGUAGE TEMPLATE
+  observeEvent(input$language, {
+    #update to english choices
+    if(input$language == "template.qmd"){
+      updated_measurements<-measure_mapping%>%
+        split(.$type)%>%
+        map(~ setNames(.x$file_name, .x$name))  
+      
+    }
+    #update to spanish choices
+    else if(input$language == "template_esp.qmd"){
+      updated_measurements<-measure_mapping_esp%>%
+        split(.$type)%>%
+        map(~ setNames(.x$file_name, .x$name))  
+      
+    }
+    
+    updateVirtualSelect(
+      inputId = "measurement_definitions",
+      choices = updated_measurements
+    )
+  })
+    
   
   observe({
     if(!is.null(input$format)){
@@ -172,14 +198,14 @@ server <- function(input, output, session) {
   
   observe({
     if (is.null(input$producer_id) || length(input$producer_id) == 0) {
-      # Disable Step 4 if no producer IDs are selected
+      # Disabl Build Repor if no producer IDs are selected
       shinyjs::runjs("document.getElementById('step-4').classList.add('disabled');")
-      shinyjs::disable("next3")
+      shinyjs::disable("report")
       
     } else {
-      # Enable Step 4 if producer IDs are selected
+      # Enable Build 4 if producer IDs are selected
       shinyjs::runjs("document.getElementById('step-4').classList.remove('disabled');")
-      shinyjs::enable("next3")
+      shinyjs::enable("report")
       
     }
   })
@@ -210,11 +236,16 @@ server <- function(input, output, session) {
           tryCatch({
             incProgress(1 / steps, detail = paste("Generating report", i, "of", num_producers))
             quarto::quarto_render(
-              input = input$language,
+              #input = input$language,
+              input = "template.qmd",
+             # output_format = "docx",
               output_format = input$format,
               execute_params = list(
                 project = input$producer_id[i],
-                year = input$year
+                year = input$year,
+                measures = input$measurement_definitions,
+                looking_forward = input$looking_forward,
+                project_summary = input$project_summary
               ),
               output_file = report_name
             )

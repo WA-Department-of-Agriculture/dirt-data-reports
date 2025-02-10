@@ -1,5 +1,5 @@
 ---
-title: "Resultados del Proyecto `r params$project`"
+title: "Resultados del Projecto `r params$project`"
 subtitle: "Primavera `r params$year`"
 format:
   html: 
@@ -12,29 +12,233 @@ format:
   docx: 
     toc: false
     reference-doc: resources/word-template.docx
+execute:
+    echo: false
+    warning: false
 params:
   project: Test Project
   year: 2023
+  definition_file: "files/measurement_dictionary_esp.csv"
+  measures: ["def-esp-texture.qmd", "def-esp-bulk-density.qmd", "def-esp-soil-ph.qmd", "def-esp-total-nitro.qmd"]
+  project_summary: "Example of a project summary"
+  looking_forward: "Example text for the looking forward section"
+  
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
 ```{r}
-1 + 1
+library(tidyverse)
+
+measures <- unlist(strsplit(params$measures, ","))
+definition_file<-read.csv(params$definition_file)
+#filtered dictionary
+measure_mapping<-definition_file|>filter(file_name %in% measures)
+#unique measure types, e.g. Biological, Phyisical, Etc
+distinct_measure_types<-measure_mapping|>distinct(section_name)|>pull(section_name)
 ```
 
-You can add options to executable code like this 
+
+## `r params$project`
+`r params$project_summary`
+
+## Salud del suelo
+
+La salud del suelo es un término que describe qué tan bien un ecosistema del
+suelo sustenta a las plantas, los animales y los seres humanos. También reconoce
+la naturaleza viva de los suelos y la importancia de los microorganismos del
+suelo. Los suelos sanos pueden proporcionar un hábitat para la vida silvestre,
+apoyar la biodiversidad, reducir los efectos del cambio climático, filtrar el
+aire y el agua, aumentar la productividad de los cultivos y la seguridad
+alimentaria, y garantizar economías rurales prósperas.
+
+::: {.content-visible when-format="html"}
+::: {.callout-tip icon="false"}
+## Calidades del Suelo Agrícola Saludable
+
+-   Una buena labranza del suelo permite que las raíces penetren
+-   El pH casi neutro (6-8) maximiza la disponibilidad de nutrientes para la
+    mayoría de los cultivos
+-   El pH casi neutro también minimiza la toxicidad de Al y Mn
+-   Suministro de nutrientes Suficiente, pero no excesivo, para el crecimiento
+    de los cultivos
+-   Pequeña población de patógenos y plagas
+-   Drenaje e infiltración adecuados del suelo
+-   Población microbiana diversa y activa
+-   Banco de semillas de malezas bajas
+-   Sin productos químicos residuales o toxinas que puedan dañar el cultivo,
+    incluidas las sales
+-   Resistencia a la degradación, como la de la erosión o la escorrentía
+    superficial
+:::
+:::
+
+
+## Ciencia del suelo 101
+
+Una parte crucial del viaje hacia la salud del suelo es medir los cambios en el
+suelo y comprender cómo interpretar esas mediciones. Podemos medir la salud del
+suelo con una serie de indicadores que describen las propiedades físicas,
+químicas y biológicas de un suelo, que pueden relacionarse con funciones
+importantes del suelo. Cada indicador mide una propiedad diferente del suelo y
+puede verse afectado de manera diferente por el manejo.
+
+Para obtener más información sobre las prácticas de manejo que apoyan la salud
+del suelo, consulte estos recursos de los [principios del Servicio de
+Conservación de Recursos Naturales (NRCS, por sus siglas en inglés) para mejorar
+la salud del
+suelo](https://www.nrcs.usda.gov/conservation-basics/natural-resource-concerns/soils/soil-health).
+
+## Lo que medimos en su suelo
+
+::: {.content-visible when-format="html"}
+::: panel-tabset
+
+
+```{r, results='asis'}
+for (measure_type in distinct_measure_types) {
+  # Print the section header
+  cat("##", measure_type, "\n\n")
+  
+  # Get measures belonging to this type
+  measures_in_type <- measure_mapping |> 
+    filter(section_name == measure_type) |> 
+    pull(file_name)
+  
+  # Include each measure file
+  for (measure in measures_in_type) {
+    cat("{{< include ", measure, " >}}\n\n")
+  }
+}
+
+```
+:::
+:::
+
+::: {.content-visible unless-format="html"}
+
+```{r, results='asis'}
+for (measure_type in distinct_measure_types) {
+  # Print the section header
+  cat("##", measure_type, "\n\n")
+  
+  # Get measures belonging to this type
+  measures_in_type <- measure_mapping |> 
+    filter(section_name == measure_type) |> 
+    pull(file_name)
+  
+  # Include each measure file
+  for (measure in measures_in_type) {
+    cat("{{< include ", measure, " >}}\n\n")
+  }
+}
+
+```
+:::
+
+{{< pagebreak >}}
+
+## Indicadores de salud del suelo
+
+La siguiente tabla describe: 1. Lo que cada indicador ayuda a medir en su suelo;
+2. Si desea que el valor medido sea más alto (más es mejor), más bajo (menos es
+mejor), o en el medio (rango óptimo); y 3. Con qué frecuencia medir cada
+indicador. Nuestro conocimiento de estos indicadores evoluciona rápidamente a
+medida que los investigadores los miden en diversos suelos, sistemas de cultivo
+y climas.
 
 ```{r}
-#| echo: false
-2 * 2
+indicators <- data.frame(
+  "Indicadores de salud del suelo" = c(
+    "La proteína del suelo ACE",
+    "La estabilidad de agregados",
+    "Conductividad eléctrica (EC)",
+    "El carbono potencialmente mineralizable (MinC)",
+    "El carbono oxidable de permanganato (POXC)",
+    "El nitrógeno potencialmente mineralizable (PMN)",
+    "El pH del suelo",
+    "Nitrógeno total",
+    "Los nutrientes esenciales de las plantas",
+    "Densidad aparente",
+    "Capacidad de intercambio catiónico (CEC)",
+    "La infiltración",
+    "Materia organica (SOM)",
+    "Capacidad de retención de agua (WHC)"
+  ),
+  "Función del suelo" = c(
+    "Ciclo de nutrientes, biodiversidad y hábitat, filtración y resiliencia",
+    "Soporte físico, relaciones hídricas, biodiversidad y hábitat, filtración y resiliencia",
+    "Soporte físico, ciclo de nutrientes, filtración y resiliencia",
+    "Ciclo de nutrientes, biodiversidad y hábitat, filtración y resiliencia",
+    "Biodiversidad y hábitat, Ciclo de nutrientes, filtración y resiliencia",
+    "Ciclo de nutrientes, biodiversidad y hábitat, filtración y resiliencia",
+    "Nutrient cycling, filtración y resiliencia",
+    "Ciclo de nutrientes, biodiversidad y hábitat, filtración y resiliencia",
+    "Ciclo de nutrientes",
+    "Soporte físico, relaciones hídricas, biodiversidad y hábitat, filtración y resiliencia",
+    "Ciclo de nutrientes, filtración y resiliencia",
+    "Relaciones hídricas, soporte físico",
+    "Ciclo de nutrientes, filtración y resiliencia",
+    "Relaciones hídricas, soporte físico"
+  ),
+  "Medir cada" = c(
+    "1-3 años",
+    "1-3 años",
+    "1-3 años",
+    "1-3 años",
+    "1-3 años",
+    "1-3 años",
+    "1-3 años",
+    "1-3 años",
+    "1-3 años",
+    "3-5 años",
+    "3-5 años",
+    "3-5 años",
+    "3-5 años",
+    "3-5 años"
+  ),
+  "Tipo de curva y mejoría" = c(
+    "Más es mejor",
+    "Más es mejor",
+    "Menos es mejor",
+    "Más es mejor",
+    "Más es mejor",
+    "Más es mejor",
+    "Rango óptimo",
+    "Rango óptimo",
+    "Rango óptimo",
+    "Rango óptimo",
+    "Más es mejor",
+    "Más es mejor",
+    "Más es mejor",
+    "Más es mejor"
+  ),
+  check.names = FALSE
+)
+
+flextable::as_grouped_data(indicators, groups = "Medir cada") |>
+  flextable::as_flextable() |>
+  # soils::style_ft(
+  #   header_font = header_font,
+  #   body_font = body_font,
+  #   header_color = header_color,
+  #   header_text_color = header_text_color,
+  #   border_color = border_color
+  # ) |>
+ # flextable::bg(i = ~ !is.na(`Medir cada`), bg = lighter_color) |> 
+  flextable::set_table_properties(layout = "autofit")
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+## Pruebas de salud del suelo
 
+![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/quality-results-spanish.png){width="6.5in"
+fig-alt="Infografía titulada Cómo obtener resultados de calidad. Sea consistente: tome muestras en la mismo tiempo cada año; enviar muestras al mismo laboratorio; mantenga las muestras frescas y llévelas al laboratorio rápidamente; Mantenga buenos registros de los resultados de laboratorio. El contexto importa: no todos los suelos son iguales; los indicadores se ven afectados por propiedades inherentes como el clima y la textura del suelo; así como por la dirección; no se alarme si su suelo está por debajo del rango óptimo para algunos indicadores, vea hasta dónde puede llevar su suelo con el manejo de suelo, pero sepa que puede haber limitaciones inherentes. De regreso a lo básico: las mediciones usadas en el pasado como el pH, la textura y la materia orgánica del suelo siguen siendo increíblemente importantes; constantemente se desarrollan nuevos indicadores, no sienta que tiene que medirlos todos o dejar que el proceso sea agobiante; Diviértete explorando a través de recursos academicos de la salud del suelo, ¡pero recuerda que conoces tu suelo mejor que nadie! Sea paciente: es posible que algunas medidas no cambien tan rápido como le gustaría; Las muestras a lo largo del tiempo es muy importante; nuestra comprensión científica de estas mediciones está evolucionando; todos estamos juntos en este viaje."}
+
+## Comprender los resultados de la salud del suelo
+
+Para obtener más información sobre cómo interpretar los resultados de la salud
+del suelo, vea el seminario web de Dani Gelardi ["Comprender las pruebas de
+suelo"](https://youtu.be/-ED-gGk4yb8?si=fxfnxqrRqhkGDaiu).
+
+
+## Esperando
+
+`r params$looking_forward`

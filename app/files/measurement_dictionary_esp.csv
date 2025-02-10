@@ -1,0 +1,17 @@
+type,section_name,name,file_name
+Physical,Fisico,Texture,def-esp-texture.qmd
+Physical,Fisico,Bulk Density,def-esp-bulk-density.qmd
+Physical,Fisico,Infiltration,def-esp-infiltration.qmd
+Physical,Fisico,Water Holding Capacity,def-esp-water-holding.qmd
+Physical,Fisico,Aggregate Stability,def-esp-agg-stability.qmd
+Biological,Biologico,Organic Matter,def-esp-organic-matter.qmd
+Biological,Biologico,Mineralizable Carbon,def-esp-min-carbon.qmd
+Biological,Biologico,Oxidizable Carbon,def-esp-ox-carbon.qmd
+Biological,Biologico,Mieralizable Nitrogen,def-esp-min-nitro.qmd
+Biological,Biologico,ACE Soil Proten,def-esp-ace-soil.qmd
+Chemical,Quimico,Plant Essential Nutrients,def-esp-plant-essentialsl.qmd
+Chemical,Quimico,Soil pH,def-esp-soil-ph.qmd
+Chemical,Quimico,Electrical Conductivity,def-esp-elec-con.qmd
+Chemical,Quimico,Cation Exchange Capacity,def-esp-cation-ex.qmd
+Chemical,Quimico,Total Nitrogen,def-esp-total-nitro.qmd
+Chemical,Quimico,Inorganic Carbon,def-esp-inorganic-carb.qmd

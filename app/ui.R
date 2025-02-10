@@ -5,6 +5,7 @@ library(rmarkdown)
 library(zip)
 library(readxl)
 library(gt)
+library(tidyverse)
 library(dplyr)
 library(readxl)
 library(shinybusy)
@@ -12,20 +13,31 @@ library(shinybusy)
 source("utils/functions.R")
 source("utils/data_validation.R")
 
+#mapping file for english by default
+measure_mapping<-read.csv("files/measurement_dictionary.csv")
+
+#create measure list choices
+measurement_list<-measure_mapping%>%
+  split(.$type)%>%
+  map(~ setNames(.x$file_name, .x$name))  
+
 
 ui <- navbarPage(
   title = actionLink(inputId="title", 
-                     tags$div(style='display:flex;gap:8px;align-items:center', tags$img(src="wshi.png", style='height:20px'),
-                              tags$div(class='title-name', style='font-size:16px', "WSDA Soil Health Reports"))
+                     tags$div(style='display:flex;gap:8px;align-items:center', tags$img(src="pictures/wshi.png", style='height:20px'),
+                              tags$div(class='title-name', style='font-size:16px', "Soil Health Reports"))
   ),
   windowTitle = "WSDA Soil Health Reports",
   id = "main_page",
   collapsible = TRUE,
-  selected = "page_home",
+  selected = "page_generate_report",
   header = tags$head(
     tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"),
     tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
-    tags$script(src = "scripts.js"),
+    tags$script(src = "scripts/toc.js"),
+    tags$script(src = "scripts/stepper.js"),
+    tags$script(src = "scripts/inputButtonFormat.js"),
+    tags$script(src = "scripts/inputButtonLanguage.js"),
     shinyjs::useShinyjs()
   ),
   tabPanel("Home",
@@ -37,13 +49,13 @@ ui <- navbarPage(
                    p(style="color:#acacac;", 
                    "Brought to you by the Washington State Department of Agriculture and the Washington Soil Health Initiative. Build custom soil health reports for each participant in your soil sampling project.", style='font-size:20px;'),
                    tags$div(style='display:flex;justify-content:center;gap:20px;width:100%;margin-top:20px',
-                     actionButton("redirect_generate_report", "Build Report", class='home-btn'),
+                     actionButton("redirect_generate_report", "Build Reports", class='home-btn'),
                      actionButton("redirect_learn_more", "Learn More", class='home-btn')
                    )
                )                   
            )),  
   tabPanel(
-    title = "Generate Reports",
+    title = "Build Reports",
     value = "page_generate_report",
     div(
       class = "container-reports",
@@ -77,7 +89,7 @@ ui <- navbarPage(
               div(class = "step-circle", shiny::icon("file-alt")), 
               div(
                 div(class = "step-num", "Step 4"),
-                div(class = "step-text", "Generate Report")
+                div(class = "step-text", "Build Report")
               )
           )
         ),
@@ -112,12 +124,12 @@ ui <- navbarPage(
             h4(class="form-step", "Step 1"),
             h2(class="form-title", "Download Template"),
             p(class="form-text",
-            "Select your preferred language for your report output, then download the data template."
+            "Choose a report language. Download the Excel template and replace example data with your own."
             ),
             div(
               class = "language-selection",
               tags$div(
-                class = "language-button english",
+                class = "language-button english active",
                 id = "englishLang",
                 tags$div(
                   class = "language-circle",
@@ -139,7 +151,7 @@ ui <- navbarPage(
                 disabled(downloadButton("downloadTemplate", "Download Template", style = "margin-top:20px;width:320px;"))
                 ),
             div(class = "buttons", style='justify-content:flex-end;',
-                actionButton("next1", "Next", class = "next", disabled = TRUE))
+                actionButton("next1", "Next", class = "next"))
           ),
           
           # Step 2 Content
@@ -164,7 +176,37 @@ ui <- navbarPage(
             class = "form-content", id = "form-3",
             h4(class="form-step", "Step 3"),
             h2(class="form-title", "Report Parameters"),
-            p(class='form-text', "Select parameters to apply to your reports. A maximum of 5 producer IDs can be selected per report batch."),
+            p(class='form-text', "Customize the report with project-specific information."),
+             textAreaInput( 
+                "project_summary", 
+                "Project Summary Description", 
+                value = "Insert text here about your project summary"
+              ), 
+            virtualSelectInput(
+              inputId = "measurement_definitions",
+              label = "Include Definitions",
+              #created from measurement mapping file- defaults to english qmds
+              choices = measurement_list,
+              showValueAsTags = TRUE,
+              search = TRUE,
+              multiple = TRUE
+            ),
+            textAreaInput( 
+              "looking_forward", 
+              "Looking Forward", 
+              value = "Insert text to add to the look forward section"
+            ), 
+            div(class = "buttons",
+                actionButton("prev3", "Previous", class = "prev"),
+                actionButton("next3", "Next", class = "next"))
+          ),
+          
+          # Step 4 Content
+          div(
+            class = "form-content", id = "form-4",
+            h4(class="form-step", "Step 4"),
+            h2(class="form-title","Build Report"),
+            p(class="form-text", "Automatically build custom reports for all participants. Reports will be generated in a zip file within your Downloads folder."),
             tags$div(class="col-2",
                      selectInput(
                        inputId = "year",
@@ -185,17 +227,6 @@ ui <- navbarPage(
                        multiple = TRUE
                      )
             ),
-            div(class = "buttons",
-                actionButton("prev3", "Previous", class = "prev"),
-                actionButton("next3", "Next", class = "next", disabled = TRUE))
-          ),
-          
-          # Step 4 Content
-          div(
-            class = "form-content", id = "form-4",
-            h4(class="form-step", "Step 4"),
-            h2(class="form-title","Generate Report"),
-            p(class="form-text", "Confirm your preferred report file type, then click below to generate your report."),
             # Output Selection Buttons
             div(
               class = "output-selection",
@@ -214,7 +245,7 @@ ui <- navbarPage(
             ),
             div(class = "buttons",
                 actionButton("prev4", "Previous", class = "prev"),
-                disabled(downloadButton("report", "Generate", icon=NULL, style='display:flex;align-items:center;'))
+                disabled(downloadButton("report", "Build", icon=NULL, style='display:flex;align-items:center;'))
                 
             )
           )
@@ -225,7 +256,7 @@ ui <- navbarPage(
   tabPanel(
     title = "Learn More",
     value = "page_learn_more",
-    create_hero("Learn More", 'default-hero.png'),
+    create_hero("Learn More", 'pictures/default-hero.png'),
     div(
       class = "content-container",
       div(
