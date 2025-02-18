@@ -139,30 +139,35 @@ server <- function(input, output, session) {
         data(uploaded_data) # Store data for future use
         
         # Update the 'year' selectInput with unique years
-        years <- uploaded_data |> 
-          dplyr::distinct(year) |> 
-          dplyr::arrange(year) |> 
+        years <- uploaded_data |>
+          dplyr::distinct(year) |>
+          dplyr::arrange(desc(year)) |>
           dplyr::pull()
         
         updateSelectInput(
           session = session,
           inputId = "year",
           choices = years,
-          selected = years[1] # Default to the first year
+          selected = years[1] # Default to the most recent year
         )
         
-        # Update the 'producer_id' pickerInput for the first year
-        ids <- uploaded_data |> 
-          dplyr::filter(year == years[1]) |> 
-          dplyr::distinct(producer_id) |> 
-          dplyr::arrange(producer_id) |> 
-          dplyr::pull()
-        
-        shinyWidgets::updatePickerInput(
-          session = session,
-          inputId = "producer_id",
-          choices = ids,
-          selected = NULL # No selection by default
+        # Update the 'producer_id' pickerInput based on the `year` selection
+        observeEvent(
+          input$year,
+          handlerExpr = {
+            ids <- uploaded_data |>
+              dplyr::distinct(year, producer_id) |>
+              dplyr::filter(year %in% input$year) |>
+              dplyr::arrange(producer_id) |>
+              dplyr::pull()
+            
+            shinyWidgets::updatePickerInput(
+              session = session,
+              inputId = "producer_id",
+              choices = ids,
+              selected = input$producer_id
+            )
+          }
         )
       } else {
         # Extract and display validation errors as a bulleted list
