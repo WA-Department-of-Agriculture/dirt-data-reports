@@ -85,7 +85,8 @@ server <- function(input, output, session) {
   observeEvent(input$next3, { shinyjs::runjs("setStep(4);") })
   observeEvent(input$prev4, { shinyjs::runjs("setStep(3);") })
   
-# Download report template
+
+  # Download report template, evaluate which template based on language selection
 output$downloadTemplate <- downloadHandler(
   filename = function() {
     template_file <- if (input$language == "template_esp.qmd") {

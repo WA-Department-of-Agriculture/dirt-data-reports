@@ -1,12 +1,16 @@
-var,var_type
-year,double
-sample_id,-
-farm_name,-
-producer_id,-
-field_name,char
-field_id,-
-county,char
-crop,char
-longitude,double
-latitude,double
-texture,char
+var,var_type,sheet
+year,double,Data
+sample_id,-,Data
+farm_name,-,Data
+producer_id,-,Data
+field_name,char,Data
+field_id,-,Data
+county,char,Data
+crop,char,Data
+longitude,double,Data
+latitude,double,Data
+texture,char,Data
+measurement_group_label,char,Data Dictionary
+column_name,char,Data Dictionary
+abbr,char,Data Dictionary
+unit,char,Data Dictionary

@@ -2,6 +2,12 @@ library(tidyverse)
 library(readxl)
 
 validate_data_file <- function(file, req_fields) {
+  
+  req_fields_data<-req_fields|>filter(sheet=="Data")
+  req_fields_dd<-req_fields|>filter(sheet=="Data Dictionary")
+  
+  
+  
   error_list <- list()
   
   ### Check 1: Does the xlsx file have 'Data' and 'Data Dictionary' tabs?
@@ -35,7 +41,7 @@ validate_data_file <- function(file, req_fields) {
   }
   
   ### Check 2: Does 'Data' have required columns?
-  required_columns <- req_fields$var
+  required_columns <- req_fields_data$var
   check2 <- all(required_columns %in% colnames(data))
   
   if (!check2) {
@@ -43,7 +49,7 @@ validate_data_file <- function(file, req_fields) {
   }
   
   ### Check 3: Does 'Data Dictionary' have required fields?
-  required_dict_fields <- c("measurement_group", "measurement_group_label", "column_name", "abbr", "unit")
+  required_dict_fields <- req_fields_dd$var
   check3 <- all(required_dict_fields %in% colnames(data_dict))
   
   if (!check3) {
@@ -86,9 +92,9 @@ validate_data_file <- function(file, req_fields) {
     }
     
     actual_types <- sapply(data, typeof)
-    expected_types <- set_names(map_r_type(req_fields$var_type), req_fields$var)
+    expected_types <- set_names(map_r_type(req_fields_data$var_type), req_fields_data$var)
     
-    mismatched_types <- req_fields %>%
+    mismatched_types <- req_fields_data %>%
       filter(var_type != "-") %>%
       filter(var %in% names(actual_types) & map_r_type(var_type) != actual_types[var])
     
@@ -112,6 +118,7 @@ validate_data_file <- function(file, req_fields) {
   ### Check 8: Do additional columns in 'Data' match values in 'Data Dictionary'?
   if (check2 && check3) {
     additional_columns <- setdiff(colnames(data), required_columns)
+    additional_columns <- c("texture", additional_columns)
     dict_column_names <- data_dict$column_name
     missing_in_dict <- setdiff(additional_columns, dict_column_names)
     missing_in_data <- setdiff(dict_column_names, additional_columns)
