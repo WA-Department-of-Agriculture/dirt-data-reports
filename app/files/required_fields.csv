@@ -1,16 +1,16 @@
-var,var_type,sheet
-year,double,Data
-sample_id,-,Data
-farm_name,-,Data
-producer_id,-,Data
-field_name,char,Data
-field_id,-,Data
-county,char,Data
-crop,char,Data
-longitude,double,Data
-latitude,double,Data
-texture,char,Data
-measurement_group_label,char,Data Dictionary
-column_name,char,Data Dictionary
-abbr,char,Data Dictionary
-unit,char,Data Dictionary
+var,var_type,missing_allowed,unique_by,sheet
+year,double,FALSE,-,Data
+sample_id,-,FALSE,sample_id,Data
+farm_name,-,TRUE,-,Data
+producer_id,-,FALSE,-,Data
+field_name,char,FALSE,-,Data
+field_id,-,FALSE,-,Data
+county,char,FALSE,-,Data
+crop,char,TRIE,-,Data
+longitude,double,TRUE,-,Data
+latitude,double,TRUE,-,Data
+texture,char,FALSE,-,Data
+measurement_group,char,FALSE,-,Data Dictionary
+column_name,char,FALSE,-,Data Dictionary
+abbr,char,FALSE,-,Data Dictionary
+unit,char,FALSE,-,Data Dictionary

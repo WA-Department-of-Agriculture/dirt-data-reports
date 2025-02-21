@@ -1,12 +1,59 @@
 library(tidyverse)
 library(readxl)
 
+library(tidyverse)
+
+validate_uniqueness <- function(data, req_fields) {
+  error_list <- list()
+  
+  unique_checks <- req_fields |> filter(unique_by != "-")
+  
+  for (i in seq_len(nrow(unique_checks))) {
+    var_name <- unique_checks$var[i]          #
+    # Split multiple vars by comma
+    group_by_vars <- str_split(unique_checks$unique_by[i], ",\\s*")[[1]]  
+    
+    # Ensure all columns exist in the data
+    if (var_name %in% colnames(data) && all(group_by_vars %in% colnames(data))) {
+      
+      if (length(group_by_vars) == 1 && group_by_vars == var_name) {
+        # Case where var_name itself must be unique (e.g., sample_id is lobally unique)
+        duplicates <- data %>%
+          count(!!sym(var_name)) %>%
+          filter(n > 1)
+        
+        if (nrow(duplicates) > 0) {
+          error_list[[var_name]] <- paste(
+            "Duplicate values found in", var_name, 
+            "which should be unique:", paste(duplicates[[var_name]], collapse = ", ")
+          )
+        }
+      } else {
+        # Case where var_name must be unique within a grouping of multiple columns
+        duplicates <- data %>%
+          group_by(across(all_of(group_by_vars))) %>%
+          summarise(unique_values = n_distinct(!!sym(var_name)), .groups = "drop") %>%
+          filter(unique_values > 1)
+        
+        if (nrow(duplicates) > 0) {
+          error_list[[var_name]] <- paste(
+            "Duplicate values found in", var_name, 
+            "within grouping of", paste(group_by_vars, collapse = ", "), 
+            "for:", paste(duplicates[[group_by_vars[1]]], collapse = ", ")
+          )
+        }
+      }
+    }
+  }
+  
+  return(error_list)
+}
+
+
 validate_data_file <- function(file, req_fields) {
   
-  req_fields_data<-req_fields|>filter(sheet=="Data")
-  req_fields_dd<-req_fields|>filter(sheet=="Data Dictionary")
-  
-  
+  req_fields_data <- req_fields |> filter(sheet == "Data")
+  req_fields_dd <- req_fields |> filter(sheet == "Data Dictionary")
   
   error_list <- list()
   
@@ -56,18 +103,11 @@ validate_data_file <- function(file, req_fields) {
     error_list$check3 <- paste("Missing fields in 'Data Dictionary':", paste(setdiff(required_dict_fields, colnames(data_dict)), collapse = ", "))
   }
   
-  ### Check 4: Are 'sample_id' values unique?
+  ## Check 4: Are required unique columns truly unique?
   if (check2) {
-    if (!"sample_id" %in% required_columns) {
-      error_list$check4 <- "The 'sample_id' column is missing from the required fields and must be included."
-    } else {
-      duplicate_sample_ids <- data %>%
-        count(sample_id) %>%
-        filter(n > 1)
-      
-      if (nrow(duplicate_sample_ids) > 0) {
-        error_list$check4 <- paste("Duplicate 'sample_id' values found:", paste(duplicate_sample_ids$sample_id, collapse = ", "))
-      }
+    unique_check<-validate_uniqueness(data, req_fields_data)
+    if(length(unique_check)>0){
+      error_list$check4<-unique_check
     }
   }
   
@@ -96,21 +136,33 @@ validate_data_file <- function(file, req_fields) {
     
     mismatched_types <- req_fields_data %>%
       filter(var_type != "-") %>%
-      filter(var %in% names(actual_types) & map_r_type(var_type) != actual_types[var])
+      filter(var %in% names(actual_types) & map_r_type(var_type) != actual_types[var]) %>%
+      mutate(actual_type = actual_types[var])
     
     if (nrow(mismatched_types) > 0) {
-      error_list$check6 <- paste("Mismatched column types:", paste(mismatched_types$var, collapse = ", "))
+      error_list$check6 <- paste(
+        "Error with data types:",
+        paste(
+          mismatched_types$var, 
+          "(expected:", mismatched_types$var_type, 
+          ", found:", mismatched_types$actual_type, ")",
+          collapse = "; "
+        )
+      )
     }
   }
   
-  ### Check 7: Are there any missing values in any of the records?
+  ### Check 7: Are there any missing values in required columns?
+  required_value_columns <- req_fields_data |> filter(missing_allowed == "FALSE") |> pull(var)
+  
   if (check2) {
     missing_values <- data %>%
-      select(all_of(required_columns)) %>%
-      summarise(across(everything(), ~ sum(is.na(.))))
+      select(all_of(required_value_columns)) %>%
+      summarise(across(everything(), ~ sum(is.na(.)), .names = "missing_{.col}"))
     
-    if (any(missing_values > 0)) {
-      missing_cols <- names(missing_values)[missing_values > 0]
+    missing_cols <- names(missing_values)[colSums(missing_values) > 0]
+    
+    if (length(missing_cols) > 0) {
       error_list$check7 <- paste("Missing values found in columns:", paste(missing_cols, collapse = ", "))
     }
   }
@@ -134,5 +186,3 @@ validate_data_file <- function(file, req_fields) {
   
   return(error_list)
 }
-
-#validate_data_file("soil-sample-7.xlsx", req_fields)
