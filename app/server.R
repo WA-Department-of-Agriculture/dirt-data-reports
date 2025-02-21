@@ -18,7 +18,11 @@ server <- function(input, output, session) {
       updateTextInput(session, "language", value = "template.qmd")
     }
   })
-  
+
+  output$test<-renderUI({
+    h3(input$language)
+  })
+
   
   #UPDATE DICTIONARY SELECTION OPTIONS BASED ON LANGUAGE TEMPLATE
   observeEvent(input$language, {
@@ -81,15 +85,25 @@ server <- function(input, output, session) {
   observeEvent(input$next3, { shinyjs::runjs("setStep(4);") })
   observeEvent(input$prev4, { shinyjs::runjs("setStep(3);") })
   
-  # Download report template
-  output$downloadTemplate <- downloadHandler(
-    filename = function() {
-      paste0("soil-data-template-", Sys.Date(), ".xlsx")
-    },
-    content = function(file) {
-      file.copy("files/template.xlsx", file)
+# Download report template
+output$downloadTemplate <- downloadHandler(
+  filename = function() {
+    template_file <- if (input$language == "template_esp.qmd") {
+      "template_esp.xlsx"
+    } else {
+      "template.xlsx"
     }
-  )
+    paste0("soil-data-template-", Sys.Date(), ".xlsx")
+  },
+  content = function(file) {
+    template_file <- if (input$language == "template_esp.qmd") {
+      "files/template_esp.xlsx"
+    } else {
+      "files/template.xlsx"
+    }
+    file.copy(template_file, file)
+  }
+)
   
   # Variable to hold the uploaded data
   data <- reactiveVal(NULL)

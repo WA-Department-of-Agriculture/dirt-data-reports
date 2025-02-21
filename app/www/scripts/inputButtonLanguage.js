@@ -1,39 +1,36 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // Get language buttons
-  const englishButton = document.getElementById('englishLang');
-  const spanishButton = document.getElementById('spanishLang');
-  const languageButtons = document.querySelectorAll('.language-button');
-
-  // Ensure one button is always selected
-  const ensureSelection = () => {
-    const activeButton = document.querySelector('.language-button.active');
-    if (!activeButton) {
-      englishButton.classList.add('active'); // Default to English
-      Shiny.setInputValue('language', 'template.qmd');
-    }
-  };
-
-  // Function to toggle active state
-  const toggleActiveLanguage = (selectedButton) => {
-    // If already active, do nothing (prevents deselection)
-    if (selectedButton.classList.contains('active')) {
-      return;
-    }
-
-    // Remove 'active' class from all buttons
-    languageButtons.forEach(button => button.classList.remove('active'));
-
-    // Add 'active' class to the selected button
-    selectedButton.classList.add('active');
-
-    // Update Shiny input
-    Shiny.setInputValue('language', selectedButton.id === 'englishLang' ? 'template.qmd' : 'template_esp.qmd');
-  };
-
-  // Add event listeners
-  englishButton.addEventListener('click', () => toggleActiveLanguage(englishButton));
-  spanishButton.addEventListener('click', () => toggleActiveLanguage(spanishButton));
-
-  // Ensure one button is always active on page load
-  ensureSelection();
-});
+Shiny.inputBindings.register({
+  find: function(scope) {
+  return $(scope).find('.custom-button-group');
+  },
+  getId: function(el) {
+  return $(el).attr('data-input-id');
+  },
+  getValue: function(el) {
+  let multi = $(el).attr('data-multi') === 'true';
+  let selected = [];
+  $(el).find('.custom-button.active').each(function() {
+  selected.push($(this).attr('data-value'));
+  });
+  return multi ? selected : (selected.length > 0 ? selected[0] : null);
+  },
+  setValue: function(el, value) {
+  $(el).find('.custom-button').removeClass('active');
+  if (Array.isArray(value)) {
+  value.forEach(val => {
+  $(el).find(`.custom-button[data-value="${val}"]`).addClass('active');
+  });
+  } else {
+  $(el).find(`.custom-button[data-value="${value}"]`).addClass('active');
+  }
+  },
+  subscribe: function(el, callback) {
+  $(el).on('click', '.custom-button', function() {
+  let multi = $(el).attr('data-multi') === 'true';
+  if (!multi) {
+  $(el).find('.custom-button').removeClass('active');
+  }
+  $(this).toggleClass('active');
+  callback();
+  });
+  }
+  }, 'customButtonInputBinding');

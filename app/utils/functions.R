@@ -35,3 +35,32 @@ create_hero <- function(title, image_url) {
     )
   )
 }
+customButtonInput <- function(inputId, choices, multi = FALSE, selected = NULL, icons = NULL) {
+  choices_json <- jsonlite::toJSON(choices, auto_unbox = TRUE)
+  selected_json <- jsonlite::toJSON(selected, auto_unbox = TRUE)
+  multi_attr <- ifelse(multi, "true", "false")
+  
+  tags$div(
+    id = inputId,
+    class = "custom-button-group",
+    `data-multi` = multi_attr,
+    `data-choices` = choices_json,
+    `data-selected` = selected_json,
+    lapply(names(choices), function(label) {
+      value <- choices[[label]]
+      active_class <- if (value %in% selected) "active" else ""
+      icon_tag <- if (!is.null(icons) && label %in% names(icons)) {
+        tags$i(style='font-size:32px; margin-bottom:10px;', class = icons[[label]])
+      } else {
+        NULL
+      }
+      tags$button(
+        type = "button",
+        class = paste("custom-button", active_class),
+        `data-value` = value,
+        icon_tag,
+        tags$span(label)
+      )
+    })
+  )
+}

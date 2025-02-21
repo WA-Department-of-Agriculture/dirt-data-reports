@@ -16,6 +16,55 @@ source("utils/data_validation.R")
 #mapping file for english by default
 measure_mapping<-read.csv("files/measurement_dictionary.csv")
 
+
+js <- "
+$(document).on('shiny:connected', function() {
+  $('.custom-button-group').each(function() {
+    let inputId = $(this).attr('id');
+    let multi = $(this).data('multi') === true;
+    let selectedValues = $(this).data('selected');
+
+    if (typeof selectedValues === 'string') {
+      selectedValues = JSON.parse(selectedValues);
+    }
+    if (!Array.isArray(selectedValues)) {
+      selectedValues = [selectedValues];
+    }
+    
+    // Apply 'active' class on load
+    selectedValues.forEach(function(val) {
+      $(this).find(`.custom-button[data-value='${val}']`).addClass('active');
+    }.bind(this));
+
+    // Ensure Shiny receives a properly formatted value
+    let initialValue = multi ? selectedValues : (selectedValues.length > 0 ? selectedValues[0] : null);
+    if (!multi && initialValue !== null) {
+      initialValue = initialValue.toString();  // Ensure it's not wrapped as JSON
+    }
+    
+    Shiny.setInputValue(inputId, initialValue, {priority: 'event'});
+
+    // Attach click event
+    $(this).on('click', '.custom-button', function() {
+      if (!multi) {
+        $(this).siblings().removeClass('active');
+      }
+      $(this).toggleClass('active');
+
+      let selected = $(this).parent().find('.custom-button.active').map(function() {
+        return $(this).data('value');
+      }).get();
+
+      if (!multi) {
+        selected = selected.length > 0 ? selected[0] : null;
+      }
+
+      Shiny.setInputValue(inputId, selected, {priority: 'event'});
+    });
+  });
+});
+"
+
 #create measure list choices
 measurement_list<-measure_mapping%>%
   split(.$type)%>%
@@ -25,7 +74,7 @@ measurement_list<-measure_mapping%>%
 ui <- navbarPage(
   title = actionLink(inputId="title", 
                      tags$div(style='display:flex;gap:8px;align-items:center', tags$img(src="pictures/wshi.png", style='height:20px'),
-                              tags$div(class='title-name', style='font-size:16px', "Soil Health Reports"))
+                              tags$div(class='title-name', style='font-size:16px', "Soil Health App"))
   ),
   windowTitle = "WSDA Soil Health Reports",
   id = "main_page",
@@ -36,8 +85,7 @@ ui <- navbarPage(
     tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
     tags$script(src = "scripts/toc.js"),
     tags$script(src = "scripts/stepper.js"),
-    tags$script(src = "scripts/inputButtonFormat.js"),
-    tags$script(src = "scripts/inputButtonLanguage.js"),
+    tags$script(HTML(js)), 
     shinyjs::useShinyjs()
   ),
   tabPanel("Home",
@@ -126,26 +174,12 @@ ui <- navbarPage(
             p(class="form-text",
             "Choose a report language. Download the Excel template and replace example data with your own."
             ),
-            div(
-              class = "language-selection",
-              tags$div(
-                class = "language-button english active",
-                id = "englishLang",
-                tags$div(
-                  class = "language-circle",
-                  "EN" # Display "EN" inside the circle
-                ),
-                tags$span("English", style = "display:block; font-size:14px; font-weight:500; color:#333;")
-              ),
-              tags$div(
-                class = "language-button spanish",
-                id = "spanishLang",
-                tags$div(
-                  class = "language-circle",
-                  "ES" # Display "ES" inside the circle
-                ),
-                tags$span("Spanish", style = "display:block; font-size:14px; font-weight:500; color:#333;")
-              )
+            div(style='width:100%;display:flex;justify-content:center',
+                customButtonInput("language", 
+                              choices = c("English" = "template.qmd", "Spanish" = "template_esp.qmd"),
+                              icons = c("English" = "fas fa-flag-usa", "Spanish" = "fas fa-globe"),
+                              multi = FALSE, 
+                              selected = "template.qmd")
             ),
             div(style='display:flex;justify-content:center',
                 disabled(downloadButton("downloadTemplate", "Download Template", style = "margin-top:20px;width:320px;"))
@@ -228,21 +262,28 @@ ui <- navbarPage(
                      )
             ),
             # Output Selection Buttons
-            div(
-              class = "output-selection",
-              tags$div(
-                class = "output-button word",
-                id = "wordOutput",
-                tags$i(class = "fas fa-file-word", style = "font-size:32px; margin-bottom:10px;"),
-                tags$span(".docx", style = "display:block; font-size:14px; font-weight:500; color:#333;")
-              ),
-              tags$div(
-                class = "output-button html",
-                id = "htmlOutput",
-                tags$i(class = "fas fa-file-code", style = "font-size:32px; margin-bottom:10px;"),
-                tags$span("HTML", style = "display:block; font-size:14px; font-weight:500; color:#333;")
-              )
+            div(style='width:100%;display:flex;justify-content:center',
+                customButtonInput("format", 
+                              choices = c("Word" = "docx", "HTML" = "html"),
+                              icons = c("Word" = "fas fa-file-word", "HTML" = "fas fa-file-code"),
+                              multi = TRUE, 
+                              selected = c("html","docx"))
             ),
+            # div(
+            #   class = "output-selection",
+            #   tags$div(
+            #     class = "output-button word",
+            #     id = "wordOutput",
+            #     tags$i(class = "fas fa-file-word", style = "font-size:32px; margin-bottom:10px;"),
+            #     tags$span(".docx", style = "display:block; font-size:14px; font-weight:500; color:#333;")
+            #   ),
+            #   tags$div(
+            #     class = "output-button html",
+            #     id = "htmlOutput",
+            #     tags$i(class = "fas fa-file-code", style = "font-size:32px; margin-bottom:10px;"),
+            #     tags$span("HTML", style = "display:block; font-size:14px; font-weight:500; color:#333;")
+            #   )
+            # ),
             div(class = "buttons",
                 actionButton("prev4", "Previous", class = "prev"),
                 disabled(downloadButton("report", "Build", icon=NULL, style='display:flex;align-items:center;'))
