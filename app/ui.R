@@ -247,7 +247,7 @@ ui <- navbarPage(
                        label = "Year",
                        choices = NULL, 
                        selected = NULL,
-                       multiple = TRUE
+                       multiple = FALSE
                      ),
                      shinyWidgets::pickerInput(
                        inputId = "producer_id",

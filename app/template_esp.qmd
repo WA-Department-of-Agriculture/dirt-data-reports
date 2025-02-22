@@ -18,6 +18,7 @@ execute:
 params:
   project: Test Project
   year: 2023
+  producer_id: "ID1234"
   definition_file: "files/measurement_dictionary_esp.csv"
   measures: ["def-esp-texture.qmd", "def-esp-bulk-density.qmd", "def-esp-soil-ph.qmd", "def-esp-total-nitro.qmd"]
   project_summary: "Example of a project summary"

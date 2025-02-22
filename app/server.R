@@ -231,78 +231,62 @@ output$downloadTemplate <- downloadHandler(
     }
   })
   
-  # Generate reports
-  rendered_reports <- reactive(paste0(Sys.Date(), "_reports.zip"))
-  
-  output$report <- downloadHandler(
-    filename = function() { rendered_reports() },
-    content = function(file) {
-      shinybusy::show_modal_spinner(
-        spin = 'flower',
-        color = '#023B2C',
-        text = 'Generating Reports...'
-      )
-      
-      reports <- NULL
-      
-      withProgress(message = 'Downloading', value = 0, {
-        num_producers <- length(input$producer_id)
-        steps <- num_producers + 1
-        
-        # Generate a report for each producer
-        for (i in seq_along(input$producer_id)) {
-          report_name <- paste0(input$producer_id[i], ".", input$format)
-          
-          # Add error handling for quarto_render
-          tryCatch({
-            incProgress(1 / steps, detail = paste("Generating report", i, "of", num_producers))
-            quarto::quarto_render(
-              #input = input$language,
-              input = "template.qmd",
-             # output_format = "docx",
-              output_format = input$format,
-              execute_params = list(
-                project = input$producer_id[i],
-                year = input$year,
-                measures = input$measurement_definitions,
-                looking_forward = input$looking_forward,
-                project_summary = input$project_summary
-              ),
-              output_file = report_name
-            )
-            reports <- c(reports, report_name)  
-          }, error = function(e) {
-            print(paste("Error during Quarto rendering for producer ID:", input$producer_id[i]))
-            print(e$message)
-          })
-        }
-        
-        # Ensure reports are not empty
-        if (is.null(reports) || length(reports) == 0) {
-          stop("No reports were generated. Check your inputs.")
-        }
-        
-        # Create a ZIP file containing all the reports
-        incProgress(1 / steps, detail = "Zipping files...")
-        tryCatch({
-          zip::zip(zipfile = file, files = reports)
-          print(paste("Files zipped successfully:", reports))
-        }, error = function(e) {
-          print("Error during zipping process:")
-          print(e$message)
-          stop("Failed to create ZIP file.")
-        })
-      })
-      
-      shinyjs::runjs(
-      "document.getElementById('step-4').classList.add('completed');
-      const step = document.getElementById('step-4');
-      const circle = step.querySelector('.step-circle');
-      circle.innerHTML = '<i class=\"fas fa-check\"></i>';
-    ");
-      
-      shinybusy::remove_modal_spinner()
+  # Create a df with inputs for quarto::quarto_render()
+  quarto_input <- eventReactive(
+    
+    eventExpr = {
+      input$year
+      input$producer_id
+    },
+    valueExpr = {
+      readxl::read_xlsx(input$upload_file$datapath, sheet = "Data") |>
+        distinct(year, producer_id) |>
+        filter(year %in% input$year & producer_id %in% input$producer_id) |>
+        mutate(
+          output_file = paste0(year, "_", producer_id),
+          output_format = paste0(input$format, collapse = ","),
+          execute_params = pmap(
+            list(year, producer_id),
+            ~ list(
+              year = ..1, 
+              producer_id = ..2, 
+              measures = input$measurement_definitions,
+              project_summary = input$project_summary,
+              looking_forward = input$looking_forward)
+          )
+        ) |>
+        select(output_file, output_format, execute_params) |>
+        separate_longer_delim(output_format, delim = ",") |>
+        mutate(
+          output_file = paste0(output_file, ".", output_format)
+        )
     }
   )
   
+  # Reactive zip file name for download
+  rendered_reports <- reactive(paste0(Sys.Date(), "_reports.zip"))
+  
+  # Download handler for building and zipping reports
+  output$report <- downloadHandler(
+    filename = function() {
+      rendered_reports()
+    },
+    content = function(file) {
+      
+      # Build reports for each producer
+      purrr::pwalk(
+        quarto_input(),
+        quarto::quarto_render,
+        input = input$language,
+        .progress = list(
+          type = "iterator",
+          name = "Building reports"
+        )
+      )
+      
+      # Create a ZIP file containing all the reports
+      zip::zip(zipfile = file, files = quarto_input()$output_file)
+    }
+  )
 }
+
