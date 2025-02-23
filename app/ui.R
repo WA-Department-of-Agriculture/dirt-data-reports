@@ -72,7 +72,7 @@ measure_mapping<-read.csv("files/measurement_dictionary.csv")|>
 #create measure list choices
 measurement_list<-measure_mapping%>%
   split(.$type)%>%
-  map(~ setNames(.x$file_name, .x$aliases))
+  map(~ setNames(.x$file_name, .x$name))
 
 ui <- navbarPage(
   title = actionLink(inputId="title", 

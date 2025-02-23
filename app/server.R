@@ -32,21 +32,23 @@ server <- function(input, output, session) {
     if(input$language == "template.qmd"){
       updated_measurements<-measure_mapping%>%
         split(.$type)%>%
-        map(~ setNames(.x$file_name, .x$name))  
+        map(~ setNames(.x$file_name, .x$aliases))  
       
     }
     #update to spanish choices
     else if(input$language == "template_esp.qmd"){
       updated_measurements<-measure_mapping_esp%>%
         split(.$type)%>%
-        map(~ setNames(.x$file_name, .x$name))  
+        map(~ setNames(.x$file_name, .x$aliases))  
       
     }
     
     updatePickerInput(
       inputId = "measurement_definitions",
-      choices = updated_measurements
+      choices = updated_measurements,
+      choicesOpt = list(content = measure_mapping$content)
     )
+      
   })
     
   
