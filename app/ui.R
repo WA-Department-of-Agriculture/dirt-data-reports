@@ -10,10 +10,15 @@ library(dplyr)
 library(readxl)
 library(shinybusy)
 library(glue)
+library(soils)
 
 source("utils/functions.R")
 source("utils/data_validation.R")
 
+options(repos = c(
+  WA_Department_Agriculture = "https://wa-department-of-agriculture.r-universe.dev",
+  CRAN = "https://cloud.r-project.org"
+))
 
 
 
