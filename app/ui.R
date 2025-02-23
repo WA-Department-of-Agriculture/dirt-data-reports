@@ -67,12 +67,18 @@ $(document).on('shiny:connected', function() {
 
 #mapping file for english by default
 measure_mapping<-read.csv("files/measurement_dictionary.csv")|>
-  mutate(content = glue("<div>{name}</div><div style='display:none'>{aliases}</div>"))
+  mutate(content = glue("<div>{name}</div><span style='display:none'>{aliases}</span>"))|>
+  arrange(type, name)
 
 #create measure list choices
 measurement_list<-measure_mapping%>%
   split(.$type)%>%
   map(~ setNames(.x$file_name, .x$name))
+
+measurement_content <- measure_mapping %>%
+  split(.$type) %>%
+  map(~ .x$content)
+
 
 ui <- navbarPage(
   title = actionLink(inputId="title", 
@@ -146,7 +152,7 @@ ui <- navbarPage(
         ),
         
         # Form Section
-        div(
+        tags$div(
           class = "form-section",
           tags$a(
             style='width:100%;display:flex;margin-bottom:10px;justify-content:end;', 
@@ -170,29 +176,29 @@ ui <- navbarPage(
             )
           ),
           # Step 1 Content
-          div(
+          tags$div(
             class = "form-content active", id = "form-1",
             h4(class="form-step", "Step 1"),
             h2(class="form-title", "Download Template"),
             p(class="form-text",
             "Choose a report language. Download the Excel template and replace example data with your own."
             ),
-            div(style='width:100%;display:flex;justify-content:center',
+            tags$div(style='width:100%;display:flex;justify-content:center',
                 customButtonInput("language", 
                               choices = c("English" = "template.qmd", "Spanish" = "template_esp.qmd"),
                               icons = c("English" = "fas fa-flag-usa", "Spanish" = "fas fa-globe"),
                               multi = FALSE, 
                               selected = "template.qmd")
             ),
-            div(style='display:flex;justify-content:center',
+            tags$div(style='display:flex;justify-content:center',
                 disabled(downloadButton("downloadTemplate", "Download Template", style = "margin-top:20px;width:320px;"))
                 ),
-            div(class = "buttons", style='justify-content:flex-end;',
+            tags$div(class = "buttons", style='justify-content:flex-end;',
                 actionButton("next1", "Next", class = "next"))
           ),
           
           # Step 2 Content
-          div(
+          tags$div(
             class = "form-content", id = "form-2",
             h4(class="form-step", "Step 2"),
             h2(class="form-title", "Upload Data"),
@@ -209,7 +215,7 @@ ui <- navbarPage(
           ),
           
           # Step 3 Content
-          div(
+          tags$div(
             class = "form-content", id = "form-3",
             h4(class="form-step", "Step 3"),
             h2(class="form-title", "Report Parameters"),
@@ -223,33 +229,26 @@ ui <- navbarPage(
               inputId = "measurement_definitions",
               label = "Include Definitions",
               choices = measurement_list,
-              choicesOpt = list(content = measure_mapping$content),
+              choicesOpt = list(content = unlist(measurement_content, recursive = FALSE)),
               options = list(
                 "live-search" = TRUE, 
                 'actions-box' = TRUE
               ),
               multiple = TRUE
             ),
-            # virtualSelectInput(
-            #   inputId = "measurement_definitions",
-            #   label = "Include Definitions",
-            #   choices = measurement_list,
-            #   showValueAsTags = TRUE,
-            #   search = TRUE,
-            #   multiple = TRUE
-            # ),
             textAreaInput( 
               "looking_forward", 
               "Looking Forward", 
               value = "Insert text to add to the look forward section"
             ), 
+            actionButton(inputId = "report_preview", label="Preview"),
             div(class = "buttons",
                 actionButton("prev3", "Previous", class = "prev"),
                 actionButton("next3", "Next", class = "next"))
           ),
           
           # Step 4 Content
-          div(
+          tags$div(
             class = "form-content", id = "form-4",
             h4(class="form-step", "Step 4"),
             h2(class="form-title","Build Report"),
@@ -283,21 +282,6 @@ ui <- navbarPage(
                               multi = TRUE, 
                               selected = c("html","docx"))
             ),
-            # div(
-            #   class = "output-selection",
-            #   tags$div(
-            #     class = "output-button word",
-            #     id = "wordOutput",
-            #     tags$i(class = "fas fa-file-word", style = "font-size:32px; margin-bottom:10px;"),
-            #     tags$span(".docx", style = "display:block; font-size:14px; font-weight:500; color:#333;")
-            #   ),
-            #   tags$div(
-            #     class = "output-button html",
-            #     id = "htmlOutput",
-            #     tags$i(class = "fas fa-file-code", style = "font-size:32px; margin-bottom:10px;"),
-            #     tags$span("HTML", style = "display:block; font-size:14px; font-weight:500; color:#333;")
-            #   )
-            # ),
             div(class = "buttons",
                 actionButton("prev4", "Previous", class = "prev"),
                 disabled(downloadButton("report", "Build", icon=NULL, class="build"))
@@ -325,5 +309,5 @@ ui <- navbarPage(
         h5("FAQs")
       )
     )
-  ),
+  )
   )

@@ -475,6 +475,10 @@ h1, h2, h3 {
   border-radius: 5px!important;
 }
 
+.filter-option-inner-inner {
+  display:flex!important;
+}
+
 
 p {
   font-size:16px;

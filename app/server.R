@@ -2,10 +2,16 @@ server <- function(input, output, session) {
   
   #mapping file for data dictionary input, different ones for english & spanish
   measure_mapping<-read.csv("files/measurement_dictionary.csv")|>
+    arrange(type, name)|>
     mutate(content = glue("<div>{name}</div><div style='display:none'>{aliases}</div>"))
   
   measure_mapping_esp<-read.csv("files/measurement_dictionary_esp.csv",encoding = "UTF-8")|>
+    arrange(type, name)|>
     mutate(content = glue("<div>{name}</div><div style='display:none'>{aliases}</div>"))
+  
+  measurement_content <- measure_mapping %>%
+    split(.$type) %>%
+    map(~ .x$content)
   
   
   # Disable Step 4 on app load
@@ -34,6 +40,8 @@ server <- function(input, output, session) {
         split(.$type)%>%
         map(~ setNames(.x$file_name, .x$aliases))  
       
+      
+      
     }
     #update to spanish choices
     else if(input$language == "template_esp.qmd"){
@@ -41,16 +49,18 @@ server <- function(input, output, session) {
         split(.$type)%>%
         map(~ setNames(.x$file_name, .x$aliases))  
       
+      
     }
     
     updatePickerInput(
       inputId = "measurement_definitions",
       choices = updated_measurements,
-      choicesOpt = list(content = measure_mapping$content)
+      choicesOpt = list(content = unlist(measurement_content, recursive = FALSE)),
     )
       
   })
     
+
   
   observe({
     if(!is.null(input$format)){
@@ -88,6 +98,47 @@ server <- function(input, output, session) {
   observeEvent(input$prev3, { shinyjs::runjs("setStep(2);") })
   observeEvent(input$next3, { shinyjs::runjs("setStep(4);") })
   observeEvent(input$prev4, { shinyjs::runjs("setStep(3);") })
+  
+  #modal popup for preview on Step 3
+  observeEvent(input$report_preview, {
+    
+    # Filter mapping to include only selected measurement definitions
+    selected_mapping <- measure_mapping %>%
+      filter(file_name %in% input$measurement_definitions)
+    
+    # Group by section_name
+    grouped_measures <- split(selected_mapping$file_name, selected_mapping$section_name)
+    
+    # Generate dynamic tabPanels
+    tabs <- lapply(names(grouped_measures), function(section_name) {
+      tabPanel(
+        title = section_name,
+        do.call(div, lapply(grouped_measures[[section_name]], function(qmd_file) {
+          includeMarkdown(read_qmd_as_md(qmd_file))
+        }))
+      )
+    })
+    
+    # Show modal with dynamically generated tabs
+    showModal(modalDialog(
+      title = "Preview Sections",
+      
+      div(class='markdown-modal', 
+          includeMarkdown("## Project Summary"),
+          includeMarkdown(input$project_summary),
+          
+          includeMarkdown("## Your Measures"),
+          tabsetPanel(id = "dynamicTabs", !!!tabs),
+          
+          includeMarkdown("## Looking Forward"),
+          includeMarkdown(input$looking_forward)
+      ),
+      
+      easyClose = TRUE,
+      footer = NULL
+    ))
+  })
+  
   
 
   # Download report template, evaluate which template based on language selection

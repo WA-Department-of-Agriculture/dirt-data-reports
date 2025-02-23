@@ -1,8 +1,20 @@
 library(htmltools)
 
 
-#create dropdowns for drivers
-
+#convert qmd to md, used in preview modal
+read_qmd_as_md <- function(file_path) {
+  lines <- readLines(file_path, warn = FALSE)
+  # Remove YAML metadata (if present)
+  if (grepl("^---$", lines[1])) {
+    end_yaml <- which(lines == "---")[2] 
+    # Find the second "---"
+    if (!is.na(end_yaml)) {
+      # Skip YAML block
+      lines <- lines[(end_yaml + 1):length(lines)] 
+    }
+  }
+  paste(lines, collapse = "\n") 
+}
 
 create_hero <- function(title, image_url) {
   tags$div(
