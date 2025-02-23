@@ -9,12 +9,12 @@ library(tidyverse)
 library(dplyr)
 library(readxl)
 library(shinybusy)
+library(glue)
 
 source("utils/functions.R")
 source("utils/data_validation.R")
 
-#mapping file for english by default
-measure_mapping<-read.csv("files/measurement_dictionary.csv")
+
 
 
 js <- "
@@ -65,11 +65,14 @@ $(document).on('shiny:connected', function() {
 });
 "
 
+#mapping file for english by default
+measure_mapping<-read.csv("files/measurement_dictionary.csv")|>
+  mutate(content = glue("<div>{name}</div><div style='display:none'>{aliases}</div>"))
+
 #create measure list choices
 measurement_list<-measure_mapping%>%
   split(.$type)%>%
-  map(~ setNames(.x$file_name, .x$name))  
-
+  map(~ setNames(.x$file_name, .x$aliases))
 
 ui <- navbarPage(
   title = actionLink(inputId="title", 
@@ -216,15 +219,25 @@ ui <- navbarPage(
                 "Project Summary Description", 
                 value = "Insert text here about your project summary"
               ), 
-            virtualSelectInput(
+            shinyWidgets::pickerInput(
               inputId = "measurement_definitions",
               label = "Include Definitions",
-              #created from measurement mapping file- defaults to english qmds
               choices = measurement_list,
-              showValueAsTags = TRUE,
-              search = TRUE,
+              choicesOpt = list(content = measure_mapping$content),
+              options = list(
+                "live-search" = TRUE, 
+                'actions-box' = TRUE
+              ),
               multiple = TRUE
             ),
+            # virtualSelectInput(
+            #   inputId = "measurement_definitions",
+            #   label = "Include Definitions",
+            #   choices = measurement_list,
+            #   showValueAsTags = TRUE,
+            #   search = TRUE,
+            #   multiple = TRUE
+            # ),
             textAreaInput( 
               "looking_forward", 
               "Looking Forward", 
@@ -287,7 +300,7 @@ ui <- navbarPage(
             # ),
             div(class = "buttons",
                 actionButton("prev4", "Previous", class = "prev"),
-                disabled(downloadButton("report", "Build", icon=NULL, style='display:flex;align-items:center;'))
+                disabled(downloadButton("report", "Build", icon=NULL, class="build"))
                 
             )
           )

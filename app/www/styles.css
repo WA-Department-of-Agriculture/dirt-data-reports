@@ -40,7 +40,6 @@ body {
 
 .shiny-input-container:not(.shiny-input-container-inline) {
   width:100%;
-  max-width:800px;
 }
 
 .custom-button {
@@ -270,6 +269,8 @@ h1, h2, h3 {
 }
 
 @media screen and (max-width: 768px) {
+  
+  
   .toc-scroll {
     display: none;
   }
@@ -383,7 +384,6 @@ h1, h2, h3 {
   
   .form-section {
     margin-left:50px!important;
-    min-height:500px;
   }
 }
 
@@ -466,11 +466,11 @@ h1, h2, h3 {
   color: #1f2937;
 }
 
-.actions-btn.bs-select-all {
+#producer_id .actions-btn.bs-select-all {
   display: none;
 }
 
-.actions-btn.bs-deselect-all{
+#producer_id .actions-btn.bs-deselect-all{
   width:100%!important;
   border-radius: 5px!important;
 }
@@ -524,12 +524,11 @@ p {
 
 .form-section {
   width:100%;
-  max-width:700px;
   margin-left: 300px; /* Offset for fixed stepper */
   margin-top:20px;
   margin-right:50px;
   display: flex;
-  height:470px;
+  height: calc(100vh - 50px);
   flex-direction: column;
   justify-content: flex-start;
   min-width: 0; /* Prevent shrinking */
@@ -537,11 +536,10 @@ p {
 
 .form-content {
   flex: 1;
-  max-width: 600px;
   min-height:600px;
+  padding-bottom:50px;
   display: flex;
   flex-direction: column;
-  height: 100%; /* Consistent height for the form */
 }
 
 .col-2{
@@ -570,8 +568,15 @@ p {
   cursor: pointer;
 }
 
-.buttons .prev, .buttons .next {
+.buttons .prev, .buttons .next, .buttons .build {
   width: 100px;
 }
 
+.buttons .build {
+  display:flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--deep-green);
+  color:white;
+}
 

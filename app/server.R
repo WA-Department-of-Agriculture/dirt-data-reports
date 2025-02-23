@@ -1,9 +1,11 @@
 server <- function(input, output, session) {
   
   #mapping file for data dictionary input, different ones for english & spanish
-  measure_mapping<-read.csv("files/measurement_dictionary.csv")
-  measure_mapping_esp<-read.csv("files/measurement_dictionary_esp.csv",
-                                encoding = "UTF-8")
+  measure_mapping<-read.csv("files/measurement_dictionary.csv")|>
+    mutate(content = glue("<div>{name}</div><div style='display:none'>{aliases}</div>"))
+  
+  measure_mapping_esp<-read.csv("files/measurement_dictionary_esp.csv",encoding = "UTF-8")|>
+    mutate(content = glue("<div>{name}</div><div style='display:none'>{aliases}</div>"))
   
   
   # Disable Step 4 on app load
@@ -41,7 +43,7 @@ server <- function(input, output, session) {
       
     }
     
-    updateVirtualSelect(
+    updatePickerInput(
       inputId = "measurement_definitions",
       choices = updated_measurements
     )
