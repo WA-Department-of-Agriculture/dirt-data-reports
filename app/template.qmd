@@ -18,27 +18,522 @@ execute:
 params:
   project: Test Project
   year: 2023
-  producer_id: "ID1234"
+  producer_id: "WUY05"
   definition_file: "files/measurement_dictionary.csv"
+  data_file: "files/template.xlsx"
   measures: ["def-texture.qmd", "def-bulk-density.qmd", "def-soil-ph.qmd", "def-total-nitro.qmd"]
   project_summary: "Example of a project summary"
   looking_forward: "Example text for the looking forward section"
   
 ---
 
-```{r}
-library(tidyverse)
+<!-- Set styling variables -->
 
+```{r set-fonts-colors}
+# EDIT: Replace any font names and colors to match your branding.
+header_font <- "Georgia"
+body_font <- "Arial"
+
+# Flextable colors -----------------------------------------------------
+
+# header background color
+header_color <- "#023B2C"
+# header text color
+header_text_color <- "white"
+# body darker background color
+darker_color <- "#ccc29c"
+# body lighter background color
+lighter_color <- "#F2F0E6"
+# border color
+border_color <- "#3E3D3D"
+
+# Map and plot colors -----------------------------------------------------
+
+# point color for producer samples
+primary_color <- "#a60f2d"
+# point color for samples in same categories as producer
+secondary_color <- "#3E3D3D"
+# point color for all other samples in project
+other_color <- "#ccc29c"
+
+# facet strip background color
+strip_color <- "#335c67"
+# facet strip text color
+strip_text_color <- "white"
+```
+
+```{r setup}
+library(soils)
+library(tidyverse)
+library(readxl)
+
+# Get output file type
+out_type <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+
+# Set path for saving figure output
+path <- here::here("figure-output/")
+
+# Delete figure output directory if it already exists
+if (fs::dir_exists(path)) fs::dir_delete(path)
+
+# Create fresh figure output directory
+fs::dir_create(path)
+```
+
+```{r read-data}
+
+
+### SET UP MEASUREMENT DEFINITIONS
 measures <- unlist(strsplit(params$measures, ","))
 definition_file<-read.csv(params$definition_file)
 #filtered dictionary
 measure_mapping<-definition_file|>filter(file_name %in% measures)
 #unique measure types, e.g. Biological, Phyisical, Etc
 distinct_measure_types<-measure_mapping|>distinct(section_name)|>pull(section_name)
+
+
+### READ IN DATA FILE
+data<-readxl::read_xlsx(params$data_file, sheet = "Data")
+
+dictionary <- readxl::read_xlsx(params$data_file, sheet = "Data Dictionary") |>
+  dplyr::mutate(
+    # Concatenate abbr and unit with html break for the table and plot labels
+    abbr_unit = glue::glue("{abbr}<br>{unit}"),
+    # Set the order of how measurement groups will appear within the report
+    # based on the order found in the data dictionary
+    group_order = dplyr::cur_group_id(),
+    # Set the order of how measurements will appear within each measurement
+    # group based on the order found in the data dictionary
+    measurement_order = seq_along(column_name),
+    .by = measurement_group
+  )
+
+# Get vector of measurement groups from dictionary
+measurement_groups <- unique(dictionary$measurement_group)
+```
+
+```{r tidy-long}
+# EDIT: `washi_data` example has soil measurements in columns 12 - 42. Replace
+# this column range with the column indices of the soil measurements in your
+# dataset.
+
+num_cols<-ncol(data)
+
+# Tidy data into long format and join with data dictionary
+results_long <- data |>
+  dplyr::mutate(
+    dplyr::across(
+      # EDIT: replace with the column range of your soil measurements
+      12:num_cols,
+      as.numeric
+    )
+   )|> 
+  tidyr::pivot_longer(
+    # EDIT: replace with the column range of your soil measurements
+    cols = 12:num_cols,
+    names_to = "measurement"
+  ) |>
+   dplyr::inner_join(dictionary, by = c("measurement" = "column_name")) |>
+  dplyr::mutate(
+    group_order = factor(
+      group_order,
+      levels = unique(dictionary$group_order),
+      ordered = unique(is.ordered(dictionary$group_order))
+    ),
+    abbr = factor(
+      abbr,
+      levels = dictionary$abbr,
+      ordered = is.ordered(dictionary$measurement_order)
+    ),
+    abbr_unit = factor(
+      abbr_unit,
+      levels = dictionary$abbr_unit,
+      ordered = is.ordered(dictionary$measurement_order)
+    )
+  ) |>
+  dplyr::arrange(group_order, measurement_order) |>
+  dplyr::filter(!is.na(value))
+```
+
+```{r get-producer-info}
+# If farm name is blank, use producer ID
+results_long$farm_name <- ifelse(
+  is.na(results_long$farm_name),
+  glue::glue("Farm {params$producer_id}"),
+  results_long$farm_name
+)
+
+# If field name is blank, use field ID
+results_long$field_name <- ifelse(
+  is.na(results_long$field_name),
+  glue::glue("Field {results_long$field_id}"),
+  results_long$field_name
+)
+
+# Subset to producer samples
+producer_samples <- results_long |>
+  dplyr::filter(producer_id == params$producer_id & year == params$year)
+
+# Abort if there are no producer samples
+if (nrow(producer_samples) == 0) {
+  cli::cli_abort(c(
+    "i" = "Update {.code params} in YAML to a valid {.code producer_id} and\
+    {.code year} combo.",
+    "x" = "{.code {params$producer_id}} and {.code {params$year}} must exist\
+     in your data."
+  ))
+}
+
+# Extract producer sample IDs, crops, counties, and farm name into
+# producer list
+producer <- list("sample_id", "crop", "county", "farm_name", "measurement") |>
+  rlang::set_names() |>
+  purrr::map(\(x) soils::pull_unique(
+    df = producer_samples,
+    target = x
+  ))
+
+# In case of multiple farm names, grab first one
+producer$farm_name <- if (producer$farm_name > 1) producer$farm_name[[1]]
+
+# Remove measurements that producer did not have tested
+results_long <- results_long |>
+  dplyr::filter(measurement %in% producer_samples$measurement)
+```
+
+<!-- GIS data prep -->
+
+```{r prep-gis-df}
+# Prep data for GIS table and map
+gis_df <- soils::prep_for_map(
+  producer_samples,
+  label_heading = field_name,
+  # If crop is empty, omit from popup
+  label_body = ifelse(!is.na(crop), crop, "")
+)
+```
+
+<!-- Data wrangling for flextables -->
+
+```{r calculate-averages}
+# Calculate averages by crop, county, and project
+crop_summary <- results_long |>
+  dplyr::filter(!is.na(crop)) |>
+  soils::summarize_by_var(
+    producer_samples,
+    var = crop
+  )
+
+county_summary <- results_long |>
+  dplyr::filter(!is.na(county)) |>
+  soils::summarize_by_var(
+    producer_samples,
+    var = county
+  )
+
+project_summary <- soils::summarize_by_project(results_long)
 ```
 
 
-## `r params$project`
+```{r combine-producer-and-summaries}
+# Combine producer table with summaries
+producer_table <- producer_samples |>
+  dplyr::select(
+    measurement_group,
+    abbr,
+    value,
+    "Field or Average" = field_name,
+    Texture = texture
+  )
+
+# Bind together into one df and round values to 2 digits
+df_table <- dplyr::bind_rows(
+  producer_table,
+  crop_summary,
+  county_summary,
+  project_summary
+) |>
+  dplyr::mutate(
+    value = as.numeric(formatC(value, 2, drop0trailing = TRUE))
+  )
+```
+
+
+```{r split-into-groups}
+# Split into list with each measurement group as its own df and pivot wider
+groups <- df_table |>
+  split(df_table$measurement_group) |>
+  purrr::map(\(x) {
+    tidyr::pivot_wider(
+      x,
+      id_cols = c("Field or Average", Texture),
+      names_from = abbr
+    )
+  })
+```
+
+```{r physical-group-tweaks}
+# Special wrangling for texture
+
+# Extract physical df from averages list
+physical <- list(Physical = groups$Physical)
+
+# Remove texture from all dataframes except physical
+groups <- purrr::map(
+  subset(
+    groups,
+    !(names(groups) == "Physical")
+  ),
+  \(x) dplyr::select(x, -Texture)
+)
+
+# Add physical df back to the averages list
+groups <- c(groups, physical)
+
+# Remove this intermediate variable from env
+rm(physical)
+```
+
+```{r remove-rows-with-one-observation}
+# Delete any county or crop averages where n = 1 or county/crop is blank.
+tables <- groups |>
+  purrr::map(
+    subset,
+    !grepl("(^1 Fields)|NA", `Field or Average`)
+  )
+
+# Order list of tables based on how they appear in dictionary. Important that
+# tables and headers are in the same order for the make-flextables chunk.
+tables <- tables[measurement_groups]
+```
+
+```{r get-headers-for-flextable}
+# Map function to each measurement group, resulting in a new df with
+# abbreviations and units in a list for make_ft()
+headers <- results_long |>
+  soils::pull_unique(target = measurement_group) |>
+  as.list() |>
+  rlang::set_names() |>
+  purrr::map(\(group) get_table_headers(dictionary, group))
+```
+
+```{r make-flextables}
+# Create a list containing a flextable for each measurement group
+table_list <- list2DF(
+  list(
+    table = tables,
+    header = headers
+  )
+) |>
+  purrr::pmap(\(table, header) {
+    soils::make_ft(table, header) |>
+      soils::format_ft_colors(
+        lighter_color = lighter_color,
+        darker_color = darker_color
+      ) |>
+      soils::style_ft(
+        header_font = header_font,
+        body_font = body_font,
+        header_color = header_color,
+        header_text_color = header_text_color,
+        border_color = border_color
+      ) |>
+      soils::unit_hline(header = header) |>
+      flextable::set_table_properties(layout = "autofit")
+  })
+```
+
+<!-- Plots -->
+
+```{r prep-df-plot}
+# Prep df for texture triangle and strip plots
+df_plot <- results_long |>
+  dplyr::mutate(
+    # Dummy column to set x-axis in same place for each facet
+    dummy = "dummy",
+    # Set category to group samples
+    category = dplyr::case_when(
+      sample_id %in% producer$sample_id ~ "Your fields",
+      crop %in% producer$crop & !is.na(crop) ~ "Same crop",
+      county %in% producer$county & !is.na(county) ~ "Same county",
+      .default = "Other fields"
+    ),
+    # Set category factors so producer samples are plotted last
+    category = factor(
+      category,
+      levels = c("Your fields", "Same crop", "Same county", "Other fields")
+    ),
+    # Label for tooltip
+    label = dplyr::case_when(
+      category == "Your fields" ~ glue::glue(
+        "{field_name}<br>{crop}<br>{value} {unit}"
+      ),
+      category == "Same crop" ~ glue::glue(
+        "{crop}<br>{value} {unit}"
+      ),
+      category == "Same county" ~ glue::glue(
+        "{county}<br>{value} {unit}"
+      ),
+      .default = glue::glue(
+        "{value} {unit}",
+        .na = ""
+      )
+    )
+  )
+
+# Order the df so producer's points are plotted on top
+df_plot <- df_plot[order(df_plot$category, decreasing = TRUE), ]
+```
+
+```{r prep-texture-triangle}
+# Select only the texture variables from the plot df and pivot so each texture
+# is in its own column
+texture_df <- df_plot |>
+  dplyr::filter(abbr %in% c("Sand", "Silt", "Clay")) |>
+  tidyr::pivot_wider(
+    id_cols = c(
+      sample_id,
+      category
+    ),
+    names_from = measurement
+  ) |>
+  # Texture must be in the order: sand, silt, clay, category
+  dplyr::select(
+    dplyr::contains("sand"),
+    dplyr::contains("silt"),
+    dplyr::contains("clay"),
+    category
+  )
+
+# Split by category then drop category column
+texture_list <- split(texture_df, texture_df$category) |>
+  purrr::map(\(df) dplyr::select(df, -category))
+
+# Does producer have sand, silt, and clay for at least 1 sample?
+producer_texture <- texture_df |>
+  dplyr::filter(category == "Your fields") |>
+  dplyr::select(-category)
+
+make_tt <- all(grepl(
+  "sand|silt|clay",
+  colnames(producer_texture),
+  ignore.case = TRUE
+)) & ncol(producer_texture) == 3
+```
+
+```{r make-texture-triangle}
+# Only create texture triangle if above prep-texture-triangle ran
+if (make_tt) {
+  # Since the texture triangle is made with base R plotting functions, we need to
+  # set our graphics device to save it as a PNG for embedding in our report.
+  ragg::agg_png(
+    "figure-output/texture-triangle.png",
+    res = 150,
+    width = 1200,
+    height = 1000,
+    scaling = 1
+  )
+
+  # Create the texture triangle
+  soils::make_texture_triangle(body_font = body_font)
+
+  # The two character code glued to the end of the six character hex color is the
+  # opacity level. The opacity value ranges from 00 to FF, with 00 being fully
+  # transparent and FF being fully opaque. See a chart to find the opacity code
+  # for the level of transparency you want: https://drawne.com/hex-opacity/.
+
+  # Add points for 'Other fields' on the bottom
+  soils::add_texture_points(
+    texture_list$`Other fields`,
+    color = glue::glue(other_color, 80),
+    pch = 19,
+    size = 1.36
+  )
+
+  # Next add points for 'Same crop'
+  soils::add_texture_points(
+    texture_list$`Same crop`,
+    color = glue::glue(secondary_color, 99),
+    pch = 18,
+    size = 2.16
+  )
+
+  # Next add points for 'Same county'
+  soils::add_texture_points(
+    texture_list$`Same county`,
+    color = glue::glue(secondary_color, 99),
+    pch = 17,
+    size = 2.16
+  )
+
+  # Lastly, add points for 'Your fields' on top of the other layers
+  soils::add_texture_points(
+    texture_list$`Your fields`,
+    color = glue::glue(primary_color, "CC"),
+    pch = 15,
+    size = 2.4
+  )
+
+  # Add the legend
+  soils::add_legend(
+    legend = c(
+      "Your fields",
+      "Same county",
+      "Same crop",
+      "Other fields"
+    ),
+    color = c(
+      glue::glue(primary_color, "CC"),
+      glue::glue(secondary_color, 99),
+      glue::glue(secondary_color, 99),
+      glue::glue(other_color, 80)
+    ),
+    pch = c(15, 17, 18, 19),
+    size = c(2.4, 2.16, 2.16, 1.36),
+    vertical_spacing = 1.5,
+  )
+
+  # Turn off the graphics device to save the figure
+  invisible(dev.off())
+
+  # Remove the extra white space around the figure if magick is installed
+  if (requireNamespace("magick", quietly = TRUE)) {
+    tt <- magick::image_read("figure-output/texture-triangle.png")
+    tt <- magick::image_trim(tt)
+    magick::image_write(tt, "figure-output/texture-triangle.png")
+  }
+}
+```
+
+```{r make-strip-plots}
+# Split df_plot into a list with each measurement group in its own plot
+plot_list <- df_plot |>
+  split(df_plot$measurement_group) |>
+  purrr::map(\(group) {
+    # Make strip plot
+    plot <- soils::make_strip_plot(
+      group,
+      color = category,
+      size = category,
+      shape = category,
+      alpha = category
+    ) |>
+      # Set color, size, shape, alpha scales
+      soils::set_scales(
+        primary_color = primary_color,
+        secondary_color = secondary_color,
+        other_color = other_color
+      ) +
+      # Apply facet strip plot theme
+      soils::theme_facet_strip(
+        body_font = body_font,
+        strip_color = strip_color,
+        strip_text_color = strip_text_color
+      )
+  })
+```
+
+## `r producer$farm_name`
 
 `r params$project_summary`
 
@@ -234,7 +729,168 @@ flextable::as_grouped_data(indicators, groups = "Measure every") |>
 ![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/quality-results.png){width="6.5in"
 fig-alt="Infographic titled How to Get Quality Results. Be Consistent: sample at the same time each year; send samples to the same lab; keep samples cool and get them to the lab quickly; keep good records of lab results. Context matters: not all soils are created equal; indicators are impacted by inherent properties like climate and soil texture; as well as by management; don't be alarmed if your soil is below the optimal range fro some indicators, see how far you can take your soil with management but know there may be inherent limitations. Back to the Basics: old school measurements like pH, texture, and soil organic matter are still incredible important; new indicators are constantly being developed, don't feel you have to measure all of them, or let the process overwhelm you; have fun exploring through a soil health lens, but remember that you know your soil better than anyone! Be Patient: some measurements may not change as quickly as you'd like; sampling across time is very important, our scientific understanding of these measurements is evolving; we are all on this journey together."}
 
+{{< pagebreak >}}
+
+## Your Fields
+
+```{r}
+# do not add chunk label due to bug
+# https://github.com/quarto-dev/quarto-cli/issues/3603
+
+gis_ft <- gis_df |>
+  dplyr::select(
+    `Sample ID` = sample_id,
+    `Field ID` = field_id,
+    `Field Name` = field_name,
+    Crop = crop,
+    Longitude = longitude,
+    Latitude = latitude
+  )
+
+# If crop is empty, remove the column from the printed table
+if (NA %in% gis_ft$Crop) gis_ft <- gis_df |> dplyr::select(-Crop)
+
+# If longitude or latitude are empty, remove the columns from the printed table
+if (NA %in% gis_ft$Longitude | NA %in% gis_ft$Latitude) {
+  gis_ft <- gis_ft |> dplyr::select(-c(Longitude, Latitude))
+}
+
+gis_ft |>
+  flextable::flextable() |>
+  soils::style_ft(
+    header_font = header_font,
+    body_font = body_font,
+  ) |>
+  flextable::set_table_properties(layout = "autofit")
+```
+
+<!-- The below "\" is a hard line break that works for html and docx. -->
+
+\
+
+```{r create-map}
+if (!NA %in% gis_df$longitude & !NA %in% gis_df$latitude) {
+  map <- soils::make_leaflet(
+    gis_df,
+    primary_color = primary_color
+  )
+}
+```
+
+```{r save-map}
+# Save a screenshot of the map for the docx report if htmlwidgets and webshot2
+# are installed.
+# if (exists("map") &
+#   requireNamespace("htmlwidgets", quietly = TRUE) &
+#   requireNamespace("webshot2", quietly = TRUE)) {
+#   invisible(htmlwidgets::saveWidget(
+#     map,
+#     file = glue::glue("{path}/map.html")
+#   ))
+#   invisible(webshot2::webshot(
+#     url = glue::glue("{path}/map.html"),
+#     file = glue::glue("{path}/map.png"),
+#   ))
+# }
+```
+
+```{r map-html}
+#| eval: !expr out_type == "html"
+if (exists("map")) map
+```
+
+```{r map-static}
+#| eval: !expr out_type == "docx"
+#| out-width: 6in
+if (exists("map") & fs::file_exists(glue::glue("{path}/map.png"))) {
+  knitr::include_graphics(
+    glue::glue("{path}/map.png")
+  )
+}
+```
+
+{{< pagebreak >}}
+
+## Project Results
+
+Below are tables and graphs describing the physical, biological, and chemical
+measurements from your soils. Each point represents a sample we collected. Take
+a look to see how your fields compare to others in the project. All samples were
+collected from \[EDIT: SOIL DEPTH (e.g. 0-6 inches, or 0-30 cm)\].
+
+```{r create-measurement-group-sections}
+#| output: asis
+
+# DO NOT RUN THIS CHUNK INTERACTIVELY. See
+# https://wa-department-of-agriculture.github.io/soils/articles/troubleshoot.html#error-when-run-interactively.
+
+# If the report fails to render at this chunk, interactively run all chunks
+# above this one, open `02_section-template.qmd`, uncomment the first
+# troubleshoot chunk, and then run each chunk in the file interactively to
+# debug.
+
+# Add section for each measurement group containing a header, texture triangle
+# (for the physical group), table, and plot.
+sections <- purrr::map_chr(measurement_groups, \(group) {
+  knitr::knit_child(
+    input = "02_section-template.qmd",
+    envir = rlang::env(),
+    quiet = TRUE
+  )
+})
+
+cat(sections, sep = "\n")
+```
+
+
+```{r download-data-text}
+#| eval: !expr out_type == "html"
+#| output: asis
+
+# Add a download section if downloadthis is installed
+if (requireNamespace("downloadthis", quietly = TRUE)) {
+  cat("## Download your data")
+}
+```
+
+```{r download-data}
+#| eval: !expr out_type == "html"
+
+# Add a data download button if downloadthis is installed
+if (requireNamespace("downloadthis", quietly = TRUE)) {
+  list(
+    results = dplyr::filter(data, producer_id == params$producer_id),
+    measurement_dictionary = dictionary[
+      ,
+      c(
+        "column_name",
+        "abbr",
+        "unit"
+      )
+    ]
+  ) |>
+    downloadthis::download_this(
+      output_name = glue::glue("{params$year}-soils-data"),
+      output_extension = ".xlsx",
+      button_label = "Download as Excel spreadsheet",
+      button_type = "success"
+    )
+}
+```
+
 
 ## Looking Forward
 
 `r params$looking_forward`
+
+## Acknowledgement 
+
+This report was generated using the [{soils} R
+package](https://wa-department-of-agriculture.github.io/soils/). {soils} was
+developed by the Washington State Department of Agriculture and Washington State
+University, as part of the Washington Soil Health Initiative. Text and figures
+were adapted from [WSU Extension publication #FS378E Soil Health in Washington
+Vineyards](https://pubs.extension.wsu.edu/soil-health-in-washington-vineyards).
+Learn more about {soils} in this [blog
+post](https://washingtonsoilhealthinitiative.com/2024/03/soils-an-r-package-for-soil-health-reporting/)
+or this [webinar](https://youtu.be/_8m7fTjSEOk?si=ikrCASdchiB6rDC2).
