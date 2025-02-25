@@ -1,6 +1,0 @@
-***Capacidad de retención de agua*** (WHC) es la cantidad de agua que puede
-contener un suelo. El WHC describe cómo el suelo almacenará y suministrará agua
-durante eventos de alta precipitación y épocas de sequía. El WHC varía según la
-textura del suelo y la densidad aparente y puede verse muy afectado por el
-manejo. Generalmente, los suelos con texturas más finas, alta materia orgánica y
-baja densidad aparente tienen un WHC más alto.
