@@ -269,10 +269,6 @@ h1, h2, h3 {
 }
 
 
-@media screen and (min-width: 768px){
-.modal-dialog{		
-    width: 65%;		
-}
 
 @media screen and (max-width: 768px) {
   
@@ -397,6 +393,10 @@ h1, h2, h3 {
    .progress-bar-container {
         display: none;
     }
+    
+    .modal-dialog{		
+    width: 65%;		
+}
 }
 
 .step {

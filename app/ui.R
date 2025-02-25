@@ -1,6 +1,7 @@
 library(shiny)
 library(shinyWidgets)
 library(shinyjs)
+library(shinyAce)
 library(rmarkdown)
 library(zip)
 library(readxl)
@@ -225,9 +226,14 @@ ui <- navbarPage(
                 class = 'form-text',
                 "Customize the report with project-specific information."
               ),
-              textAreaInput("project_summary",
-                            "Project Summary Description",
-                            value = "Insert text here about your project summary"),
+              textInput(inputId="soil_depth", label="Soil Depth", value="0-12 inches"),
+              tags$label("Project Summary Description"),
+              shinyAce::aceEditor(
+                outputId = "project_summary",
+                wordWrap = TRUE,
+                mode = "markdown",
+                value = "Thank the participating farmer. Consider including infomration related to how many samples you've taken, in how many crops and regions. Consider identifying members of the project team and acknowledging support from your funders and collaborators.",
+                ),
               shinyWidgets::pickerInput(
                 inputId = "measurement_definitions",
                 label = "Include Definitions",
@@ -237,10 +243,13 @@ ui <- navbarPage(
                                'actions-box' = TRUE),
                 multiple = TRUE
               ),
-              textAreaInput("looking_forward",
-                            "Looking Forward",
-                            value = "Insert text to add to the look forward section"),
-              actionButton(inputId = "report_preview", label = "Preview"),
+              tags$label("Looking Forward"),
+              shinyAce::aceEditor(
+                outputId="looking_forward",
+                wordWrap = TRUE,
+                mode = "markdown",
+                value = "Consider describing how this data will be used. Are you building decision support tools? Publications? Will you be speaking at upcoming field days or conferences about this work? Soils data can be confusing… let your audience know that this is just the start of the conversation! Thank participating producers once again."),
+              actionButton(inputId = "report_preview", label = "Preview", style='margin:20px 0px;'),
               div(
                 class = "buttons",
                 actionButton("prev3", "Previous", class = "prev"),
