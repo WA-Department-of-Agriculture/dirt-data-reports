@@ -61,20 +61,12 @@ server <- function(input, output, session) {
     }
   })
   
-  # Page navigation
-  observeEvent(input$title, {
-    updateNavbarPage(session, "main_page", "page_home")
-  })
+  # Page navigation - redirect on navbar title to home, and home buttons to section pages
+  observeEvent(input$title, {updateNavbarPage(session, "main_page", "page_home")})
+  observeEvent(input$redirect_learn_more, {updateNavbarPage(session, "main_page", "page_learn_more")})
+  observeEvent(input$redirect_generate_report, {updateNavbarPage(session, "main_page", "page_generate_report")})
   
-  observeEvent(input$redirect_learn_more, {
-    updateNavbarPage(session, "main_page", "page_learn_more")
-  })
-  
-  observeEvent(input$redirect_generate_report, {
-    updateNavbarPage(session, "main_page", "page_generate_report")
-  })
-  
-  #hide tabs
+  #Hide Home Page tab in Navbar
   observe({
     if(input$main_page == "page_generate_report"){
       shinyjs::runjs("hideNonCurrentForms()")
@@ -88,6 +80,21 @@ server <- function(input, output, session) {
   observeEvent(input$prev3, { shinyjs::runjs("setStep(2);") })
   observeEvent(input$next3, { shinyjs::runjs("setStep(4);") })
   observeEvent(input$prev4, { shinyjs::runjs("setStep(3);") })
+
+  #Modal popul for Step 2 Requirements
+
+  observeEvent(input$requirementInfo, {
+    showModal(
+      modalDialog(
+        title = "Data Check",
+        tags$div(id="modal-validation",
+                 includeMarkdown("www/content/about_validation.md")
+        ),
+        easyClose = TRUE,
+        footer= NULL
+      )
+    )
+  })
   
   # Modal popup for preview on Step 3
   observeEvent(input$report_preview, {
@@ -96,6 +103,7 @@ server <- function(input, output, session) {
     
     grouped_measures <- split(selected_mapping$file_name, selected_mapping$section_name)
     
+    #create measure tab panels
     tabs <- lapply(names(grouped_measures), function(section_name) {
       tabPanel(title = section_name,
                do.call(div, lapply(grouped_measures[[section_name]], function(qmd_file) {
@@ -107,7 +115,7 @@ server <- function(input, output, session) {
     showModal(modalDialog(
       title = "Preview Sections",
       div(
-        class = 'markdown-modal',
+        id = 'modal-preview', 
         includeMarkdown("## Project Summary"),
         includeMarkdown(input$project_summary),
         includeMarkdown("## Your Measures"),

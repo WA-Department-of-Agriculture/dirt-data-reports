@@ -165,6 +165,7 @@ ui <- navbarPage(
                 class = "form-text",
                 "Choose a report language. Download the Excel template and replace example data with your own."
               ),
+              #tags$label("Select Report Language"),
               tags$div(
                 style = 'width:100%;display:flex;justify-content:center',
                 customButtonInput(
@@ -194,7 +195,7 @@ ui <- navbarPage(
               h2(class = "form-title", "Upload Data"),
               p(
                 class = "form-text",
-                "Upload your completed template below and validate the data."
+                "Upload your completed template below and validate the data. Learn more about template requirements ", actionLink(inputId="requirementInfo", "here."),
               ),
               fileInput(
                 "upload_file",
@@ -280,6 +281,7 @@ ui <- navbarPage(
                 )
               ),
               # Output Selection Buttons
+              tags$label("Select Report Output Formats"),
               div(
                 style = 'width:100%;display:flex;justify-content:center',
                 customButtonInput(
