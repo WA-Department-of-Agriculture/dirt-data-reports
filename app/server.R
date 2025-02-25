@@ -312,33 +312,66 @@ server <- function(input, output, session) {
   rendered_reports <- reactive(paste0(Sys.Date(), "_reports.zip"))
   
   # Download handler for building and zipping reports
+  # Download handler for building and zipping reports
   output$report <- downloadHandler(
     filename = function() {
       rendered_reports()
     },
     content = function(file) {
-        #initiate spinner
-        shinybusy::show_modal_spinner(
-          spin = 'flower',
-          color = '#023B2C',
-          text = 'Generating Reports...'
-        )
       
-      # Build reports for each producer
-      purrr::pwalk(
-        quarto_input(),
-        quarto::quarto_render,
-        input = input$language,
-        .progress = list(
-          type = "iterator",
-          name = "Building reports"
-        )
+      # Initiate spinner
+      shinybusy::show_modal_spinner(
+        spin = 'flower',
+        color = '#023B2C',
+        text = 'Generating Reports...'
       )
       
-      # Create a ZIP file containing all the reports
-      zip::zip(zipfile = file, files = quarto_input()$output_file)
+      reports <- NULL
+      report_data <- quarto_input()  
       
-      #mark last step in stepper as complete
+      withProgress(message = 'Generating Reports', value = 0, {
+        num_reports <- nrow(report_data)
+        steps <- num_reports + 1 
+        
+        # Generate a report for each producer using purrr::pwalk
+        purrr::pwalk(
+          report_data,
+          function(output_file, output_format, execute_params) {
+            tryCatch({
+              incProgress(1 / steps, detail = paste("Processing", output_file))
+              
+              quarto::quarto_render(
+                input = input$language,
+                output_format = output_format,
+                execute_params = execute_params,
+                output_file = output_file
+              )
+              
+              reports <<- c(reports, output_file)  
+            }, error = function(e) {
+              warning(paste("Error during Quarto rendering for:", output_file))
+              warning(e$message)
+            })
+          }
+        )
+        
+        # Make sure reports are not empty before zipping
+        if (is.null(reports) || length(reports) == 0) {
+          stop("No reports were generated. Check your inputs.")
+        }
+        
+        # Create a ZIP file containing all  reports
+        incProgress(1 / steps, detail = "Zipping files...")
+        tryCatch({
+          zip::zip(zipfile = file, files = reports)
+        }, error = function(e) {
+          warning("Error during zipping process:")
+          warning(e$message)
+          stop("Failed to create ZIP file.")
+        })
+      })
+      
+      # Mark last step in stepper as complete
       shinyjs::runjs(
         "document.getElementById('step-4').classList.add('completed');
       const step = document.getElementById('step-4');
@@ -346,8 +379,9 @@ server <- function(input, output, session) {
       circle.innerHTML = '<i class=\"fas fa-check\"></i>';
     ");
       
-      #remove spinner
+      # Remove spinner
       shinybusy::remove_modal_spinner()
     }
   )
+  
 }
