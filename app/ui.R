@@ -57,10 +57,10 @@ ui <- navbarPage(
   ),
   tabPanel("Home",
            value = "page_home",
-           div(
+           tags$div(
              class = "banner-bg",
-             div(class = "banner-overlay"),
-             div(
+             tags$div(class = "banner-overlay"),
+             tags$div(
                class = "banner-content",
                h1("Soil Health Report", style = 'font-size:40px'),
                p(
@@ -80,53 +80,53 @@ ui <- navbarPage(
   tabPanel(
     title = "Build Reports",
     value = "page_generate_report",
-    div(class = "container-reports",
-        div(
+    tags$div(class = "container-reports",
+        tags$div(
           style = "display:flex",
           # Stepper Tree Section
-          div(
+          tags$div(
             class = "stepper",
-            div(
+            tags$div(
               class = "step active",
               id = "step-1",
               onclick = "setStep(1)",
-              div(
+              tags$div(
                 class = "step-circle",
                 html('<i class="fas fa-circle"  style="font-size:2rem"></i>')
               ),
-              div(
-                div(class = "step-num", "Step 1"),
-                div(class = "step-text", "Download Template")
+              tags$div(
+                tags$div(class = "step-num", "Step 1"),
+                tags$div(class = "step-text", "Download Template")
               )
             ),
-            div(
+            tags$div(
               class = "step",
               id = "step-2",
               onclick = "setStep(2)",
-              div(class = "step-circle", shiny::icon("table")),
-              div(
+              tags$div(class = "step-circle", shiny::icon("table")),
+              tags$div(
                 div(class = "step-num", "Step 2"),
                 div(class = "step-text", "Upload Data")
               )
             ),
-            div(
+            tags$div(
               class = "step",
               id = "step-3",
               onclick = "setStep(3)",
-              div(class = "step-circle", shiny::icon("gear")),
-              div(
-                div(class = "step-num", "Step 3"),
-                div(class = "step-text", "Report Parameters")
+              tags$div(class = "step-circle", shiny::icon("gear")),
+              tags$div(
+                tags$div(class = "step-num", "Step 3"),
+                tags$div(class = "step-text", "Report Parameters")
               )
             ),
-            div(
+            tags$div(
               class = "step",
               id = "step-4",
               onclick = "setStep(4)",
-              div(class = "step-circle", shiny::icon("file-alt")),
-              div(
-                div(class = "step-num", "Step 4"),
-                div(class = "step-text", "Build Report")
+              tags$div(class = "step-circle", shiny::icon("file-alt")),
+              tags$div(
+                tags$div(class = "step-num", "Step 4"),
+                tags$div(class = "step-text", "Build Report")
               )
             )
           ),
