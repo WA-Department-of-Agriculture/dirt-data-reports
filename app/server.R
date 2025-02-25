@@ -140,6 +140,8 @@ server <- function(input, output, session) {
       paste0("soil-data-template-", Sys.Date(), ".xlsx")
     },
     content = function(file) {
+      
+      
       template_file <- if (input$language == "template_esp.qmd") {
         "files/template_esp.xlsx"
       } else {
@@ -315,6 +317,12 @@ server <- function(input, output, session) {
       rendered_reports()
     },
     content = function(file) {
+        #initiate spinner
+        shinybusy::show_modal_spinner(
+          spin = 'flower',
+          color = '#023B2C',
+          text = 'Generating Reports...'
+        )
       
       # Build reports for each producer
       purrr::pwalk(
@@ -329,6 +337,17 @@ server <- function(input, output, session) {
       
       # Create a ZIP file containing all the reports
       zip::zip(zipfile = file, files = quarto_input()$output_file)
+      
+      #mark last step in stepper as complete
+      shinyjs::runjs(
+        "document.getElementById('step-4').classList.add('completed');
+      const step = document.getElementById('step-4');
+      const circle = step.querySelector('.step-circle');
+      circle.innerHTML = '<i class=\"fas fa-check\"></i>';
+    ");
+      
+      #remove spinner
+      shinybusy::remove_modal_spinner()
     }
   )
 }
