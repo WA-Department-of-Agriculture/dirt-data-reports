@@ -1,0 +1,32 @@
+<!-- Image wrapped around text for HTML -->
+
+::: {.content-visible when-format="html"}
+![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/som-spanish.png){width="3.5in"
+style="float:right"
+fig-alt="La materia orgánica del suelo (SOM) respalda la mayoría de los servicios de los ecosistemas y los beneficios del suelo, pero su cambio es lento. Hay tres capas de círculos. El círculo más exterior dice 42% otros materiales. El siguiente círculo interior dice 58% de carbono orgánico total. Hay dos círculos dentro de este círculo que dicen carbono potencialmente mineralizable (respiración microbiana esencial para el ciclo de los nutrientes) y carbono oxidable con permanganato (SOM recientemente estabilizada, responde más rápidamente al ser manejado)."}
+:::
+
+***La materia orgánica del suelo*** (SOM) es la porción de los suelos que no
+está formada por minerales, aire y agua, sino que está compuesta por materia
+animal, vegetal y microbiana en varias etapas de descomposición. El SOM se
+compone de alrededor de un 58 % de carbono orgánico (TOC) (una regla general
+fácil es multiplicar por 2). La porción restante de SOM incluye otros nutrientes
+esenciales para las plantas, como nitrógeno, fósforo y azufre. El SOM varía
+según las propiedades inherentes del suelo y del paisaje, como la textura, la
+mineralogía, la precipitación y la temperatura. También se ve muy afectado por
+la gestión. Para obtener más información sobre cómo aumentar la SOM, lea sobre
+los [principios de NRCS para mejorar la salud del
+suelo](https://www.nrcs.usda.gov/conservation-basics/natural-resource-concerns/soils/soil-health).
+La SOM es la base de muchos de los beneficios y servicios ecosistémicos que
+proporcionan los suelos. Tiene un gran impacto en casi todas las demás
+propiedades del suelo y, a menudo, se usa como indicador primario de la salud
+del suelo. Sin embargo, SOM puede tardar en cambiar como resultado de la
+gestión. Debido a esto, se han desarrollado muchos otros indicadores para
+detectar componentes más sensibles en SOM. Sigue leyendo para saber más.
+
+<!-- Image below around text for docx -->
+
+::: {.content-visible unless-format="html"}
+![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/som-spanish.png){height="3.5in"
+fig-alt="La materia orgánica del suelo (SOM) respalda la mayoría de los servicios de los ecosistemas y los beneficios del suelo, pero su cambio es lento. Hay tres capas de círculos. El círculo más exterior dice 42% otros materiales. El siguiente círculo interior dice 58% de carbono orgánico total. Hay dos círculos dentro de este círculo que dicen carbono potencialmente mineralizable (respiración microbiana esencial para el ciclo de los nutrientes) y carbono oxidable con permanganato (SOM recientemente estabilizada, responde más rápidamente al ser manejado)."}
+:::

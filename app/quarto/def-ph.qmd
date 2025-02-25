@@ -1,0 +1,10 @@
+***Soil pH*** describes how acidic (pH less than 7.0) or alkaline (pH greater
+than 7.0) the soil is, and is a measure of the concentration of hydrogen ions in
+the soil solution. Many essential nutrients like P, Fe, Mn, Zn, Cu, Co, and B
+become less plant-available at alkaline pHs. Other nutrients like Al or B can
+become toxic at acidic pHs. Soil pH also greatly affects what microbial
+populations can live in the soil. Soil pH is impacted by inherent qualities of
+the soil such as its age, mineralogy, and rainfall zone. It is also impacted by
+fertilization, irrigation water pH, and SOM content. Most agricultural crops
+grow best in neutral soil pHs, within a range of 6 to 8. Soil pH can be lowered
+using sulfur or raised by adding agricultural lime.

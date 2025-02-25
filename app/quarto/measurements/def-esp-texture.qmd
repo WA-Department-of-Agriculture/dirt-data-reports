@@ -1,0 +1,17 @@
+***Textura del suelo*** es la proporción relativa de partículas del tamaño de
+arena, limo y arcilla en el suelo. Imagínese estas partículas como pelotas de
+baloncesto, pelotas de golf y semillas de amapola, que son muy diferentes en
+tamaño a pesar de que las partículas del suelo no parecen diferentes a simple
+vista. Es importante destacar que la textura del suelo describe solo la parte
+mineral del suelo y no se ve afectada por la materia orgánica o el manejo. Sin
+embargo, la textura del suelo es un factor importante de cómo responden los
+suelos al manejo. Los suelos con mayor contenido de arcilla pueden contener más
+nutrientes, materia orgánica y agua que los suelos arenosos. Esto se debe a que
+las partículas de arcilla tienen una gran superficie y carga eléctrica y crean
+pequeños poros en el suelo. Los suelos con alto contenido de arena tienen poros
+más grandes y no pueden retener tanta agua.
+
+![Figura que muestra comparaciones de tamaño de partículas de suelo (arena, limo
+y arcilla) con elementos circulares comunes (baloncesto, pelota de golf y
+semillas de
+amapola)](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/ball-texture-spanish.png){width="3in" fig-align="left"}

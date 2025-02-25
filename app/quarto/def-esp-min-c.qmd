@@ -1,0 +1,11 @@
+***El carbono potencialmente mineralizable*** (MinC, a menudo denominado
+"respiración del suelo") mide la liberación de dióxido de carbono (CO₂) del
+suelo. Esta medición se realiza en una incubación de laboratorio bajo
+condiciones controladas "ideales" para los microbios. El término mineralización
+se refiere al proceso en el que los microbios del suelo producen CO₂ a medida
+que descomponen la SOM y los residuos vegetales. Este proceso también libera
+otros nutrientes, como el nitrógeno, que pueden ser absorbidos por los cultivos.
+Un MinC más alto representa una mayor actividad biológica potencial. Los suelos
+con un SOM más bajo tendrán un MinC inherentemente más bajo, mientras que los
+suelos compactados pueden no proporcionar una aireación adecuada para el proceso
+de mineralización.

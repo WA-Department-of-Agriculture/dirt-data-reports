@@ -15,60 +15,6 @@ library(soils)
 source("utils/functions.R")
 source("utils/data_validation.R")
 
-options(repos = c(
-  WA_Department_Agriculture = "https://wa-department-of-agriculture.r-universe.dev",
-  CRAN = "https://cloud.r-project.org"
-))
-
-
-
-js <- "
-$(document).on('shiny:connected', function() {
-  $('.custom-button-group').each(function() {
-    let inputId = $(this).attr('id');
-    let multi = $(this).data('multi') === true;
-    let selectedValues = $(this).data('selected');
-
-    if (typeof selectedValues === 'string') {
-      selectedValues = JSON.parse(selectedValues);
-    }
-    if (!Array.isArray(selectedValues)) {
-      selectedValues = [selectedValues];
-    }
-    
-    // Apply 'active' class on load
-    selectedValues.forEach(function(val) {
-      $(this).find(`.custom-button[data-value='${val}']`).addClass('active');
-    }.bind(this));
-
-    // Ensure Shiny receives a properly formatted value
-    let initialValue = multi ? selectedValues : (selectedValues.length > 0 ? selectedValues[0] : null);
-    if (!multi && initialValue !== null) {
-      initialValue = initialValue.toString();  // Ensure it's not wrapped as JSON
-    }
-    
-    Shiny.setInputValue(inputId, initialValue, {priority: 'event'});
-
-    // Attach click event
-    $(this).on('click', '.custom-button', function() {
-      if (!multi) {
-        $(this).siblings().removeClass('active');
-      }
-      $(this).toggleClass('active');
-
-      let selected = $(this).parent().find('.custom-button.active').map(function() {
-        return $(this).data('value');
-      }).get();
-
-      if (!multi) {
-        selected = selected.length > 0 ? selected[0] : null;
-      }
-
-      Shiny.setInputValue(inputId, selected, {priority: 'event'});
-    });
-  });
-});
-"
 
 #mapping file for english by default
 measure_mapping<-read.csv("files/measurement_dictionary.csv")|>
@@ -99,7 +45,8 @@ ui <- navbarPage(
     tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
     tags$script(src = "scripts/toc.js"),
     tags$script(src = "scripts/stepper.js"),
-    tags$script(HTML(js)), 
+    tags$script(src = "scripts/customButton.js"),
+    #tags$script(HTML(js)), 
     shinyjs::useShinyjs()
   ),
   tabPanel("Home",
@@ -123,7 +70,7 @@ ui <- navbarPage(
       class = "container-reports",
       div(
         style = "display:flex",
-        # Stepper Section
+        # Stepper Tree Section
         div(
           class = "stepper",
           div(class = "step active", id = "step-1", onclick = "setStep(1)", 
@@ -155,7 +102,6 @@ ui <- navbarPage(
               )
           )
         ),
-        
         # Form Section
         tags$div(
           class = "form-section",

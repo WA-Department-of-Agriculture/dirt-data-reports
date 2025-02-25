@@ -1,0 +1,11 @@
+***Infiltration*** measures the rate at which water enters the soil surface. If
+the infiltration rate is low, water will pond on the surface. This can make it
+difficult to enter the field and lead to erosion and runoff. High salinity, plow
+pans, and cemented layers in the soil can lead to poor infiltration and
+drainage. Soil texture is also a major factor, as large pores created by sand
+particles quicken infiltration rates while small pores from clay particles slow
+infiltration rates. Management also plays a role. Excessive tillage can break up
+soil structure which slows infiltration. Adding organic matter can form soil
+aggregates, which can quicken infiltration. This indicator is typically measured
+in the field, as outlined in this [NRCS
+protocol](https://www.nrcs.usda.gov/sites/default/files/2022-10/Infiltration.pdf "NRCS infiltration protocol").

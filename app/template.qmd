@@ -30,9 +30,15 @@ params:
 <!-- Set styling variables -->
 
 ```{r set-fonts-colors}
+library(gdtools)
+library(gfonts)
+
+gdtools::register_gfont("Lato")  
+gdtools::register_gfont("Poppins")  
+
 # EDIT: Replace any font names and colors to match your branding.
-header_font <- "Georgia"
-body_font <- "Arial"
+header_font <- "Poppins"
+body_font <- "Lato"
 
 # Flextable colors -----------------------------------------------------
 
@@ -596,12 +602,11 @@ for (measure_type in distinct_measure_types) {
     filter(section_name == measure_type) |> 
     pull(file_name)
   
-  # Include each measure file
+  # Include each measure file, ensuring the correct file path
   for (measure in measures_in_type) {
-    cat("{{< include ", measure, " >}}\n\n")
+    cat("{{< include quarto/measurements/", measure, " >}}\n\n", sep = "")
   }
 }
-
 ```
 :::
 :::
@@ -620,7 +625,7 @@ for (measure_type in distinct_measure_types) {
   
   # Include each measure file
   for (measure in measures_in_type) {
-    cat("{{< include ", measure, " >}}\n\n")
+    cat("{{< include quarto/measurements/", measure, " >}}\n\n", sep = "")
   }
 }
 
@@ -833,7 +838,7 @@ collected from \[EDIT: SOIL DEPTH (e.g. 0-6 inches, or 0-30 cm)\].
 # (for the physical group), table, and plot.
 sections <- purrr::map_chr(measurement_groups, \(group) {
   knitr::knit_child(
-    input = "02_section-template.qmd",
+    input = "quarto/02_section-template.qmd",
     envir = rlang::env(),
     quiet = TRUE
   )

@@ -1,8 +1,0 @@
-***El nitrógeno potencialmente mineralizable*** (PMN) representa la cantidad de
-nitrógeno orgánico que se puede convertir (o "mineralizar") en nitrato o amonio
-disponible para las plantas. Esta medición se toma de una incubación de
-laboratorio y puede ayudar a los productores a estimar la cantidad de nitrógeno
-que se puede liberar a los cultivos durante la temporada de crecimiento. Se
-puede encontrar información adicional sobre la medición e interpretación de PMN
-en esta [Publicación de Extensión de la Universidad Estatal de
-Oregón](https://catalog.extension.oregonstate.edu/sites/catalog/files/project/pdf/em9281.pdf).

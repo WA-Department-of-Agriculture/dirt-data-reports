@@ -1,0 +1,14 @@
+***Soil Texture*** is the relative proportion of sand, silt, and clay-sized
+particles in your soil. Imagine these particles like basketballs, golf balls,
+and poppy seeds, which are very different in size even though soil particles
+don't appear different to the naked eye. Importantly, soil texture describes
+only the mineral portion of the soil and is not affected by organic matter or
+management. However, soil texture is a significant driver of how soils respond
+to management. Soils with higher clay content can hold more nutrients, organic
+matter, and water than sandy soils. This is because clay particles have high
+surface area and electrical charge and create small soil pores. Soils with high
+sand content have larger pores, and cannot hold as much water.
+
+![Figure showing size comparisons of soil particles (sand, silt, and clay) to
+common circular items (basketball, golf ball, and poppy
+seed)](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/ball-texture.png){width="3in" fig-align="left"}
