@@ -187,8 +187,8 @@ server <- function(input, output, session) {
   observe({
     if (!is.null(input$upload_file)) {
       # Load the required fields
-      req_fields <- read_csv("files/required_fields.csv")
-      
+      req_fields <- read.csv("files/required_fields.csv")
+
       # Validate the uploaded file
       validation_results <- tryCatch(
         validate_data_file(input$upload_file$datapath, req_fields),
