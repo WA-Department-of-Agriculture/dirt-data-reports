@@ -146,6 +146,12 @@ server <- function(input, output, session) {
         includeMarkdown(input$project_summary),
         includeMarkdown("## What We Measured in Your Soils"),
         tabsetPanel(id = "dynamicTabs", !!!tabs),
+        includeMarkdown("## Project Results"),
+        includeMarkdown(paste0(
+          "All samples were collected from ",
+          input$soil_depth,
+          "."
+        )),
         includeMarkdown("## Looking Forward"),
         includeMarkdown(input$looking_forward)
       ),
