@@ -1,4 +1,16 @@
 server <- function(input, output, session) {
+  
+  #when screen is inactive and app disconnects prompt with reload screen
+  sever(
+    html = sever_default(
+      title = "Pause", 
+      subtitle = "You've been inactive for too long. Click reload to refresh page.", 
+      button = "Reload", 
+      button_class = "default"), 
+    bg_color = "#023B2C"
+    )
+  
+  
   # mapping file for data dictionary input, different ones for english & spanish
   measure_mapping <- read.csv("files/measurement_dictionary.csv") |>
     mutate(content = glue("<div>{name}</div><div style='display:none'>{aliases}</div>"))

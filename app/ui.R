@@ -2,6 +2,7 @@ library(shiny)
 library(shinyWidgets)
 library(shinyjs)
 library(shinyAce)
+library(sever)
 library(rmarkdown)
 library(zip)
 library(readxl)
@@ -53,8 +54,8 @@ ui <- navbarPage(
     tags$script(src = "scripts/toc.js"),
     tags$script(src = "scripts/stepper.js"),
     tags$script(src = "scripts/customButton.js"),
-    # tags$script(HTML(js)),
-    shinyjs::useShinyjs()
+    shinyjs::useShinyjs(),
+    sever::use_sever(),
   ),
   tabPanel(
     "Home",
