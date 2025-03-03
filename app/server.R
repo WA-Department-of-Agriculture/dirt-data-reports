@@ -34,10 +34,6 @@ server <- function(input, output, session) {
     }
   })
 
-  output$test <- renderUI({
-    h3(input$language)
-  })
-
 
   # UPDATE DICTIONARY SELECTION OPTIONS BASED ON LANGUAGE TEMPLATE
   observeEvent(input$language, {
@@ -61,7 +57,7 @@ server <- function(input, output, session) {
     )
   })
 
-
+  #disable report download if format selection  is null
   observe({
     if (!is.null(input$format)) {
       shinyjs::enable("report")
@@ -239,6 +235,7 @@ server <- function(input, output, session) {
         )
         shinyjs::enable("report")
         shinyjs::enable("next2")
+        shinyjs::enable("next3")
         shinyjs::runjs("document.getElementById('step-3').classList.remove('disabled');")
 
         # Load the uploaded data
