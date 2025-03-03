@@ -7,8 +7,8 @@ library(systemfonts)
 library(sever)
 library(rmarkdown)
 library(zip)
-library(readxl)
 library(gt)
+library(here)
 library(tidyverse)
 library(readxl)
 library(glue)
@@ -60,7 +60,7 @@ ui <- navbarPage(
     tags$script(src = "scripts/stepper.js"),
     tags$script(src = "scripts/customButton.js"),
     shinyjs::useShinyjs(),
-    sever::use_sever(),
+    sever::useSever(),
   ),
   tabPanel(
     "Home",
@@ -386,6 +386,7 @@ ui <- navbarPage(
       div(
         class = "content",
         id = "content-area",
+        #to modify content for Learn More please edit the markdown file
         includeMarkdown("www/content/learn_more.md")
       ),
       div(
