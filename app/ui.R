@@ -44,13 +44,17 @@ ui <- navbarPage(
       tags$div(class = "title-name", style = "font-size:16px", "Soil Health App")
     )
   ),
-  windowTitle = "WSDA Soil Health Reports",
+  windowTitle = "Soil Health Reports",
   id = "main_page",
   collapsible = TRUE,
   selected = "page_generate_report",
   header = tags$head(
+    #add font awesome and css stylesheets
     tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"),
     tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
+    #add favicon
+   # tags$link(rel="shortcut icon", href="pictures/wshi.png"),
+    #add js scripts
     tags$script(src = "scripts/toc.js"),
     tags$script(src = "scripts/stepper.js"),
     tags$script(src = "scripts/customButton.js"),

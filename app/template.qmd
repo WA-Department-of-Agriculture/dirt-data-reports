@@ -33,15 +33,15 @@ params:
 ```{r set-fonts-colors}
 #| output: false
 
-library(gdtools)
-library(gfonts)
-
-gdtools::register_gfont("Lato")
-gdtools::register_gfont("Poppins")
+# library(gdtools)
+# library(gfonts)
+# 
+# gdtools::register_gfont("Lato")
+# gdtools::register_gfont("Poppins")
 
 # EDIT: Replace any font names and colors to match your branding.
-header_font <- "Poppins"
-body_font <- "Lato"
+header_font <- "Georgia"
+body_font <- "Arial"
 
 # Flextable colors -----------------------------------------------------
 

@@ -12,6 +12,16 @@
 /* You don't need to edit the below content unless you want to
 further customize your HTML report style */
 
+tr th {
+      background: var(--primary-color);
+      font-family: var(--heading-font);
+      color: var(--fg-color);
+}
+
+table {
+  font-family: var(--body-font);
+}
+
 p.subtitle {
     margin-top: 0.95em;
     margin-bottom: -0.05em;
@@ -25,8 +35,8 @@ p.subtitle {
     text-align: right;
 }
 
-p {
-    font-family: var(--body-font);
+body, p, text {
+    font-family: var(--body-font)!important;
 }
 
 .tab-pane>p {
