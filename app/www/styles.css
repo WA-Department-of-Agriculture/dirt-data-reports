@@ -478,7 +478,11 @@ h1, h2, h3 {
 }
 
 #producer_id .actions-btn.bs-select-all {
-  display: none;
+  display: none!important;
+}
+
+#producer_id + .dropdown-menu .bs-actionsbox .select-all {
+    display: none !important;
 }
 
 #producer_id .actions-btn.bs-deselect-all{

@@ -1,5 +1,5 @@
 ---
-title: "Results from `r params$project`"
+title: "Results from `r params$project_name`"
 subtitle: "Fall `r params$year`"
 prefer-html: true
 format:
@@ -18,7 +18,7 @@ execute:
     echo: false
     warning: false
 params:
-  project: Test Project
+  project_name: Test Project
   year: 2023
   producer_id: "WUY05"
   definition_file: "files/measurement_dictionary.csv"

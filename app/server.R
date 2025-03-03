@@ -57,14 +57,7 @@ server <- function(input, output, session) {
     )
   })
 
-  #disable report download if format selection  is null
-  observe({
-    if (!is.null(input$format)) {
-      shinyjs::enable("report")
-    } else {
-      shinyjs::disable("report")
-    }
-  })
+
 
   # Page navigation - redirect on navbar title to home, and home buttons to section pages
   observeEvent(input$title, {
@@ -233,7 +226,7 @@ server <- function(input, output, session) {
             "All checks passed! No issues found."
           )
         )
-        shinyjs::enable("report")
+       # shinyjs::enable("report")
         shinyjs::enable("next2")
         shinyjs::enable("next3")
         shinyjs::runjs("document.getElementById('step-3').classList.remove('disabled');")
@@ -303,18 +296,9 @@ server <- function(input, output, session) {
       shinyjs::runjs("document.getElementById('step-4').classList.add('disabled');")
     }
   })
+  
 
-  observe({
-    if (is.null(input$producer_id) || length(input$producer_id) == 0) {
-      # Disabl Build Repor if no producer IDs are selected
-      shinyjs::runjs("document.getElementById('step-4').classList.add('disabled');")
-      shinyjs::disable("report")
-    } else {
-      # Enable Build 4 if producer IDs are selected
-      shinyjs::runjs("document.getElementById('step-4').classList.remove('disabled');")
-      shinyjs::enable("report")
-    }
-  })
+
 
   # Create a df with inputs for quarto::quarto_render()
   quarto_input <- eventReactive(
@@ -335,6 +319,7 @@ server <- function(input, output, session) {
               year = ..1,
               producer_id = ..2,
               measures = input$measurement_definitions,
+              project_name = input$project_name,
               project_summary = input$project_summary,
               looking_forward = input$looking_forward
             )

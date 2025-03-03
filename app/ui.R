@@ -274,6 +274,11 @@ ui <- navbarPage(
                 icon = icon("circle-info")
               )
             ),
+            textInput(
+              inputId = "project_name",
+              label = "Project Name",
+              value = "Project Name"
+            ),
             tags$label("Project Summary"),
             shinyAce::aceEditor(
               outputId = "project_summary",
