@@ -225,98 +225,119 @@ ui <- navbarPage(
           tags$div(
             class = "form-content",
             id = "form-2",
+            tags$div(
+              class='form-header',
             h4(class = "form-step", "Step 2"),
-            h2(class = "form-title", "Upload Data"),
-            p(
-              class = "form-text",
-              "Upload your completed template to validate the data. Any checks that fail will be printed below in an error message.",
-              br(),
-              br(),
-              actionLink(
-                inputId = "requirementInfo",
-                "Learn about the data validation checks.",
-                icon = icon("circle-info")
-              )
+            h2(class = "form-title", "Upload Data")
             ),
-            br(),
-            fileInput(
-              "upload_file",
-              "Upload Data",
-              multiple = FALSE,
-              accept = c(
-                "text/xlsx",
-                "text/comma-separated-values,text/plain",
-                ".xlsx"
-              )
+            tags$div(class='form-main',
+                p(
+                  class = "form-text",
+                  "Upload your completed template to validate the data. Any checks that fail will be printed below in an error message.",
+                  br(),
+                  br(),
+                  actionLink(
+                    inputId = "requirementInfo",
+                    "Learn about the data validation checks.",
+                    icon = icon("circle-info")
+                  )
+                ),
+                br(),
+                fileInput(
+                  "upload_file",
+                  "Upload Data",
+                  multiple = FALSE,
+                  accept = c(
+                    "text/xlsx",
+                    "text/comma-separated-values,text/plain",
+                    ".xlsx"
+                  )
+                ),
+                div(id = "error_message")
             ),
-            div(id = "error_message"),
+            tags$div(class='form-footer',
             div(
               class = "buttons",
               actionButton("prev2", "Previous", class = "prev"),
               actionButton("next2", "Next", class = "next", disabled = TRUE)
             )
-          ),
+          )),
 
           # Step 3 Content
           tags$div(
             class = "form-content",
             id = "form-3",
-            h4(class = "form-step", "Step 3"),
-            h2(class = "form-title", "Project Info"),
-            p(
-              class = "form-text",
-              'Customize reports with your project-specific information and then click "Preview" to see what the text will look like in the report.',
-              br(),
-              br(),
-              actionLink(
-                inputId = "markdown",
-                'Learn how to use basic markdown to format text and insert links for your "Project Summary" and "Looking Forward" sections.',
-                icon = icon("circle-info")
-              )
-            ),
-            textInput(
-              inputId = "project_name",
-              label = "Project Name",
-              value = "Project Name"
-            ),
-            tags$label("Project Summary"),
-            shinyAce::aceEditor(
-              outputId = "project_summary",
-              wordWrap = TRUE,
-              mode = "markdown",
-              height = "70%",
-              value = "Thank the participating farmer. Consider including information related to how many samples you've taken, in how many crops and regions. Identify the project team and acknowledge support from your funders and collaborators.",
-            ),
-            shinyWidgets::pickerInput(
-              inputId = "measurement_definitions",
-              label = "Measurement Definitions",
-              choices = measurement_list,
-              choicesOpt = list(content = unlist(measurement_content, recursive = FALSE)),
-              options = shinyWidgets::pickerOptions(
-                title = "Which measurements were included in your project?",
-                actionsBox = TRUE,
-                liveSearch = TRUE
+            tags$div(class='form-main',
+               tags$div(class='form-header',
+                        h4(class = "form-step", "Step 3"),
+                        h2(class = "form-title", "Project Info")
+               ),
+              p(
+                class = "form-text",
+                'Customize reports with your project-specific information and then click',
+                tags$b("Preview"),
+                'to see what the text will look like in the report.',
+                br(),
+                br(),
+                actionLink(
+                  inputId = "markdown",
+                  label = tags$span(
+                    'Learn how to use basic markdown to format text and insert links for your ', 
+                    tags$b('Project Summary'),
+                    'and ',
+                    tags$b('Looking Forward'),
+                    'sections.'),
+                  icon = icon("circle-info")
+                )
               ),
-              multiple = TRUE
+                  textInput(
+                    inputId = "project_name",
+                    label = "Project Name",
+                    value = "Project Name"
+                  ),
+                  tags$label("Project Summary"),
+                  shinyAce::aceEditor(
+                    outputId = "project_summary",
+                    wordWrap = TRUE,
+                    mode = "markdown",
+                    height = "150px",
+                    value = "Thank the participating farmer. Consider including information related to how many samples you've taken, in how many crops and regions. Identify the project team and acknowledge support from your funders and collaborators.",
+                  ),
+                  shinyWidgets::pickerInput(
+                    inputId = "measurement_definitions",
+                    label = "Measurement Definitions",
+                    choices = measurement_list,
+                    choicesOpt = list(content = unlist(measurement_content, recursive = FALSE)),
+                    options = shinyWidgets::pickerOptions(
+                      title = "Which measurements were included in your project?",
+                      actionsBox = TRUE,
+                      liveSearch = TRUE
+                    ),
+                    multiple = TRUE
+                  ),
+                  textInput(
+                    inputId = "soil_depth",
+                    label = "Soil Sample Depth",
+                    value = "0-12 inches"
+                  ),
+                  tags$label("Looking Forward"),
+                  shinyAce::aceEditor(
+                    outputId = "looking_forward",
+                    wordWrap = TRUE,
+                    mode = "markdown",
+                    height = "150px",
+                    value = "Consider describing how this data will be used. Are you building decision support tools? Publications? Will you be speaking at upcoming field days or conferences about this work? Soils data can be confusing… let your audience know that this is just the start of the conversation! Thank participants once again."
+                  
+              ),
+              actionButton(inputId = "report_preview", label = "Preview", style = "margin:20px 0px;width:100%;"),
+              
             ),
-            textInput(
-              inputId = "soil_depth",
-              label = "Soil Sample Depth",
-              value = "0-12 inches"
-            ),
-            tags$label("Looking Forward"),
-            shinyAce::aceEditor(
-              outputId = "looking_forward",
-              wordWrap = TRUE,
-              mode = "markdown",
-              height = "70%",
-              value = "Consider describing how this data will be used. Are you building decision support tools? Publications? Will you be speaking at upcoming field days or conferences about this work? Soils data can be confusing… let your audience know that this is just the start of the conversation! Thank participants once again."
-            ),
-            actionButton(inputId = "report_preview", label = "Preview", style = "margin:20px 0px;"),
-            div(
-              class = "buttons",
-              actionButton("prev3", "Previous", class = "prev"),
-              actionButton("next3", "Next", class = "next")
+            tags$div(class='form-footer',
+              div(
+                class = "buttons",
+                actionButton("prev3", "Previous", class = "prev"),
+                actionButton("next3", "Next", class = "next")
+              )
             )
           ),
 

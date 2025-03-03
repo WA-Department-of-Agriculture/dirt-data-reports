@@ -12,14 +12,13 @@
 /* You don't need to edit the below content unless you want to
 further customize your HTML report style */
 
-tr th {
-      background: var(--primary-color);
-      font-family: var(--heading-font);
-      color: var(--fg-color);
+.panel-tabset .nav-link {
+  font-family: var(--heading-font)!important;
+  font-weight:bold!important;
 }
 
-table {
-  font-family: var(--body-font);
+.panel-tabset .nav-link img {
+  height:30px!important;
 }
 
 p.subtitle {

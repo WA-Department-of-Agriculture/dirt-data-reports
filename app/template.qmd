@@ -23,7 +23,7 @@ params:
   producer_id: "WUY05"
   definition_file: "files/measurement_dictionary.csv"
   data_file: "files/template.xlsx"
-  measures: ["def-texture.qmd", "def-bulk-density.qmd", "def-soil-ph.qmd", "def-total-nitro.qmd"]
+  measures: ["def-texture.qmd", "def-bulk-density.qmd", "def-soil-ph.qmd", "def-total-nitro.qmd","def-min-c.qmd"]
   project_summary: "Example of a project summary"
   looking_forward: "Example text for the looking forward section"
   
@@ -613,16 +613,19 @@ health](https://www.nrcs.usda.gov/conservation-basics/natural-resource-concerns/
 
 ```{r, results='asis'}
 for (measure_type in distinct_measure_types) {
-  # Print the section header
-  cat("##", measure_type, "\n\n")
-
-  # Get measures belonging to this type
+  
+    # Get measures belonging to this type
   measures_in_type <- measure_mapping |>
-    filter(section_name == measure_type) |>
-    pull(file_name)
+    filter(section_name == measure_type)
+  
+
+  image = paste0('![](images/', tolower(measures_in_type$type[1]),'.png)')
+  
+  # Print the section header
+  cat("##", measure_type, image, "\n\n")
 
   # Include each measure file, ensuring the correct file path
-  for (measure in measures_in_type) {
+  for (measure in measures_in_type$file_name) {
     cat("{{< include quarto/measurements/", measure, " >}}\n\n", sep = "")
   }
 }

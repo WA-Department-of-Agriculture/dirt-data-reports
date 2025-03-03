@@ -20,8 +20,28 @@ body {
   color: #333;
 }
 
+.form-footer {
+  padding-top:20px;
+  padding-bottom:20px;
+}
+
 .navbar-brand a {
   color: white;
+}
+
+#modal-preview .nav-tabs {
+  font-family: "Georgia";
+  font-weight: bold;
+}
+
+#modal-preview h2 {
+  font-family: "Georgia";
+  color: var(--deep-green);
+  font-size: 25px;
+}
+
+#modal-preview p {
+  font-family: "Arial";
 }
 
 
@@ -569,6 +589,7 @@ p {
   display: flex;
   flex-direction: column;
 }
+
 
 .col-2{
   display: flex;

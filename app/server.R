@@ -23,7 +23,7 @@ server <- function(input, output, session) {
 
   # Disable Step 4 on app load
   shinyjs::runjs("document.getElementById('step-2').classList.add('disabled');")
-  shinyjs::disable("report")
+  #shinyjs::disable("report")
   shinyjs::enable("downloadTemplate")
   shinyjs::runjs("document.getElementById('step-2').classList.remove('disabled');")
 
@@ -133,8 +133,22 @@ server <- function(input, output, session) {
 
     # create measure tab panels
     tabs <- lapply(names(grouped_measures), function(section_name) {
+      
+      section_colors<-data.frame(
+        section_name = c("Biological","Physical","Chemical"),
+        color = c("#335c67", "#a60f2d","#d4820a")
+      )
+      
+      image = selected_mapping$type[selected_mapping$section_name == section_name][1]
+      image_path = paste0("pictures/", tolower(image),".png")
+      
+      section_color = section_colors$color[section_colors$section_name == section_name]
+      
       tabPanel(
-        title = section_name,
+        title = tags$div(
+          tags$image(src = image_path, style="height:30px;padding-right:5px"),
+          tags$span(section_name, style=glue("color:{section_color}"))
+        ),
         do.call(div, lapply(grouped_measures[[section_name]], function(qmd_file) {
           includeMarkdown(read_qmd_as_md(paste0("quarto/measurements/", qmd_file)))
         }))
@@ -205,7 +219,7 @@ server <- function(input, output, session) {
         }
       )
       if (is.null(validation_results)) {
-        shinyjs::disable("report")
+      #  shinyjs::disable("report")
         shinyjs::disable("next2")
         shinyjs::runjs("document.getElementById('step-3').classList.add('disabled');")
         shinyjs::runjs("document.getElementById('step-4').classList.add('disabled');")
@@ -299,6 +313,18 @@ server <- function(input, output, session) {
   
 
 
+  observe({
+    if (is.null(input$producer_id) || length(input$producer_id) == 0) {
+      # Disable Build Report if no producer IDs are selected
+      shinyjs::runjs("document.getElementById('step-4').classList.add('disabled');")
+      shinyjs::disable("report")
+    } else {
+      # Enable Build 4 if producer IDs are selected
+      shinyjs::runjs("document.getElementById('step-4').classList.remove('disabled');")
+      shinyjs::enable("report")
+    }
+  })
+  
 
   # Create a df with inputs for quarto::quarto_render()
   quarto_input <- eventReactive(
