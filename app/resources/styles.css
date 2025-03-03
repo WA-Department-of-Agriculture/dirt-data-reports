@@ -39,6 +39,11 @@ body, p, text {
     font-family: var(--body-font)!important;
 }
 
+.opts_hover {
+  font-family:Rockwell!important;
+  color:red!important;
+}
+
 .tab-pane>p {
     padding-top: 0em;
 }

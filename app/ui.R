@@ -2,6 +2,7 @@ library(shiny)
 library(shinyWidgets)
 library(shinyjs)
 library(shinyAce)
+library(systemfonts)
 library(sever)
 library(rmarkdown)
 library(zip)
@@ -53,7 +54,7 @@ ui <- navbarPage(
     tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"),
     tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
     #add favicon
-   # tags$link(rel="shortcut icon", href="pictures/wshi.png"),
+    tags$link(rel="shortcut icon", href="pictures/wshi.png"),
     #add js scripts
     tags$script(src = "scripts/toc.js"),
     tags$script(src = "scripts/stepper.js"),

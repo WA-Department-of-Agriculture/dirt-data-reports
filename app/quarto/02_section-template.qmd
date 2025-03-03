@@ -8,6 +8,10 @@
 ```
 
 ```{r}
+#register fonts
+
+
+  
 # Get path of measurement group image
 image_path <- glue::glue("images/{group}.png")
 
