@@ -1,6 +1,7 @@
 ---
 title: "Results from `r params$project`"
 subtitle: "Fall `r params$year`"
+prefer-html: true
 format:
   html: 
     toc: true
@@ -40,7 +41,7 @@ params:
 # gdtools::register_gfont("Poppins")
 
 library(systemfonts)
-
+library(webshot2)
 # Get the list of available font families
 fonts <- system_fonts()
 families <- unique(fonts$family)

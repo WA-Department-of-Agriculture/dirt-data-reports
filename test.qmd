@@ -1,0 +1,22 @@
+---
+title: "Quarto Format Detection Test"
+author: "Tanya"
+date: today
+format: 
+  html: default
+  docx: default
+  pdf: default
+---
+
+## Detecting the Output Format
+
+```{r}
+# Get the output format
+format <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+
+print(format)
+```
+
+```{r}
+1+1
+```
