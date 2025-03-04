@@ -30,19 +30,40 @@ params:
   
 ---
 
+<!--Add JS event listener to change colors of tabs based on text -->
+
+```{=html}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Select all nav links
+    const navLinks = document.querySelectorAll(".nav-tabs .nav-link");
+
+    navLinks.forEach(link => {
+        switch (link.textContent.trim()) {
+            case "Biological":
+                link.style.color = "#335c67";
+                break;
+            case "Chemical":
+                link.style.color = "#d4820a";
+                break;
+            case "Physical":
+                link.style.color = "#a60f2d";
+                break;
+        }
+    });
+});
+</script>
+```
+
 <!-- Set styling variables -->
 
 ```{r set-fonts-colors}
 #| output: false
 
-# library(gdtools)
-# library(gfonts)
-# 
-# gdtools::register_gfont("Lato")
-# gdtools::register_gfont("Poppins")
 
 library(systemfonts)
 library(webshot2)
+
 # Get the list of available font families
 fonts <- system_fonts()
 families <- unique(fonts$family)
