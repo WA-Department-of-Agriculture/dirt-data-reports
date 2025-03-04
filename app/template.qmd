@@ -19,6 +19,7 @@ execute:
     warning: false
 params:
   project_name: Test Project
+  soil_depth: "0-6 inches"
   year: 2023
   producer_id: "WUY05"
   definition_file: "files/measurement_dictionary.csv"
@@ -805,18 +806,18 @@ if (!NA %in% gis_df$longitude & !NA %in% gis_df$latitude) {
 ```{r save-map}
 # Save a screenshot of the map for the docx report if htmlwidgets and webshot2
 # are installed.
-# if (exists("map") &
-#   requireNamespace("htmlwidgets", quietly = TRUE) &
-#   requireNamespace("webshot2", quietly = TRUE)) {
-#   invisible(htmlwidgets::saveWidget(
-#     map,
-#     file = glue::glue("{path}/map.html")
-#   ))
-#   invisible(webshot2::webshot(
-#     url = glue::glue("{path}/map.html"),
-#     file = glue::glue("{path}/map.png"),
-#   ))
-# }
+if (exists("map") &
+  requireNamespace("htmlwidgets", quietly = TRUE) &
+  requireNamespace("webshot2", quietly = TRUE)) {
+  invisible(htmlwidgets::saveWidget(
+    map,
+    file = glue::glue("{path}/map.html")
+  ))
+  invisible(webshot2::webshot(
+    url = glue::glue("{path}/map.html"),
+    file = glue::glue("{path}/map.png"),
+  ))
+}
 ```
 
 ```{r map-html}
@@ -841,7 +842,7 @@ if (exists("map") & fs::file_exists(glue::glue("{path}/map.png"))) {
 Below are tables and graphs describing the physical, biological, and chemical
 measurements from your soils. Each point represents a sample we collected. Take
 a look to see how your fields compare to others in the project. All samples were
-collected from \[EDIT: SOIL DEPTH (e.g. 0-6 inches, or 0-30 cm)\].
+collected from `r params$soil_depth`.
 
 ```{r create-measurement-group-sections}
 #| output: asis

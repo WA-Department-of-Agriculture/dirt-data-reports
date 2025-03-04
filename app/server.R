@@ -347,6 +347,7 @@ server <- function(input, output, session) {
               measures = input$measurement_definitions,
               project_name = input$project_name,
               project_summary = input$project_summary,
+              soil_depth = input$soil_depth,
               looking_forward = input$looking_forward
             )
           )
