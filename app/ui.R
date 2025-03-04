@@ -17,7 +17,6 @@ library(soils)
 library(webshot)
 library(webshot2)
 library(chromote)
-library(curl)
 
 source("utils/functions.R")
 source("utils/data_validation.R")
