@@ -804,20 +804,49 @@ if (!NA %in% gis_df$longitude & !NA %in% gis_df$latitude) {
 ```
 
 ```{r save-map}
+#| output: false
+
 # Save a screenshot of the map for the docx report if htmlwidgets and webshot2
 # are installed.
-if (exists("map") &
-  requireNamespace("htmlwidgets", quietly = TRUE) &
-  requireNamespace("webshot2", quietly = TRUE)) {
-  invisible(htmlwidgets::saveWidget(
-    map,
-    file = glue::glue("{path}/map.html")
-  ))
-  invisible(webshot2::webshot(
-    url = glue::glue("{path}/map.html"),
-    file = glue::glue("{path}/map.png"),
-  ))
-}
+# if (exists("map") &
+#   requireNamespace("htmlwidgets", quietly = TRUE) &
+#   requireNamespace("webshot2", quietly = TRUE)) {
+#   invisible(htmlwidgets::saveWidget(
+#     map,
+#     file = glue::glue("{path}/map.html")
+#   ))
+#   invisible(webshot2::webshot(
+#     url = glue::glue("{path}/map.html"),
+#     file = glue::glue("{path}/map.png"),
+#   ))
+# }
+
+
+#example with chromote instead of webshot
+# if (exists("map") &&
+#     requireNamespace("htmlwidgets", quietly = TRUE) &&
+#     requireNamespace("chromote", quietly = TRUE)) {
+#   
+#   # Load necessary libraries
+#   library(chromote)
+#   library(htmlwidgets)
+# 
+#   # Create a Chromote session
+#   b <- ChromoteSession$new()
+# 
+#   # Save widget as HTML
+#   html_file <- glue::glue("{path}/map.html")
+#   saveWidget(map, file = html_file)
+# 
+#   # Use Chromote to capture a screenshot
+#   img_file <- glue::glue("{path}/map.png")
+#   b$Page$navigate(paste0("file://", normalizePath(html_file)))
+#   Sys.sleep(2) # Allow time for page to load
+#   b$screenshot(filename = img_file)
+# 
+#  # cat("Map successfully saved as an image using Chromote!")
+# }
+
 ```
 
 ```{r map-html}

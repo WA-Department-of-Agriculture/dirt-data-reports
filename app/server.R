@@ -1,5 +1,8 @@
 server <- function(input, output, session) {
   
+  
+  
+  
   #when screen is inactive and app disconnects prompt with reload screen
   sever(
     html = sever_default(
