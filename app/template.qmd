@@ -30,30 +30,7 @@ params:
   
 ---
 
-<!--Add JS event listener to change colors of tabs based on text -->
 
-```{=html}
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Select all nav links
-    const navLinks = document.querySelectorAll(".nav-tabs .nav-link");
-
-    navLinks.forEach(link => {
-        switch (link.textContent.trim()) {
-            case "Biological":
-                link.style.color = "#335c67";
-                break;
-            case "Chemical":
-                link.style.color = "#d4820a";
-                break;
-            case "Physical":
-                link.style.color = "#a60f2d";
-                break;
-        }
-    });
-});
-</script>
-```
 
 <!-- Set styling variables -->
 
@@ -86,6 +63,12 @@ if (!("Arial" %in% families)) {
 # EDIT: Replace any font names and colors to match your branding.
 header_font <- "Georgia"
 body_font <- "Arial"
+
+# Group header colors
+section_colors<-data.frame(
+    section_name = c("Biological","Physical","Chemical"),
+    color = c("#335c67", "#a60f2d","#d4820a")
+  )
 
 # Flextable colors -----------------------------------------------------
 
@@ -636,21 +619,28 @@ health](https://www.nrcs.usda.gov/conservation-basics/natural-resource-concerns/
 ```{r, results='asis'}
 for (measure_type in distinct_measure_types) {
   
-    # Get measures belonging to this type
-  measures_in_type <- measure_mapping |>
+  # Get measures belonging to this type
+  measures_in_type <- measure_mapping |> 
     filter(section_name == measure_type)
-  
 
-  image = paste0('![](images/', tolower(measures_in_type$type[1]),'.png)')
+  # Measure group image path
+  image <- paste0('![](images/', tolower(measures_in_type$type[1]), '.png)')
   
-  # Print the section header
-  cat("##", measure_type, image, "\n\n")
+  # Header color
+  color <- section_colors$color[section_colors$section_name == measure_type]
 
-  # Include each measure file, ensuring the correct file path
+  # Apply inline styling to measure group  header
+  styled_header <- paste0("## [**", measure_type, "**]{style='color:", color,"'}")
+
+  # Print the measure group header with image
+  cat(styled_header, image, "\n\n")
+
+  # Include each measure file in group
   for (measure in measures_in_type$file_name) {
     cat("{{< include quarto/measurements/", measure, " >}}\n\n", sep = "")
   }
 }
+
 ```
 :::
 :::
