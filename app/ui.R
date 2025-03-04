@@ -364,18 +364,20 @@ ui <- navbarPage(
                 selected = NULL,
                 multiple = FALSE
               ),
-              shinyWidgets::pickerInput(
-                inputId = "producer_id",
-                label = "Producer IDs",
-                choices = NULL,
-                options = shinyWidgets::pickerOptions(
-                  title = "Select up to 5 producers",
-                  actionsBox = TRUE,
-                  liveSearch = TRUE,
-                  maxOptions = 5,
-                  maxOptionsText = "Maximum of 5"
-                ),
-                multiple = TRUE
+              tags$div(id='producer-dropdown', style='width:100%;display:flex;justify-content:center',
+                shinyWidgets::pickerInput(
+                  inputId = "producer_id",
+                  label = "Producer IDs",
+                  choices = NULL,
+                  options = shinyWidgets::pickerOptions(
+                    title = "Select up to 5 producers",
+                    actionsBox = TRUE,
+                    liveSearch = TRUE,
+                    maxOptions = 5,
+                    maxOptionsText = "Maximum of 5"
+                  ),
+                  multiple = TRUE
+                )
               )
             ),
             # Output Selection Buttons

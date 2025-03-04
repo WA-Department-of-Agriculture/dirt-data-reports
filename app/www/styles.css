@@ -9,7 +9,6 @@
   --beige-gray: #CCC29C;     
   --light-cream: #F2F0E6;  
   --soil-brown: #603916;
-  
   --active-blue: #2268a1;
   --active-green: #22b648e6;
 }
@@ -18,6 +17,17 @@ body {
   margin: 0;
   font-family: Lato, sans-serif;
   color: #333;
+}
+
+#producer-dropdown .actions-btn.bs-select-all.btn.btn-default {
+  display:none;
+}
+
+#producer-dropdown .actions-btn.bs-deselect-all.btn.btn-default
+{
+    width: 100%;
+    border-radius: 2px;
+    margin-left: 0px;
 }
 
 .form-footer {
