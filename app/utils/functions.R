@@ -45,7 +45,7 @@ create_hero <- function(title, image_url) {
       "background-size: cover; ",
       "background-position: center; ",
       "padding: 50px; ",
-      "width: 100vw; ",
+      "width: 100%; ",
       # Ensure full viewport width
       "height: auto;",
       # Adjust the height to auto
