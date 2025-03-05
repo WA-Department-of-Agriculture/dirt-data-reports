@@ -31,8 +31,8 @@ The **`Data Dictionary`** must contain all expected reference fields.
 
 ### 4. Unique Values Check
 
-- Certain columns (like ``sample_id`` or ``producer_id``) must be **unique** based on defined rules.
-- Some fields must be **unique within specific groups**  (e.g., ``field_id`` must be unique within each ``producer_id``).
+- ``sample_id`` must be **unique** across the entire dataset.
+- ``field_id`` must be **unique** within each ``year`` and ``producer_id`` combination. (i.e., Producer A cannot have two fields called `Field 01` sampled in 2023.)
 
 🚨 *If duplicates are found, they will be flagged.*
 

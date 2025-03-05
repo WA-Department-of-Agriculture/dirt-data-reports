@@ -78,9 +78,9 @@ The server script manages data processing, validation, user interactions, and re
 -   **Purpose**: Ensures the "Data Dictionary" sheet contains the fields: `measurement_group`, `column_name`, `abbr`, and `unit`.
 -   **Failure**: Missing fields are reported.
 
-### **4. Check for Unique `sample_id`, `field_id`, and `field_name` Values**
+### **4. Check for Unique `sample_id` and `field_id` Values**
 
--   **Purpose**: Ensures the `sample_id` column contains unique values and `field_id` and `field_name` values are unique for each `producer_id`.
+-   **Purpose**: Ensures the `sample_id` column contains unique values and `field_id` values are unique for each `year` and `producer_id` group.
 -   **Failure**: Duplicate values are listed in the error message.
 
 ### **5. Check for Additional Columns in "Data"**
