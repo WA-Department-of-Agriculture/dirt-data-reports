@@ -7,17 +7,20 @@ read_qmd_as_md <- function(file_path) {
   # Convert to a single string with proper line breaks
   content <- paste(lines, collapse = "\n")
   
-  # Use `(?s)` to allow `.` to match newlines (dotall mode)
+  # ✅ Remove Quarto-specific div markers
   content <- str_remove_all(content, "(?s)::: \\{\\.content-visible unless-format=\"html\"\\}.*?:::")
   
-  # Remove any attributes inside {} (like {width="5.8in" fig-alt="..."})
+  # Remove attributes inside `{}` (like `{width="5.8in" fig-alt="..."}`)
   content <- str_replace_all(content, "\\{[^}]+\\}", "")
   
-  # Remove ::: div markers used in Quarto
+  # Remove Quarto's ::: markers
   content <- str_replace_all(content, ":::", "")
   
-  # Remove HTML comments (<!-- ... -->)
+  # Remove HTML comments
   content <- str_replace_all(content, "<!--.*?-->", "")
+  
+  # Convert superscripts (e.g., `NH^~4~+^` → `NH<sup>4+</sup>`)
+  content <- str_replace_all(content, "\\^([0-9+-]+)\\^", "<sup>\\1</sup>")
   
   # Ensure image links remain properly formatted with a new line before them
   content <- str_replace_all(content, "!\\[(.*?)\\]\\((.*?)\\)", "\n![](\\2)\n")

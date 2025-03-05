@@ -1,5 +1,5 @@
 ***Cation Exchange Capacity*** (CEC) describes the soil's ability to hold a
-slow-release reservoir of nutrients, as positively charged ions (e.g., NH^~4~+^,
+slow-release reservoir of nutrients, as positively charged ions (e.g., NH^4+^,
 K^+^, Ca^2+^, Mg^2+^) in the soil are held by negatively charged sites on clay
 particles and SOM. While CEC is determined in part by soil texture, increasing
 SOM can greatly increase CEC. Sandy loam soils typically have CECs ranging from

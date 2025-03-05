@@ -1,11 +1,3 @@
-```{r}
-# If the report fails to render at the `create-measurement-group-sections` chunk
-# in `01_producer-report.qmd`, run all chunks above to load the data in your
-# environment. Then uncomment this group assignment and run each code chunk in
-# this file interactively to troubleshoot.
-
-# group <- "Physical"
-```
 
 ```{r}
 #register fonts
