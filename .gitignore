@@ -55,6 +55,6 @@ rsconnect/
 /app/*.html
 /app/*.docx
 
-# figure_output folder
+# figure_output folders
 /app/figure-output
-/app/template_files
+/figure-output

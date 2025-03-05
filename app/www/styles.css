@@ -44,7 +44,9 @@ body {
 }
 
 .tab-content img {
-  max-width:100%;
+  display: flex;
+  flex-direction: row;
+  max-width: 50%;
 }
 
 #modal-preview .nav-tabs {
