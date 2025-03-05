@@ -39,11 +39,11 @@ body {
   color: white;
 }
 
-.tab-content .content {
+.tabbable .tab-content .content {
   padding:0px!important;
 }
 
-.tab-content img {
+.tabbable .tab-content img {
   display: flex;
   flex-direction: row;
   max-width: 50%;
