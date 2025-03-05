@@ -39,6 +39,14 @@ body {
   color: white;
 }
 
+.tab-content .content {
+  padding:0px!important;
+}
+
+.tab-content img {
+  max-width:100%;
+}
+
 #modal-preview .nav-tabs {
   font-family: "Georgia";
   font-weight: bold;

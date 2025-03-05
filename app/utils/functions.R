@@ -1,20 +1,36 @@
 library(htmltools)
 
 
-#convert qmd to md, used in preview modal
 read_qmd_as_md <- function(file_path) {
   lines <- readLines(file_path, warn = FALSE)
-  # Remove YAML metadata (if present)
-  if (grepl("^---$", lines[1])) {
-    end_yaml <- which(lines == "---")[2]
-    # Find the second "---"
-    if (!is.na(end_yaml)) {
-      # Skip YAML block
-      lines <- lines[(end_yaml + 1):length(lines)]
-    }
-  }
-  paste(lines, collapse = "\n")
+  
+  # Convert to a single string with proper line breaks
+  content <- paste(lines, collapse = "\n")
+  
+  # Use `(?s)` to allow `.` to match newlines (dotall mode)
+  content <- str_remove_all(content, "(?s)::: \\{\\.content-visible unless-format=\"html\"\\}.*?:::")
+  
+  # Remove any attributes inside {} (like {width="5.8in" fig-alt="..."})
+  content <- str_replace_all(content, "\\{[^}]+\\}", "")
+  
+  # Remove ::: div markers used in Quarto
+  content <- str_replace_all(content, ":::", "")
+  
+  # Remove HTML comments (<!-- ... -->)
+  content <- str_replace_all(content, "<!--.*?-->", "")
+  
+  # Ensure image links remain properly formatted with a new line before them
+  content <- str_replace_all(content, "!\\[(.*?)\\]\\((.*?)\\)", "\n![](\\2)\n")
+  
+  # Remove extra spaces introduced during cleaning
+  content <- str_replace_all(content, "\\s+\n", "\n")  # Trim spaces before new lines
+  content <- str_replace_all(content, "\n{2,}", "\n\n")  # Ensure at most one blank line
+  
+  return(content)
 }
+
+
+
 
 create_hero <- function(title, image_url) {
   tags$div(

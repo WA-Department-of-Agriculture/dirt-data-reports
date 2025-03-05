@@ -154,6 +154,9 @@ server <- function(input, output, session) {
         ),
         do.call(div, lapply(grouped_measures[[section_name]], function(qmd_file) {
           includeMarkdown(read_qmd_as_md(paste0("quarto/measurements/", qmd_file)))
+          #file<-paste0("quarto/measurements/html/", str_replace(qmd_file,".qmd",".html"))
+          #html<-readLines(file, warn=F)
+          #includeHTML(html)
         }))
       )
     })
