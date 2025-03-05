@@ -57,7 +57,7 @@ ui <- navbarPage(
   windowTitle = "Soil Health Reports",
   id = "main_page",
   collapsible = TRUE,
-  selected = "page_generate_report",
+  selected = "page_home",
   header = tags$head(
     #add font awesome and css stylesheets
     tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"),
