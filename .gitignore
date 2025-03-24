@@ -1,0 +1,10 @@
+# macOS junk
+.DS_Store
+
+# R-specific
+.Rhistory
+.Rapp.history
+.RData
+.Ruserdata
+.Rproj.user/
+.Rproj.user/**

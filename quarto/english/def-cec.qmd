@@ -1,0 +1,10 @@
+***Cation Exchange Capacity*** (CEC) describes the soil's ability to hold a
+slow-release reservoir of nutrients, as positively charged ions (e.g., NH^4+^,
+K^+^, Ca^2+^, Mg^2+^) in the soil are held by negatively charged sites on clay
+particles and SOM. While CEC is determined in part by soil texture, increasing
+SOM can greatly increase CEC. Sandy loam soils typically have CECs ranging from
+1 to 10 meq/100 g, loam soils range from 5 to 15 meq/100 g, and clay soils have
+CECs greater than 30 meq/100 g. SOM can provide an additional 200 to 400 meq/100
+g (note that CEC units may be reported differently, but 1 meq/100g = 1
+cmolc/kg). Soil pH can also alter the CEC of organic matter and clay particles,
+further underscoring the impact of pH on other soil measurements.
