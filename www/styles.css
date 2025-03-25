@@ -93,11 +93,11 @@ body {
   width:100%;
 }
 
-#producer-dropdown .actions-btn.bs-select-all.btn.btn-default {
+#build-step4-producer_input .actions-btn.bs-select-all.btn.btn-default {
   display:none;
 }
 
-#producer-dropdown .actions-btn.bs-deselect-all.btn.btn-default
+#build-step4-producer_input .actions-btn.bs-deselect-all.btn.btn-default
 {
     width: 100%;
     border-radius: 2px;
