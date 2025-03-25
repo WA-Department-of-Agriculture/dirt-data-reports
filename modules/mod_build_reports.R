@@ -62,7 +62,7 @@ mod_build_reports_server <- function(id) {
           `data-step` = 1,
           title = "Start here",
           onclick = paste0("setStep(this, '", ns("step_click"), "')"),
-          tags$div(class = "step-circle", icon("circle")),
+          tags$div(class = "step-circle", icon("download")),
           tags$div(div(class = "step-num", "Step 1"), div(class = "step-text", "Download Template"))
         ),
         
