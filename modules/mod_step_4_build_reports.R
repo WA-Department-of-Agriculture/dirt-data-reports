@@ -107,6 +107,9 @@ mod_step_4_build_reports_server <- function(id, state) {
         template_copy <- file.path(temp_dir, "template.qmd")
         file.copy(original_template, template_copy)
         
+        section_template_copy <- file.path(temp_dir, "section_template.qmd")
+        file.copy(original_template, section_template_copy)
+        
         # Create 'styles' subdirectory in the temp directory
         styles_dir <- file.path(temp_dir, "styles")
         dir.create(styles_dir, recursive = TRUE, showWarnings = FALSE)
