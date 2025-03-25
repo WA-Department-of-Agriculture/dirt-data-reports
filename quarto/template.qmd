@@ -243,20 +243,14 @@ results_long <- data |>
 ```
 
 ```{r get-producer-info}
-# Ensure 'farm_name' and 'field_name' exist; create if missing
+# Ensure 'farm_name' exist; create if missing
 if (!"farm_name" %in% names(results_long)) results_long$farm_name <- NA
-if (!"field_name" %in% names(results_long)) results_long$field_name <- NA
 
-# Fill missing farm/field names with fallback labels
+# Fill missing farm names with fallback labels
 results_long$farm_name <- ifelse(
   is.na(results_long$farm_name),
   glue::glue("Farm {params$producer_id}"),
   results_long$farm_name
-)
-results_long$field_name <- ifelse(
-  is.na(results_long$field_name),
-  glue::glue("Field {results_long$field_id}"),
-  results_long$field_name
 )
 
 # Subset to producer samples
@@ -361,7 +355,7 @@ producer_table <- producer_samples |>
     measurement_group,
     abbr,
     value,
-    !!tr("field_or_average") := field_name,
+    !!tr("field_or_average") := field_id,
     Textura = texture
   )
 
@@ -500,7 +494,7 @@ df_plot <- results_long |>
     # Label for tooltip
     label = dplyr::case_when(
       category == tr("your_fields") ~ glue::glue(
-        "{field_name}<br>{crop}<br>{value} {unit}"
+        "{field_id}<br>{crop}<br>{value} {unit}"
       ),
       category == tr("same_crop") ~ glue::glue(
         "{crop}<br>{value} {unit}"
@@ -870,7 +864,6 @@ gis_ft <- gis_df |>
   dplyr::select(
     !!tr("sample_id") := sample_id,
     !!tr("field_id") := field_id,
-    !!tr("field_name") := field_name,
     !!tr("crop") := crop,
     !!tr("longitude") := longitude,
     !!tr("latitude") := latitude
@@ -1011,3 +1004,5 @@ list(
 
 <!-- ACKNOWLEDGEMENTS TEXT -->
 `r get_text(section = "acknowledgements", content_dir = params$language)`
+
+\
