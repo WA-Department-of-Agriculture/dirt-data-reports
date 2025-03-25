@@ -66,7 +66,6 @@ fs::dir_create(path)
 ```{r set-fonts-colors}
 #| output: false
 
-
 # Get the list of available font families
 fonts <- system_fonts()
 families <- unique(fonts$family)
@@ -84,7 +83,6 @@ if (!("Arial" %in% families)) {
 } else {
   message("Arial font is already registered.")
 }
-
 
 # EDIT: Replace any font names and colors to match your branding.
 header_font <- "Georgia"
@@ -159,24 +157,20 @@ parse_bullets_from_markdown <- function(section, content_dir = "english") {
 
 lang_map <- yaml::read_yaml(file.path(params$language, "mapping.yml"))
 
-
 tr <- function(key) {
   lang_map[[key]] %||% key
 }
-
 ```
 
 ```{r read-data}
-
-
 ### SET UP MEASUREMENT DEFINITIONS
 measures <- unlist(strsplit(params$measures, ","))
-measurement_dictionary <- read.csv(paste0(params$language,"/measurement_dictionary.csv"))
+measurement_dictionary <- read.csv(paste0(params$language, "/measurement_dictionary.csv"))
 
 # filtered dictionary
-selected_measures<- measurement_dictionary |> filter(file_name %in% measures)
+selected_measures <- measurement_dictionary |> filter(file_name %in% measures)
 
-# unique measure types, e.g. Biological, Phyisical, Etc
+# unique measure types, e.g. Biological, Physical, Etc
 distinct_selected_measure_types <- selected_measures |>
   distinct(section_name) |>
   pull(section_name)
@@ -240,7 +234,6 @@ results_long <- data |>
   ) |>
   dplyr::arrange(group_order, measurement_order) |>
   dplyr::filter(!is.na(value))
-
 ```
 
 ```{r get-producer-info}
@@ -333,13 +326,21 @@ county_summary <- results_long |>
   ) |>
   dplyr::rename(
     !!tr("field_or_average") := `Field or Average`,
-    !!tr("texture")  := Texture
+    !!tr("texture") := Texture
   )
 
 project_summary <- soils::summarize_by_project(results_long) |>
   dplyr::mutate(
-    `Field or Average` = gsub("Fields", tr("fields"), `Field or Average`),
-    `Field or Average` = gsub("Project Average",tr("project_average"),`Field or Average`)
+    `Field or Average` = gsub(
+      "Fields",
+      tr("fields"),
+      `Field or Average`
+    ),
+    `Field or Average` = gsub(
+      "Project Average",
+      tr("project_average"),
+      `Field or Average`
+    )
   ) |>
   dplyr::rename(
     !!tr("field_or_average") := `Field or Average`,
@@ -387,7 +388,10 @@ groups <- df_table |>
 # Special wrangling for texture
 
 # Extract physical df from averages list
-physical <- setNames(list(groups[[tr("physical_group")]]), tr("physical_group"))
+physical <- setNames(
+  list(groups[[tr("physical_group")]]),
+  tr("physical_group")
+)
 
 # Remove texture from all dataframes except physical
 groups <- purrr::map(
@@ -408,11 +412,11 @@ rm(physical)
 ```{r remove-rows-with-one-observation}
 # Delete any county or crop averages where n = 1 or county/crop is blank.
 
-#e.g. ^1 Fields)|NA or ^1 Campos)|NA
+# e.g. ^1 Fields)|NA or ^1 Campos)|NA
 search <- paste0("(^1 ", tr("fields"), ")|NA")
 
 tables <- groups |>
-  purrr::  map(~ filter(.x, !grepl(search, !!sym(tr("field_or_average")))))
+  purrr::map(~ filter(.x, !grepl(search, !!sym(tr("field_or_average")))))
 
 # Order list of tables based on how they appear in dictionary. Important that
 # tables and headers are in the same order for the make-flextables chunk.
@@ -481,11 +485,12 @@ df_plot <- results_long |>
     category = factor(
       category,
       levels = c(
-        tr("your_fields"), 
-        tr("same_crop"), 
+        tr("your_fields"),
+        tr("same_crop"),
         tr("same_county"),
         tr("other_fields")
-    )),
+      )
+    ),
     # Label for tooltip
     label = dplyr::case_when(
       category == tr("your_fields") ~ glue::glue(
@@ -494,7 +499,7 @@ df_plot <- results_long |>
       category == tr("same_crop") ~ glue::glue(
         "{crop}<br>{value} {unit}"
       ),
-      category ==  tr("same_county") ~ glue::glue(
+      category == tr("same_county") ~ glue::glue(
         "{county}<br>{value} {unit}"
       ),
       .default = glue::glue(
@@ -511,7 +516,10 @@ df_plot <- df_plot[order(df_plot$category, decreasing = TRUE), ]
 
 ```{r prep-texture-triangle}
 # Make sure dataset has sand, silt, and clay measurements
-texture <- dplyr::filter(producer_samples, abbr %in% c(tr("sand"), tr("silt"), tr("clay")))
+texture <- dplyr::filter(
+  producer_samples,
+  abbr %in% c(tr("sand"), tr("silt"), tr("clay"))
+)
 
 # Select only the texture variables from the plot df and pivot so each texture
 # is in its own column
@@ -551,8 +559,8 @@ make_tt <- all(grepl(
 ```{r make-texture-triangle}
 # Only create texture triangle if above prep-texture-triangle ran
 if (make_tt) {
-  # Since the texture triangle is made with base R plotting functions, we need to
-  # set our graphics device to save it as a PNG for embedding in our report.
+  # Since the texture triangle is made with base R plotting functions, we need
+  # to set our graphics device to save it as a PNG for embedding in our report.
   ragg::agg_png(
     "figure-output/texture-triangle.png",
     res = 150,
@@ -564,40 +572,45 @@ if (make_tt) {
   # Create the texture triangle
   soils::make_texture_triangle(body_font = body_font)
 
-  # The two character code glued to the end of the six character hex color is the
-  # opacity level. The opacity value ranges from 00 to FF, with 00 being fully
-  # transparent and FF being fully opaque. See a chart to find the opacity code
-  # for the level of transparency you want: https://drawne.com/hex-opacity/.
+  # The two character code glued to the end of the six character hex color is
+  # the opacity level. The opacity value ranges from 00 to FF, with 00 being
+  # fully transparent and FF being fully opaque. See a chart to find the opacity
+  # code for the level of transparency you want:
+  # https://drawne.com/hex-opacity/.
 
   # Add points for other fields on the bottom
-    soils::add_texture_points(
+  soils::add_texture_points(
     texture_list[[tr("other_fields")]],
-    color = glue::glue(other_color, 80),
-    pch = 19,
+    color = glue::glue(other_color, "CC"),
+    bg = glue::glue(other_color, 99),
+    pch = 21,
     size = 1.36
   )
 
   # Next add points for sampe crop
   soils::add_texture_points(
     texture_list[[tr("same_crop")]],
-    color = glue::glue(secondary_color, 99),
-    pch = 18,
-    size = 2.16
+    color = glue::glue("#918D8D", "CC"),
+    bg = glue::glue("#918D8D", 99),
+    pch = 24,
+    size = 1.36
   )
 
   # Next add points for same county
   soils::add_texture_points(
     texture_list[[tr("same_county")]],
-    color = glue::glue(secondary_color, 99),
-    pch = 17,
-    size = 2.16
+    color = glue::glue("#494646", "CC"),
+    bg = glue::glue("#494646", 99),
+    pch = 8,
+    size = 2
   )
 
   # Lastly, add points for 'Su campo' on top of the other layers
   soils::add_texture_points(
     texture_list[[tr("your_fields")]],
-    color = glue::glue(primary_color, "CC"),
-    pch = 15,
+    color = glue::glue(primary_color, "FF"),
+    bg = glue::glue(primary_color, "CC"),
+    pch = 22,
     size = 2.4
   )
 
@@ -610,14 +623,20 @@ if (make_tt) {
       tr("other_fields")
     ),
     color = c(
-      glue::glue(primary_color, "CC"),
-      glue::glue(secondary_color, 99),
-      glue::glue(secondary_color, 99),
-      glue::glue(other_color, 80)
+      primary_color,
+      secondary_color,
+      "#918D8D",
+      other_color
     ),
-    pch = c(15, 17, 18, 19),
-    size = c(2.4, 2.16, 2.16, 1.36),
-    vertical_spacing = 1.5,
+    pt.bg = c(
+      glue::glue(primary_color, "CC"),
+      glue::glue("#494646", 99),
+      glue::glue("#918D8D", 99),
+      glue::glue(other_color, 99)
+    ),
+    pch = c(22, 8, 24, 21),
+    size = c(2.4, 2, 1.36, 1.36),
+    vertical_spacing = 1.5
   )
 
   # Turn off the graphics device to save the figure
@@ -641,13 +660,14 @@ plot_list <- df_plot |>
     plot <- soils::make_strip_plot(
       group,
       color = category,
+      fill = category,
       size = category,
       shape = category,
       alpha = category,
       language = str_to_title(params$language)
     ) |>
       # Set color, size, shape, alpha scales
-      soils::set_scales(
+      set_scales(
         primary_color = primary_color,
         secondary_color = secondary_color,
         other_color = other_color,
@@ -748,15 +768,15 @@ for (measure_type in distinct_selected_measure_types) {
 `r get_text(section = "indicators", content_dir = params$language)`
 
 ```{r indicator-table}
-#read in data to generate indicators table, ignore empty rows
-indicators<-selected_measures[, 6:9]
+# read in data to generate indicators table, ignore empty rows
+indicators <- selected_measures[, 6:9]
 indicators <- indicators[!apply(indicators, 1, function(row) all(is.na(row) | row == "")), ]
 names(indicators) <- gsub("\\.", " ", names(indicators))
 
-#grouping column name always indexed at 3 (post-subset)
-indicator_groups<-colnames(indicators)[3]
+# grouping column name always indexed at 3 (post-subset)
+indicator_groups <- colnames(indicators)[3]
 
-#generate flextable
+# generate flextable
 flextable::as_grouped_data(indicators, groups = indicator_groups) |>
   flextable::as_flextable() |>
   soils::style_ft(
@@ -766,8 +786,8 @@ flextable::as_grouped_data(indicators, groups = indicator_groups) |>
     header_text_color = header_text_color,
     border_color = border_color
   ) |>
-  #@jadeyryan need help determining how to handle logic
-  #flextable::bg(i = ~ !is.na(`Medir cada`), bg = lighter_color) |> 
+  # @jadeyryan need help determining how to handle logic
+  # flextable::bg(i = ~ !is.na(`Medir cada`), bg = lighter_color) |>
   flextable::set_table_properties(layout = "autofit")
 ```
 
@@ -791,11 +811,14 @@ gis_ft <- gis_df |>
 
 # If crop is empty, remove the column from the printed table
 if (all(is.na(gis_ft[[tr("crop")]]))) {
-  gis_ft <- gis_ft |> select(-all_of(tr("crop")))
+  gis_ft <- gis_ft |>
+    select(-all_of(tr("crop")))
 }
 # If longitude or latitude are empty, remove the columns from the printed table
-if (all(is.na(gis_ft[[tr("longitude")]])) | all(is.na(gis_ft[[tr("latitude")]]))) {
-  gis_ft <- gis_ft |> select(-any_of(c(tr("longitude"), tr("latitude"))))
+if (all(is.na(gis_ft[[tr("longitude")]])) |
+  all(is.na(gis_ft[[tr("latitude")]]))) {
+  gis_ft <- gis_ft |>
+    select(-any_of(c(tr("longitude"), tr("latitude"))))
 }
 
 gis_ft |>
@@ -890,4 +913,3 @@ cat(sections, sep = "\n")
 
 <!-- ACKNOWLEDGEMENTS TEXT -->
 `r get_text(section = "acknowledgements", content_dir = params$language)`
-

@@ -8,3 +8,4 @@
 .Ruserdata
 .Rproj.user/
 .Rproj.user/**
+/figure-output
