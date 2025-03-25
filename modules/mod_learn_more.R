@@ -1,6 +1,7 @@
 mod_learn_more_ui <- function(id) {
   ns <- NS(id)
   tagList(
+    create_hero("Learn More", "pictures/default-hero.png"),
     div(
       class = "content-container",
       div(class = "content",id = "content-area",

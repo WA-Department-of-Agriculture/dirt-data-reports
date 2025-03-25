@@ -20,7 +20,6 @@ ui <- navbarPage(
     tags$link(rel = "shortcut icon", href = "pictures/wshi.png"),
     tags$script(src = "scripts/toc.js"),
     tags$script(src = "scripts/stepper.js"),
-    tags$script(src = "scripts/customButton.js"),
     shinyjs::useShinyjs(),
     sever::useSever()
   ),
