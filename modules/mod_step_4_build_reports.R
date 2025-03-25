@@ -14,7 +14,8 @@ mod_step_4_build_reports_ui <- function(id, state) {
       shinyWidgets::checkboxGroupButtons(
         inputId = ns("format"),
         label = "Select Report Formats",
-        choices = c("Word" = "docx", "HTML" = "html"),
+        choices = c("<div style='text-align:center;'><i class='fas fa-file-word fa-2x'></i><br><span>Word</span></div>" = "docx",
+                    "<div style='text-align:center;'><i class='fas fa-file-code fa-2x'></i><br><span>HTML</span></div>" = "html"),
         selected = isolate(state$step_4_vals$format) %||% c("html", "docx"),
         justified = TRUE
       ),
@@ -22,6 +23,8 @@ mod_step_4_build_reports_ui <- function(id, state) {
       downloadButton(ns("report"), "Build Report", style='margin-top:20px')
   )
 }
+
+
 
 
 mod_step_4_build_reports_server <- function(id, state) {
