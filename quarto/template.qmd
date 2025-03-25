@@ -38,7 +38,7 @@ params:
   soil_depth: "0-12 inches"
   project_summary: "This is a summary."
   looking_forward: "Next steps include more analysis."
-  measures: ["def-texture.qmd", "def-bulk-density.qmd", "def-soil-ph.qmd", "def-total-nitro.qmd","def-min-c.qmd"]
+  measures: ["def-texture.qmd", "def-bulk-density.qmd", "def-ph.qmd", "def-total-c.qmd", "def-total-n.qmd","def-min-c.qmd"]
 ---
 
 ```{r set-up}
@@ -165,10 +165,14 @@ tr <- function(key) {
 ```{r read-data}
 ### SET UP MEASUREMENT DEFINITIONS
 measures <- unlist(strsplit(params$measures, ","))
-measurement_dictionary <- read.csv(paste0(params$language, "/measurement_dictionary.csv"))
+measurement_dictionary <- read.csv(
+  paste0(params$language, "/measurement_dictionary.csv"),
+  encoding = "UTF-8"
+)
 
 # filtered dictionary
-selected_measures <- measurement_dictionary |> filter(file_name %in% measures)
+selected_measures <- measurement_dictionary |>
+  dplyr::filter(file_name %in% measures)
 
 # unique measure types, e.g. Biological, Physical, Etc
 distinct_selected_measure_types <- selected_measures |>
@@ -757,7 +761,7 @@ flextable::flextable(qualities) |>
 <!-- SOIL SCIENCE TEXT -->
 `r get_text(section = "soil_science", content_dir = params$language)`
 
-<!-- WHAT WE MEASURE IN YOUR SOIL TEXT -->
+<!-- WHAT WE MEASURED IN YOUR SOIL TEXT -->
 `r get_text(section = "measured_soil", content_dir = params$language)`
 
 \n
@@ -795,21 +799,45 @@ for (measure_type in distinct_selected_measure_types) {
 <!--If output is word, definitions as text -->
 ::: {.content-visible unless-format="html"}
 ```{r, results='asis'}
-for (measure_type in distinct_selected_measure_types) {
-  # Print the section header
-  cat("##", measure_type, "\n\n")
+# for (measure_type in distinct_selected_measure_types) {
+#   # Print the section header
+#   cat("##", measure_type, "\n\n")
+#
+#   # Get measures belonging to this type
+#   measures_in_type <- selected_measures |>
+#     filter(type == measure_type) |>
+#     pull(file_name)
+#
+#   # Include each measure file
+#   for (measure in measures_in_type) {
+#     cat("{{< include ", params$language, "/", measure, " >}}\n\n", sep = "")
+#   }
+# }
+```
 
+```{r, results='asis'}
+for (measure_type in distinct_selected_measure_types) {
   # Get measures belonging to this type
   measures_in_type <- selected_measures |>
-    filter(type == measure_type) |>
-    pull(file_name)
+    filter(section_name == measure_type)
 
-  # Include each measure file
-  for (measure in measures_in_type) {
+  # Measure group image path
+  image <- paste0(
+    "![](images/",
+    tolower(measures_in_type$type[1]),
+    ".png){height='50px'}"
+  )
+
+  # Print the measure group header with image
+  cat("##", measure_type, image, "\n\n")
+
+  # Include each measure file in group
+  for (measure in measures_in_type$file_name) {
     cat("{{< include ", params$language, "/", measure, " >}}\n\n", sep = "")
   }
 }
 ```
+
 :::
 
 {{< pagebreak >}}

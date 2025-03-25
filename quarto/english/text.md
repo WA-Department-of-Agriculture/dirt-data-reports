@@ -57,10 +57,7 @@ is better), or in the middle (optimal range); and 3. How often to measure each
 indicator. Our understanding of these indicators is rapidly evolving as
 researchers measure them in diverse soils, cropping systems, and climates.
 
-![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-more.png){width="1.5in"
-fig-alt="More is better scoring curve"}![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-optimal.png){width="1.5in"
-fig-alt="Optimal range scoring curve"}![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-less.png){width="1.5in"
-fig-alt="Less is better scoring curve"}
+![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-more.png){width="1.5in" fig-alt="More is better scoring curve"}![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-optimal.png){width="1.5in" fig-alt="Optimal range scoring curve"}![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-less.png){width="1.5in" fig-alt="Less is better scoring curve"}
 
 <!--section:testing-->
 ## Soil Health Testing
