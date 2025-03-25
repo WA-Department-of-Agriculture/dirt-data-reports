@@ -67,12 +67,15 @@ y climas.
 ![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-more-spanish.png){width="1.5in" fig-alt="Curva de puntuación más es mejor"}![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-optimal-spanish.png){width="1.5in" fig-alt="Curva de puntuación de rango óptimo"}![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-less-spanish.png){width="1.5in" fig-alt="Curva de puntuación de menos es mejor"}
 
 <!--section:testing-->
+## Pruebas de salud del suelo
+
+![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/quality-results-spanish.png){width="6.5in" fig-alt="Infografía titulada Cómo obtener resultados de calidad. Sea consistente: tome muestras en la mismo tiempo cada año; enviar muestras al mismo laboratorio; mantenga las muestras frescas y llévelas al laboratorio rápidamente; Mantenga buenos registros de los resultados de laboratorio. El contexto importa: no todos los suelos son iguales; los indicadores se ven afectados por propiedades inherentes como el clima y la textura del suelo; así como por la dirección; no se alarme si su suelo está por debajo del rango óptimo para algunos indicadores, vea hasta dónde puede llevar su suelo con el manejo de suelo, pero sepa que puede haber limitaciones inherentes. De regreso a lo básico: las mediciones usadas en el pasado como el pH, la textura y la materia orgánica del suelo siguen siendo increíblemente importantes; constantemente se desarrollan nuevos indicadores, no sienta que tiene que medirlos todos o dejar que el proceso sea agobiante; Diviértete explorando a través de recursos academicos de la salud del suelo, ¡pero recuerda que conoces tu suelo mejor que nadie! Sea paciente: es posible que algunas medidas no cambien tan rápido como le gustaría; Las muestras a lo largo del tiempo es muy importante; nuestra comprensión científica de estas mediciones está evolucionando; todos estamos juntos en este viaje."}
+
 ## Comprender los resultados de la salud del suelo
 
 Para obtener más información sobre cómo interpretar los resultados de la salud
 del suelo, vea el seminario web de Dani Gelardi ["Comprender las pruebas de
 suelo"](https://youtu.be/-ED-gGk4yb8?si=fxfnxqrRqhkGDaiu).
-
 
 <!--section:your_fields-->
 ## Su campos
@@ -94,3 +97,4 @@ El texto del reporte y las imágenes fueron traducidas por Erica Tello, Eber
 Rivera, y Kate Smith con WSU Food Systems y Skagit County Extension como parte
 del programa de USDA NRCS Innovación en la conservación, dirigido por Viva Farms
 (grant number NR22-13G004).
+

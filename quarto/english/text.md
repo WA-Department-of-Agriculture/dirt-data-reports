@@ -65,6 +65,10 @@ researchers measure them in diverse soils, cropping systems, and climates.
 ![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/quality-results.png){width="6.5in"
 fig-alt="Infographic titled How to Get Quality Results. Be Consistent: sample at the same time each year; send samples to the same lab; keep samples cool and get them to the lab quickly; keep good records of lab results. Context matters: not all soils are created equal; indicators are impacted by inherent properties like climate and soil texture; as well as by management; don't be alarmed if your soil is below the optimal range fro some indicators, see how far you can take your soil with management but know there may be inherent limitations. Back to the Basics: old school measurements like pH, texture, and soil organic matter are still incredible important; new indicators are constantly being developed, don't feel you have to measure all of them, or let the process overwhelm you; have fun exploring through a soil health lens, but remember that you know your soil better than anyone! Be Patient: some measurements may not change as quickly as you'd like; sampling across time is very important, our scientific understanding of these measurements is evolving; we are all on this journey together."}
 
+## Understanding Soil Health Results
+
+Learn more about interpreting your soil health results by watching Dani Gelardi's webinar ["Understanding Soil Tests"](https://youtu.be/-ED-gGk4yb8?si=fxfnxqrRqhkGDaiu).
+
 <!--section:your_fields-->
 ## Your Fields
 
@@ -79,6 +83,5 @@ developed by the Washington State Department of Agriculture and Washington State
 University, as part of the Washington Soil Health Initiative. Text and figures
 were adapted from [WSU Extension publication #FS378E Soil Health in Washington
 Vineyards](https://pubs.extension.wsu.edu/soil-health-in-washington-vineyards).
-Learn more about {soils} in this [blog
-post](https://washingtonsoilhealthinitiative.com/2024/03/soils-an-r-package-for-soil-health-reporting/)
-or this [webinar](https://youtu.be/_8m7fTjSEOk?si=ikrCASdchiB6rDC2).
+Learn more about {soils} in this [blog post](https://washingtonsoilhealthinitiative.com/2024/03/soils-an-r-package-for-soil-health-reporting/) or this [webinar](https://youtu.be/_8m7fTjSEOk?si=ikrCASdchiB6rDC2).
+

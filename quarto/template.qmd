@@ -854,6 +854,11 @@ flextable::as_grouped_data(indicators, groups = indicator_groups) |>
 
 {{< pagebreak >}}
 
+<!-- SOIL TESTING TEXT -->
+`r get_text(section = "testing", content_dir = params$language)`
+
+{{< pagebreak >}}
+
 <!-- YOUR FIELDS TEXT -->
 `r get_text(section = "your_fields", content_dir = params$language)`
 
