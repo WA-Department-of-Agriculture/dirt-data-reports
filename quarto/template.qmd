@@ -779,7 +779,7 @@ for (measure_type in distinct_selected_measure_types) {
   image <- paste0("![](images/", tolower(measures_in_type$type[1]), ".png)")
 
   # Header color
-  color <- section_colors$color[section_colors$name == measure_type]
+  color <- section_colors$color[section_colors$name == measures_in_type$type[1]]
 
   # Apply inline styling to measure group  header
   styled_header <- paste0("## [**", measure_type, "**]{style='color:", color, "'}")
@@ -798,23 +798,6 @@ for (measure_type in distinct_selected_measure_types) {
 
 <!--If output is word, definitions as text -->
 ::: {.content-visible unless-format="html"}
-```{r, results='asis'}
-# for (measure_type in distinct_selected_measure_types) {
-#   # Print the section header
-#   cat("##", measure_type, "\n\n")
-#
-#   # Get measures belonging to this type
-#   measures_in_type <- selected_measures |>
-#     filter(type == measure_type) |>
-#     pull(file_name)
-#
-#   # Include each measure file
-#   for (measure in measures_in_type) {
-#     cat("{{< include ", params$language, "/", measure, " >}}\n\n", sep = "")
-#   }
-# }
-```
-
 ```{r, results='asis'}
 for (measure_type in distinct_selected_measure_types) {
   # Get measures belonging to this type
