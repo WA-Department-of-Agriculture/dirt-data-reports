@@ -700,7 +700,10 @@ plot_list <- df_plot |>
 
 ::: {.content-visible unless-format="html"}
 ```{r echo=FALSE}
-qualities <- parse_bullets_from_markdown(section = "soil_qualities", content_dir = params$language)
+qualities <- parse_bullets_from_markdown(
+  section = "soil_qualities",
+  content_dir = params$language
+)
 
 flextable::flextable(qualities)
 ```
@@ -772,7 +775,11 @@ for (measure_type in distinct_selected_measure_types) {
 ```{r indicator-table}
 # read in data to generate indicators table, ignore empty rows
 indicators <- selected_measures[, 6:9]
-indicators <- indicators[!apply(indicators, 1, function(row) all(is.na(row) | row == "")), ]
+indicators <- indicators[!apply(
+  indicators,
+  1,
+  function(row) all(is.na(row) | row == "")
+), ]
 names(indicators) <- gsub("\\.", " ", names(indicators))
 
 # grouping column name always indexed at 3 (post-subset)
@@ -857,7 +864,7 @@ if (!NA %in% gis_df$longitude & !NA %in% gis_df$latitude) {
     coords = c("longitude", "latitude"),
     crs = "+proj=lonlat"
   ) |>
-    sf::st_transform(32148)
+    sf::st_transform(3857)
 
   basetiles <- maptiles::get_tiles(
     df_sf,
@@ -877,6 +884,7 @@ if (!NA %in% gis_df$longitude & !NA %in% gis_df$latitude) {
       point.padding = 2,
       min.segment.length = 0
     ) +
+    ggplot2::coord_sf(crs = 3857) +
     ggplot2::theme_void()
 
   ggplot2::ggsave(glue::glue("{path}/map.png"), map, dpi = 300)

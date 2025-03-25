@@ -1,8 +1,4 @@
 ```{r}
-#register fonts
-
-
-  
 # Get path of measurement group image
 image_path <- glue::glue("images/{group}.png")
 
@@ -44,17 +40,15 @@ table_list |>
 
 ::: {.content-visible when-format="html"}
 ```{r}
-# If HTML, convert the strip plot to interactive ggirap
-format <- knitr::opts_knit$get("rmarkdown.pandoc.to")
-
-if(format == "html"){
-plot_list |>
-  purrr::pluck(group) |>
-  convert_ggiraph(
-    plot,
-    plot_name = group,
-    body_font = body_font
-  )
+# If HTML, convert the strip plot to interactive ggiraph
+if (out_type == "html") {
+  plot_list |>
+    purrr::pluck(group) |>
+    convert_ggiraph(
+      plot,
+      plot_name = group,
+      body_font = body_font
+    )
 }
 ```
 :::
