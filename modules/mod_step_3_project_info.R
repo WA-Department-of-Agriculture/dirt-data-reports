@@ -33,7 +33,7 @@ mod_step_3_project_info_ui <- function(id, state) {
         height = "150px"
       ),
       
-      actionButton(ns("report_preview"), "Preview", class = "btn-primary")
+      actionButton(ns("report_preview"), "Preview", style='margin-top:20px')
   )
 }
 
@@ -91,6 +91,14 @@ mod_step_3_project_info_server <- function(id, state) {
     observeEvent(input$report_preview, {
       req(input$measurement_definitions, state$measure_mapping)
       
+      
+      lang_map <- yaml::read_yaml(paste0("quarto/",state$language(),"/mapping.yml"))
+      
+      
+      tr <- function(key) {
+        lang_map[[key]] %||% key
+      }
+      
       selected_mapping <- state$measure_mapping %>%
         dplyr::filter(file_name %in% input$measurement_definitions)
       
@@ -115,17 +123,10 @@ mod_step_3_project_info_server <- function(id, state) {
             tags$span(tr(section_name), style = glue::glue("color:{section_color}"))
           ),
           do.call(div, lapply(grouped_measures[[section_name]], function(qmd_file) {
-            htmltools::includeMarkdown(read_qmd_as_md(paste0("quarto/", params$language,"/", qmd_file)))
+            htmltools::includeMarkdown(read_qmd_as_md(paste0("quarto/", state$language(),"/", qmd_file)))
           }))
         )
       })
-      
-      lang_map <- yaml::read_yaml(paste0("quarto/",params$language,"/mapping.yml"))
-      
-      
-      tr <- function(key) {
-        lang_map[[key]] %||% key
-      }
       
       # Show modal with all sections
       showModal(modalDialog(

@@ -5,9 +5,11 @@ mod_step_4_build_reports_ui <- function(id, state) {
       h4(class = "form-step", "Step 4"),
       h2(class = "form-title", "Build Reports"),
       
+      div(class="col-2",
       # Render year and producer inputs dynamically
-      uiOutput(ns("year_input")),
-      uiOutput(ns("producer_input")),
+        uiOutput(ns("year_input")),
+        uiOutput(ns("producer_input"))
+      ),
       
       shinyWidgets::checkboxGroupButtons(
         inputId = ns("format"),
@@ -17,7 +19,7 @@ mod_step_4_build_reports_ui <- function(id, state) {
         justified = TRUE
       ),
       
-      downloadButton(ns("report"), "Build Report")
+      downloadButton(ns("report"), "Build Report", style='margin-top:20px')
   )
 }
 

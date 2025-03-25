@@ -14,6 +14,7 @@ mod_step_1_template_ui <- function(id, state) {
              actionLink(ns("about_template"), "Learn about the data template.", icon = icon("circle-info"))
            ),
            div(
+             class = 'custom-toggle',
              style = "width:100%;display:flex;justify-content:center",
              shinyWidgets::radioGroupButtons(
                inputId = ns("language"),

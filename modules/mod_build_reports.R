@@ -132,24 +132,31 @@ mod_build_reports_server <- function(id) {
         tooltip <- "Please select at least one measurement definition."
       }
       
-      tagList(
-        if (state$current_step > 1)
-          actionButton(ns("prev_step"), "Previous", class = "prev"),
-        
-        if (state$current_step < 4) {
-          div(
-            style = "position: relative;",
-            title = tooltip,
-            actionButton(
-              ns("next_step"),
-              "Next",
-              class = "next",
-              disabled = next_disabled  # ✅ this is the key line
-            )
-          )
-        }
+      # Adjust alignment based on step
+      align_style <- if (state$current_step == 1) {
+        "width:100%; display: flex; justify-content: flex-end; gap: 10px;"
+      } else {
+        "width: 100%; display: flex; justify-content: space-between; gap: 10px;"
+      }
+      
+      tags$div(style = align_style,
+               if (state$current_step > 1)
+                 actionButton(ns("prev_step"), "Previous", class = "prev"),
+               
+               if (state$current_step < 4)
+                 tags$div(
+                   style = "position: relative;",
+                   title = tooltip,
+                   actionButton(
+                     ns("next_step"),
+                     "Next",
+                     class = "next",
+                     disabled = next_disabled
+                   )
+                 )
       )
     })
+    
     
     
     # Handle Next/Previous button clicks

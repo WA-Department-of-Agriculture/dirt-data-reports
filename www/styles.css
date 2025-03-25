@@ -19,6 +19,67 @@ body {
   color: #333;
 }
 
+
+.shiny-html-output.shiny-bound-output {
+  width:100%;
+}
+
+
+/* Shared container styles for both radio and checkbox groups */
+.radio-group-buttons .btn-group-container-sw,
+.checkbox-group-buttons .btn-group-container-sw {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* Individual button group wrapper */
+.radio-group-buttons .btn-group-toggle,
+.checkbox-group-buttons .btn-group-toggle {
+  flex: 1;
+  max-width: 200px;
+}
+
+/* Shared button styles */
+.radiobtn.btn-default,
+.checkbtn.btn-default {
+  width: 150px;
+  height: 150px;
+  padding: 20px;
+  border-radius: 12px !important;
+  background-color: #f9f9f9;
+  border: 2px solid #ccc;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+  color: var(--deep-green);
+}
+
+/* Hover states */
+.radiobtn.btn-default:hover,
+.checkbtn.btn-default:hover {
+  background-color: #e6f5eb;
+  border-color: #028A2E;
+}
+
+/* Active states */
+.radiobtn.btn-default.active,
+.checkbtn.btn-default.active {
+  background-color: #d6efe3;
+  border-color: #028A2E;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.form-group {
+  width: 100%;
+}
+
+
+
 #build-step_nav_buttons {
   display:flex;
   justify-content: space-between;
@@ -88,111 +149,25 @@ body {
   width:100%;
 }
 
-.custom-button {
-  padding: 10px 15px;
-  margin: 5px;
-  border: 1px solid #007bff;
-  background-color: white;
-  cursor: pointer;
+
+
+
+.reset-button {
+  background-color: #ccc;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 20px;
   border-radius: 5px;
-}
-
-
-      
-      .custom-button-group {
-        display: flex;
-      }
-
-      .custom-button {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        background-color: #f9f9f9;
-        color: var(--deepn-green);
-        font-family: 'Poppins', sans-serif;
-        font-size: 16px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        width: 150px;
-        height: 150px;
-        text-align: center;
-      }
-
-      .output-button i {
-        font-size: 36px;
-        margin-bottom: 10px;
-      }
-
-      .output-button:hover, .language-button:hover, .custom-button:active {
-        border-color: #028A2E;
-        background-color: #e6f5eb;
-      }
-
-      .output-button.active, .language-button.active, .custom-button.active  {
-        border-color: #028A2E;
-        background-color: #d6efe3;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
-        transform: translateY(-3px);
-        color: var(--deep-green);
-      }
-      
-      .language-button.active .language-circle {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  border: 1px var(--deep-green) solid;
-  background-color: var(--deep-green);
   color: white;
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  transition: background-color 0.3s, color 0.3s;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
 }
 
-      .output-button.active i, .language-button.active i {
-        color: var(--deep-green);
-      }
-
-      .reset-button {
-        background-color: #ccc;
-        border: none;
-        padding: 10px 20px;
-        margin-top: 20px;
-        border-radius: 5px;
-        color: white;
-        cursor: pointer;
-        font-size: 14px;
-        font-family: 'Poppins', sans-serif;
-      }
-
-      .reset-button:hover {
-        background-color: #888;
-      }
+.reset-button:hover {
+  background-color: #888;
+}
       
-
-.language-circle {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  border: 1px #333 solid;
-  background-color: transparent;
-  color: #333;
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  transition: background-color 0.3s, color 0.3s;
-}
-
 
 
 
@@ -602,7 +577,7 @@ p {
   margin-top:20px;
   margin-right:50px;
   display: flex;
-  height: calc(100vh - 50px);
+  height: calc(100vh - 120px);
   flex-direction: column;
   justify-content: flex-start;
   min-width: 0; /* Prevent shrinking */
