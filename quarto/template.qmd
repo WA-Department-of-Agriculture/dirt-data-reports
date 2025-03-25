@@ -183,7 +183,7 @@ dictionary <- readxl::read_xlsx(params$data_file, sheet = "Data Dictionary") |>
     # Concatenate abbr and unit with html break for the table and plot labels
     abbr_unit = glue::glue("{abbr}<br>{unit}"),
     # Remove NA if unit is blank
-    abbr_unit = gsub("NA", "", abbr_unit),
+    abbr_unit = gsub("<br>NA", "", abbr_unit),
     # Set the order of how measurement groups will appear within the report
     # based on the order found in the data dictionary
     group_order = dplyr::cur_group_id(),
@@ -684,6 +684,8 @@ plot_list <- df_plot |>
   })
 ```
 
+## `r producer$farm_name`
+
 <!-- PROJECT SUMMARY TEXT -->
 `r params$project_summary`
 
@@ -705,7 +707,50 @@ qualities <- parse_bullets_from_markdown(
   content_dir = params$language
 )
 
-flextable::flextable(qualities)
+flextable::flextable(qualities) |>
+  flextable::color(
+    color = header_text_color,
+    part = "header"
+  ) |>
+  flextable::bg(
+    bg = header_color,
+    part = "header"
+  ) |>
+  flextable::vline_left(
+    border = officer::fp_border(
+      color = header_color,
+      width = 3
+    )
+  ) |>
+  flextable::vline_right(
+    border = officer::fp_border(
+      color = header_color,
+      width = 1
+    )
+  ) |>
+  flextable::hline_bottom(
+    border = officer::fp_border(
+      color = header_color,
+      width = 1
+    )
+  ) |>
+  flextable::bg(
+    bg = lighter_color,
+    part = "body"
+  ) |>
+  flextable::align(align = "left", part = "all") |>
+  flextable::fontsize(size = 10) |>
+  flextable::line_spacing(
+    space = 1.5,
+    part = "header"
+  ) |>
+  flextable::line_spacing(
+    space = 1.1,
+    part = "body"
+  ) |>
+  flextable::width(
+    width = 6
+  )
 ```
 :::
 
@@ -769,7 +814,7 @@ for (measure_type in distinct_selected_measure_types) {
 
 {{< pagebreak >}}
 
-<!-- SOIL HEALTH INDICATOS TEXT -->
+<!-- SOIL HEALTH INDICATORS TEXT -->
 `r get_text(section = "indicators", content_dir = params$language)`
 
 ```{r indicator-table}
@@ -795,8 +840,10 @@ flextable::as_grouped_data(indicators, groups = indicator_groups) |>
     header_text_color = header_text_color,
     border_color = border_color
   ) |>
-  # @jadeyryan need help determining how to handle logic
-  # flextable::bg(i = ~ !is.na(`Medir cada`), bg = lighter_color) |>
+  flextable::bg(
+    i = ~ !is.na(eval(sym(tr("measure_every")))),
+    bg = lighter_color
+  ) |>
   flextable::set_table_properties(layout = "autofit")
 ```
 
@@ -915,6 +962,36 @@ sections <- purrr::map_chr(measurement_groups, \(group) {
 })
 
 cat(sections, sep = "\n")
+```
+
+```{r download-data-text}
+#| eval: !expr out_type == "html"
+#| output: asis
+
+cat("##", tr("download_data"))
+```
+
+```{r download-data}
+#| eval: !expr out_type == "html"
+
+# Add a data download button if downloadthis is installed
+list(
+  results = dplyr::filter(data, producer_id == params$producer_id),
+  measurement_dictionary = dictionary[
+    ,
+    c(
+      "column_name",
+      "abbr",
+      "unit"
+    )
+  ]
+) |>
+  downloadthis::download_this(
+    output_name = glue::glue("{params$year}-soils-data"),
+    output_extension = ".xlsx",
+    button_label = tr("download_button"),
+    button_type = "success"
+  )
 ```
 
 <!-- LOOKING FORWARD TEXT -->

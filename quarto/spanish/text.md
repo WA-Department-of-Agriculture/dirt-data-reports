@@ -64,6 +64,9 @@ indicador. Nuestro conocimiento de estos indicadores evoluciona rápidamente a
 medida que los investigadores los miden en diversos suelos, sistemas de cultivo
 y climas.
 
+![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-more.png){width="1.5in" fig-alt="More is better scoring curve"}![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-optimal.png){width="1.5in"
+fig-alt="Optimal range scoring curve"}![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-less.png){width="1.5in" fig-alt="Less is better scoring curve"}
+
 <!--section:testing-->
 ## Comprender los resultados de la salud del suelo
 
@@ -73,7 +76,7 @@ suelo"](https://youtu.be/-ED-gGk4yb8?si=fxfnxqrRqhkGDaiu).
 
 
 <!--section:your_fields-->
-## Su campo
+## Su campos
 
 <!--section:looking_forward-->
 ## Esperando
