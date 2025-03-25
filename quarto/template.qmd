@@ -182,6 +182,8 @@ dictionary <- readxl::read_xlsx(params$data_file, sheet = "Data Dictionary") |>
   dplyr::mutate(
     # Concatenate abbr and unit with html break for the table and plot labels
     abbr_unit = glue::glue("{abbr}<br>{unit}"),
+    # Remove NA if unit is blank
+    abbr_unit = gsub("NA", "", abbr_unit),
     # Set the order of how measurement groups will appear within the report
     # based on the order found in the data dictionary
     group_order = dplyr::cur_group_id(),
