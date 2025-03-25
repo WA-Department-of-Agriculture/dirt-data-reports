@@ -1,11 +1,25 @@
 mod_step_3_project_info_ui <- function(id, state) {
   ns <- NS(id)
   
+  #read in english mapping file
+  mapping<-read.csv(paste0("quarto/english/measurement_dictionary.csv"))
+  
+  measurement_choices <- mapping %>%
+    split(.$type) %>%
+    map(~ setNames(.x$file_name, .x$aliases))
+  
+  measurement_content <- mapping %>%
+    mutate(content = glue::glue("<div>{name}</div><div style='display:none'>{aliases}</div>"))
+  
+  measurement_selected <- mapping$file_name
+  
+  #fix values so they dont update unless changed 
   project_name_val <- isolate(state$project_info_vals$project_name %||% "")
   project_summary_val <- isolate(state$project_info_vals$project_summary %||% "")
-  measurement_val <- isolate(state$project_info_vals$measurement_definitions %||% NULL)
   soil_depth_val <- isolate(state$project_info_vals$soil_depth %||% "0-12 inches")
   looking_forward_val <- isolate(state$project_info_vals$looking_forward %||% "")
+  measurement_val <- isolate(state$project_info_vals$measurement_definitions %||% measurement_selected)
+  
   
   div(class = "form-content",
       h4(class = "form-step", "Step 3"),
@@ -21,8 +35,19 @@ mod_step_3_project_info_ui <- function(id, state) {
         height = "150px"
       ),
       
-      uiOutput(ns("measurements")),  # handled separately
-      
+      shinyWidgets::pickerInput(
+        inputId = ns("measurement_definitions"),
+        label = "Measurement Definitions",
+        choices = measurement_choices,
+        selected = measurement_val,
+        choicesOpt = list(content = measurement_content$content),
+        options = shinyWidgets::pickerOptions(
+          title = "Which measurements were included in your project?",
+          actionsBox = TRUE,
+          liveSearch = TRUE
+        ),
+        multiple = TRUE
+      ),      
       textInput(ns("soil_depth"), "Soil Sample Depth", value = soil_depth_val),
       
       tags$label("Looking Forward"),
@@ -45,6 +70,7 @@ mod_step_3_project_info_server <- function(id, state) {
     
     # Save all values into state
     observe({
+      
       state$project_info_vals <- list(
         project_name = input$project_name,
         project_summary = input$project_summary,
@@ -55,53 +81,26 @@ mod_step_3_project_info_server <- function(id, state) {
       
       state$step_3_valid <- !is.null(input$measurement_definitions) &&
         length(input$measurement_definitions) > 0
+      
     })
     
-    # Render measurement picker dynamically with selected value
-    output$measurements <- renderUI({
-      req(state$language())
-      
-      mapping<-read.csv(paste0("quarto/",state$language(),"/measurement_dictionary.csv"))
-      
-      state$measure_mapping <- mapping
-      
-      updated_choices <- mapping %>%
-        split(.$type) %>%
-        map(~ setNames(.x$file_name, .x$aliases))
-      
-      updated_content <- mapping %>%
-        mutate(content = glue::glue("<div>{name}</div><div style='display:none'>{aliases}</div>"))
-      
-      shinyWidgets::pickerInput(
-        inputId = ns("measurement_definitions"),
-        label = "Measurement Definitions",
-        choices = updated_choices,
-        selected = state$project_info_vals$measurement_definitions,  # pre-fill
-        choicesOpt = list(content = updated_content$content),
-        options = shinyWidgets::pickerOptions(
-          title = "Which measurements were included in your project?",
-          actionsBox = TRUE,
-          liveSearch = TRUE
-        ),
-        multiple = TRUE
-      )
-    })
     
     # Preview modal
     observeEvent(input$report_preview, {
-      req(input$measurement_definitions, state$measure_mapping)
-      
+      req(state$language())
+    
       
       lang_map <- yaml::read_yaml(paste0("quarto/",state$language(),"/mapping.yml"))
+      measure_mapping<-read.csv(paste0("quarto/", state$language(), "/measurement_dictionary.csv"))
       
-      
+
       tr <- function(key) {
         lang_map[[key]] %||% key
       }
       
-      selected_mapping <- state$measure_mapping %>%
+      selected_mapping <- measure_mapping%>%
         dplyr::filter(file_name %in% input$measurement_definitions)
-      
+
       grouped_measures <- split(selected_mapping$file_name, selected_mapping$section_name)
       
       # Section color mapping
