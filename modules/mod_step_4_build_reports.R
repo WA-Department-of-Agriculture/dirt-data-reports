@@ -124,6 +124,20 @@ mod_step_4_build_reports_server <- function(id, state) {
         dir.create(fig_output_dir, recursive = TRUE, showWarnings = FALSE)
         
         
+        # Copy fonts from www/fonts dir and include in temp dir under www/fonts
+        original_fonts_dir <- file.path("www", "fonts")
+        fonts_copy_dir <- file.path(temp_dir, "www", "fonts")
+        
+        # Create the directory if it doesn't exist
+        dir.create(fonts_copy_dir, recursive = TRUE, showWarnings = FALSE)
+        
+        # Copy each font file
+        file.copy(
+          from = list.files(original_fonts_dir, full.names = TRUE, recursive = TRUE),
+          to = fonts_copy_dir,
+          recursive = TRUE
+        )        
+        
         
         # copy language folder and all of its contents
         original_lang_dir <- file.path("quarto", language)
