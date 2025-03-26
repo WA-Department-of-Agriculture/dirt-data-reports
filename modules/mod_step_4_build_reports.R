@@ -108,7 +108,8 @@ mod_step_4_build_reports_server <- function(id, state) {
         file.copy(original_template, template_copy)
         
         section_template_copy <- file.path(temp_dir, "section_template.qmd")
-        file.copy(original_template, section_template_copy)
+        file.copy("quarto/section_template.qmd", section_template_copy)
+        
         
         # Create 'styles' subdirectory in the temp directory
         styles_dir <- file.path(temp_dir, "styles")
@@ -117,6 +118,11 @@ mod_step_4_build_reports_server <- function(id, state) {
         # Copy stylings into the styles subdirectory
         file.copy("quarto/styles/styles.css", file.path(styles_dir, "styles.css"))
         file.copy("quarto/styles/word-template.docx", file.path(styles_dir, "word-template.docx"))
+        
+        #create fig-output subdirectory
+        fig_output_dir <- file.path(temp_dir, "styles")
+        dir.create(fig_output_dir, recursive = TRUE, showWarnings = FALSE)
+        
         
         
         # copy language folder and all of its contents
@@ -131,7 +137,7 @@ mod_step_4_build_reports_server <- function(id, state) {
         
         
         # copy images folder and all of its contents
-        original_images_dir <- file.path("quarto", language)
+        original_images_dir <- file.path("quarto", "images")
         image_dir_copy <- file.path(temp_dir, "images")
         dir.create(image_dir_copy, recursive = TRUE, showWarnings = FALSE)
         file.copy(

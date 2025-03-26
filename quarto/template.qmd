@@ -42,6 +42,7 @@ params:
 ---
 
 ```{r set-up}
+
 library(systemfonts)
 library(webshot2)
 library(soils)
@@ -49,6 +50,7 @@ library(tidyverse)
 library(flextable)
 library(readxl)
 library(glue)
+
 
 # Get output file type
 out_type <- knitr::opts_knit$get("rmarkdown.pandoc.to")
@@ -348,7 +350,7 @@ project_summary <- soils::summarize_by_project(results_long) |>
   )
 ```
 
-```{r combine-producer-and-summaries}
+```{r combine-producer-and-summarie}
 # Combine producer table with summaries
 producer_table <- producer_samples |>
   dplyr::select(
@@ -424,6 +426,7 @@ tables <- tables[measurement_groups]
 ```
 
 ```{r get-headers-for-flextable}
+ 
 # Map function to each measurement group, resulting in a new df with
 # abbreviations and units in a list for make_ft()
 headers <- results_long |>
@@ -652,6 +655,7 @@ if (make_tt) {
 ```
 
 ```{r make-strip-plots}
+ 
 # Split df_plot into a list with each measurement group in its own plot
 plot_list <- df_plot |>
   split(df_plot$measurement_group) |>
@@ -969,6 +973,7 @@ sections <- purrr::map_chr(measurement_groups, \(group) {
     quiet = TRUE
   )
 })
+
 
 cat(sections, sep = "\n")
 ```
