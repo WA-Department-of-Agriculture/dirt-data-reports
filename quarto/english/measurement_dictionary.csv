@@ -1,14 +1,14 @@
 type,section_name,name,aliases,file_name,Soil Health Indicator,Soil Function,Measure every,Scoring Curve Type
-Biological,Biological,ACE Protein,More is better,def-ace-protein.qmd,ACE Soil Protein,"Nutrient cycling, biodiversity & habitat, filtering & resilience",1-3 years,More is better
+Biological,Biological,ACE Protein,"ACE Protein; ACE; Autoclaved Citrate-Extractable Protein, Soil Protein",def-ace-protein.qmd,ACE Soil Protein,"Nutrient cycling, biodiversity & habitat, filtering & resilience",1-3 years,More is better
 Biological,Biological,Mineralizable C,Mineralizable C; Mineralizable Carbon; MinC; Soil Respiration; Potentially Mineralizable Carbon; PMC; Solvita; Solvita Burst; CO2 Burst; Burst; Solvita CO2 Burst,def-min-c.qmd,Mineralizable Carbon,"Nutrient cycling, biodiversity & habitat, filtering & resilience",1-3 years,More is better
-Biological,Biological,Mineralizable N,Potentially Mineralizable Nitrogen; PMN; Mineralizable Nitrogen; MN,def-pmn.qmd,,,,
+Biological,Biological,Mineralizable N,Potentially Mineralizable Nitrogen; PMN; Mineralizable Nitrogen; MN,def-pmn.qmd,Potentially Mineralizable Nitrogen (PMN),"Nutrient cycling, biodiversity & habitat, filtering & resilience",1-3 years,More is better
 Biological,Biological,Permanganate Oxidizable C,Permanganate Oxidizable Carbon; POXC,def-poxc.qmd,Permanganate Oxidizable Carbon (POXC),"Biodiversity & habitat, nutrient cycling, filtering & resilience",1-3 years,More is better
 Biological,Biological,Soil Organic Matter,Soil Organic Matter; SOM; Organic Matter; OM,def-som.qmd,Soil Organic Matter (SOM),"Nutrient cycling, filtering & resilience",3-5 years,More is better
 Chemical,Chemical,Cation Exchange Capacity,Cation Exchange Capacity; CEC,def-cec.qmd,Cation Exchange Capacity,"Nutrient cycling, filtering & resilience",3-5 years,More is better
 Chemical,Chemical,Electrical Conductivity,Electrical Conductivity; EC,def-ec.qmd,Electrical Conductivity (EC),"Physical support, nutrient cycling, filtering & resilience",1-3 years,Less is better
 Chemical,Chemical,Inorganic C,Inorganic C; Inorganic Carbon,def-inorganic-c.qmd,,,,
 Chemical,Chemical,pH,Soil pH; pH,def-ph.qmd,Soil pH,"Nutrient cycling, filtering & resilience",1-3 years,Optimal range
-Chemical,Chemical,Plant Essential Nutrients,Nitrogen; N; Nitrate-Nitrogen; Nitrate-N; NO₃-N; Ammonium-Nitrogen; Ammonium-N; NH₄-N; Phosphorous; P; Potassium; K; Calcium; Ca; Magnesium; Mg; Sulfur; S; Boron; B;  Iron; Fe; Manganese; Mn; Copper; Cu; Zinc; Zn; Sodium; Na,def-nutrients.qmd,,,,
+Chemical,Chemical,Plant Essential Nutrients,Nitrogen; N; Nitrate-Nitrogen; Nitrate-N; NO₃-N; Ammonium-Nitrogen; Ammonium-N; NH₄-N; Phosphorous; P; Potassium; K; Calcium; Ca; Magnesium; Mg; Sulfur; S; Boron; B;  Iron; Fe; Manganese; Mn; Copper; Cu; Zinc; Zn; Sodium; Na,def-nutrients.qmd,Plant Essential Nutrients,Nutrient cycling,1-3 years,Optimal range
 Chemical,Chemical,Total N,Total N; Total Nitrogen,def-total-n.qmd,Total Nitrogen,"Nutrient cycling, biodiversity & habitat, filtering & resilience",1-3 years,Optimal range
 Physical,Physical,Aggregate Stability,Aggregate Stability; Agg. Stability; AS; Wet Aggregate Stability; Wet Agg. Stability; WSA,def-aggregate-stability.qmd,Aggregate Stability,"Physical support, water relations, biodiversity & habitat, filtering & resilience",1-3 years,More is better
 Physical,Physical,Bulk Density,Bulk Density; BD,def-bulk-density.qmd,Bulk Density,"Physical support, water relations, biodiversity & habitat, filtering & resilience",3-5 years,Optimal range
