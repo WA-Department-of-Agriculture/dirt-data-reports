@@ -69,8 +69,8 @@ mod_step_1_template_server <- function(id, state) {
         paste0("soil-data-template-", Sys.Date(), ".xlsx")
       },
       content = function(file) {
-        template_file <- if (input$language == "template_esp.qmd") {
-          "files/template_esp.xlsx"
+        template_file <- if (input$language == "spanish") {
+          "files/template-esp.xlsx"
         } else {
           "files/template.xlsx"
         }

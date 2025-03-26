@@ -46,7 +46,7 @@ mod_step_2_upload_server <- function(id, state) {
     })
 
     observeEvent(input$upload_file, {
-      req_fields <- read.csv("files/required_fields.csv")
+      req_fields <- read.csv("files/required-fields.csv")
 
       # Remove previous messages
       removeUI(
