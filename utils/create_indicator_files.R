@@ -66,7 +66,12 @@ spanish_indicators <- data.frame(
   check.names = FALSE
 )
 
-write.csv(spanish_indicators, "quarto/spanish/indicators.csv", row.names=F)
+write.csv(
+  spanish_indicators,
+  "quarto/spanish/indicators.csv",
+  row.names = F,
+  fileEncoding = "UTF-8"
+)
 
 english_indicators <- data.frame(
   "Soil Health Indicator" = c(
@@ -136,6 +141,9 @@ english_indicators <- data.frame(
   check.names = FALSE
 )
 
-write.csv(english_indicators, "quarto/english/indicators.csv", row.names=F)
-
-
+write.csv(
+  english_indicators,
+  "quarto/english/indicators.csv",
+  row.names = F,
+  fileEncoding = "UTF-8"
+)

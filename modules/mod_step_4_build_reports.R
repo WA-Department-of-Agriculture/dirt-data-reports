@@ -192,7 +192,7 @@ mod_step_4_build_reports_server <- function(id, state) {
                 producer_id = row$producer_id,
                 language = state$language(),
                 project_name = project_info$project_name,
-                soil_depth = project_info$soil_depth,
+                project_results = project_info$project_results,
                 project_summary = project_info$project_summary,
                 looking_forward = project_info$looking_forward,
                 measures = project_info$measurement_definitions

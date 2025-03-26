@@ -35,7 +35,7 @@ params:
   language: "spanish"
   producer_id: "WUY05"
   project_name: "Sample Project"
-  soil_depth: "0-12 inches"
+  project_results: "Intro to the project results section."
   project_summary: "This is a summary."
   looking_forward: "Next steps include more analysis."
   measures: ["def-texture.qmd", "def-bulk-density.qmd", "def-ph.qmd", "def-total-c.qmd", "def-total-n.qmd","def-min-c.qmd"]
@@ -959,7 +959,7 @@ if (!NA %in% gis_df$longitude & !NA %in% gis_df$latitude) {
 
 
 <!-- PROJECT RESULTS TEXT -->
-`r get_text(section = "project_results", content_dir = params$language)` `r params$soil_depth`.
+`r get_text(section = "project_results", content_dir = params$language)` `r params$project_results`
 
 ```{r create-measurement-group-sections}
 #| output: asis

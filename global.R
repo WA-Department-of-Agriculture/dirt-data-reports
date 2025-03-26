@@ -1,6 +1,7 @@
 # Load packages
 library(shiny)
 library(shinyWidgets)
+library(bslib)
 library(shinyAce)
 library(shinyjs)
 library(sever)

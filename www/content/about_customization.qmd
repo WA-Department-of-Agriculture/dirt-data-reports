@@ -1,0 +1,35 @@
+---
+format: gfm
+---
+
+This tool prioritizes user-friendliness by limiting content and branding customization. Microsoft Word reports can be generated and then edited manually to suit your specific needs, while HTML reports require direct editing of the HTML code for more customization. If you have experience with R and Quarto, you can use the [{soils} R package](https://github.com/WA-Department-of-Agriculture/soils/){target="_blank"} to fully adapt the underlying code for maximum flexibility.
+
+------------------------------------------------------------------------
+
+### Markdown Basics
+
+The **Project Summary**, **Project Results**, and **Looking Forward** text boxes support [Markdown](https://www.markdownguide.org/basic-syntax/){target="_blank"} to format text, add links, and insert images.
+
++--------------------------------------------------------------------------------------------------+------------+---------------------------------------------------------------------------------------------------------------+
+| Markdown syntax                                                                                  |            | Output                                                                                                        |
++==================================================================================================+============+===============================================================================================================+
+| ``` markdown                                                                                     |            | *italics*, **bold**, ***bold italics***                                                                       |
+| *italics*, **bold**, ***bold italics***                                                          |            |                                                                                                               |
+| ```                                                                                              |            |                                                                                                               |
++--------------------------------------------------------------------------------------------------+------------+---------------------------------------------------------------------------------------------------------------+
+| ``` markdown                                                                                     |            | -   Item 1                                                                                                    |
+| - Item 1                                                                                         |            | -   Item 2                                                                                                    |
+| - Item 2                                                                                         |            | -   Item 3                                                                                                    |
+| - Item 3                                                                                         |            |                                                                                                               |
+| ```                                                                                              |            |                                                                                                               |
++--------------------------------------------------------------------------------------------------+------------+---------------------------------------------------------------------------------------------------------------+
+| ``` markdown                                                                                     |            | [Washington Soil Health Initiative website](https://www.wasoilhealth.org){target="_blank"}                    |
+| [Washington Soil Health Initiative website](https://www.wasoilhealth.org)                        |            |                                                                                                               |
+| ```                                                                                              |            |                                                                                                               |
++--------------------------------------------------------------------------------------------------+------------+---------------------------------------------------------------------------------------------------------------+
+| Note: images must be hosted online. Place the URL to the image in the parentheses.               |            | ![](https://washingtonsoilhealthinitiative.com/wp-content/uploads/2019/10/Soil-health-Color.jpg){width="100"} |
+|                                                                                                  |            |                                                                                                               |
+| ``` markdown                                                                                     |            |                                                                                                               |
+| ![](https://washingtonsoilhealthinitiative.com/wp-content/uploads/2019/10/Soil-health-Color.jpg) |            |                                                                                                               |
+| ```                                                                                              |            |                                                                                                               |
++--------------------------------------------------------------------------------------------------+------------+---------------------------------------------------------------------------------------------------------------+
