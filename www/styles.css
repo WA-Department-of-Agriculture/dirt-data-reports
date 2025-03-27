@@ -19,6 +19,16 @@ body {
   color: #333;
 }
 
+a {
+    color: var(--slate-blue);
+    text-decoration: underline;
+}
+
+a:hover {
+    color: var(--slate-blue);
+    filter: brightness(100%);
+}
+
 .home-btn {
     color: white;
     background-color: var(--slate-blue);
