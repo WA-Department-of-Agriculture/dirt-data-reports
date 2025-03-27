@@ -10,7 +10,7 @@ Generating customized and comprehensive soil health reports for numerous partici
 
 Customized soil health reports can be generated in four steps. Be prepared to spend the most time on steps 1 and 2 as you adjust your data to match the template format.
 
-![](steps.png)
+![Step 1: Download the Excel template & replace example data with your own. Step 2: Upload and validate your data file. Step 3: Customize with project-specific information. Step 4: Generate custom reports for all participants.](steps.png)
 
 ## **Why was this tool created**?
 
