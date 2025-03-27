@@ -22,7 +22,7 @@ mod_step_3_project_info_ui <- function(id, state) {
 
   # Get the abbr column from the uploaded data dictionary
   measurement_in_dictionary <- state$data_dictionary$abbr
-  
+
   # Match the abbr column with the aliases and get the file_name to pre-select
   # the uploaded measurements in the measurement definition picker
   measurement_selected <- mapping |>
@@ -30,7 +30,7 @@ mod_step_3_project_info_ui <- function(id, state) {
     tidyr::separate_longer_delim(cols = aliases, delim = "; ") |>
     dplyr::filter(aliases %in% measurement_in_dictionary) |>
     dplyr::pull(file_name)
-  
+
   # fix values so they don't update unless changed
   project_name_val <- isolate(
     state$project_info_vals$project_name %||% "Soil Sampling Project"
@@ -105,19 +105,22 @@ mod_step_3_project_info_ui <- function(id, state) {
       mode = "markdown",
       height = "150px"
     ),
+    tags$label("Measurement Definitions"),
+    p(
+      class = "form-text",
+      "Selected definitions will be included in the 'What We Measured in Your Soil' section. Measurements are pre-selected based on the",
+      tags$b("abbr"),
+      "column in your uploaded",
+      tags$b("Data Dictionary"),
+      "tab but should be reviewed as we may call these measurements something different than your abbreviation.",
+      "To remove measurements from the tables and plots in the 'Project Results' section, remove them from both the",
+      tags$b("Data"),
+      "and",
+      tags$b("Data Dictionary"),
+      "tabs of your spreadsheet and re-upload in Step 2."
+    ),
     shinyWidgets::pickerInput(
       inputId = ns("measurement_definitions"),
-      label = bslib::tooltip(
-        trigger = tags$span(
-          tags$label("Measurement Definitions"),
-          icon("circle-info")
-        ),
-        placement = "right",
-        a11y = "sem",
-        title = "Definitions included in the 'What We Measured in Your Soil' section. To remove measurements from the tables and plots in the 'Project Results' section, remove them from your spreadsheet and re-upload in Step 2.",
-        show = TRUE,
-        "Definitions included in the 'What We Measured in Your Soil' section. To remove measurements from the tables and plots in the 'Project Results' section, remove them from your spreadsheet and re-upload in Step 2."
-      ),
       choices = measurement_choices,
       selected = measurement_val,
       choicesOpt = list(content = measurement_content$content),
@@ -235,10 +238,22 @@ mod_step_3_project_info_server <- function(id, state) {
 
       # Section color mapping
       section_colors <- data.frame(
-        section_name = c("Biological", "Physical", "Chemical", 
-                         "Biológico", "Físico", "Químico"),
-        color = c("#335c67", "#a60f2d", "#d4820a",
-                  "#335c67", "#a60f2d", "#d4820a"),
+        section_name = c(
+          "Biological",
+          "Physical",
+          "Chemical",
+          "Biológico",
+          "Físico",
+          "Químico"
+        ),
+        color = c(
+          "#335c67",
+          "#a60f2d",
+          "#d4820a",
+          "#335c67",
+          "#a60f2d",
+          "#d4820a"
+        ),
         stringsAsFactors = FALSE
       )
 
