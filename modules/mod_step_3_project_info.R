@@ -33,7 +33,7 @@ mod_step_3_project_info_ui <- function(id, state) {
   
   # fix values so they don't update unless changed
   project_name_val <- isolate(
-    state$project_info_vals$project_name %||% ""
+    state$project_info_vals$project_name %||% "Soil Sampling Project"
   )
   project_summary_val <- isolate(
     state$project_info_vals$project_summary %||% "Thank the participating farmer. Consider including information related to how many samples you've taken, in how many crops and regions. Identify the project team and acknowledge support from your funders and collaborators."
