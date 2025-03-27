@@ -160,7 +160,21 @@ a:hover {
     background-color: var(--soil-brown)!important;
 }
 
+.navbar-default .navbar-nav>li>a {
+    font-family: "Poppins";
+    font-size: 14px;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+}
 
+.navbar-brand a {
+    font-family: "Poppins";
+    font-size: 20px;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+}
 
 .shiny-input-container:not(.shiny-input-container-inline) {
   width:100%;
