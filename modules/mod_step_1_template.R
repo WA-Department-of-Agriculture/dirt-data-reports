@@ -29,7 +29,7 @@ mod_step_1_template_ui <- function(id, state) {
       style = "width:100%;display:flex;justify-content:center",
       shinyWidgets::radioGroupButtons(
         inputId = ns("language"),
-        label = "Select language",
+        label = "Select Report Language",
         choices = c("English" = "english", "Spanish" = "spanish"),
         selected = language_val,
         justified = TRUE
