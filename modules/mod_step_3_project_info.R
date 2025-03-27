@@ -235,8 +235,10 @@ mod_step_3_project_info_server <- function(id, state) {
 
       # Section color mapping
       section_colors <- data.frame(
-        section_name = c("Biological", "Physical", "Chemical"),
-        color = c("#335c67", "#a60f2d", "#d4820a"),
+        section_name = c("Biological", "Physical", "Chemical", 
+                         "Biológico", "Físico", "Químico"),
+        color = c("#335c67", "#a60f2d", "#d4820a",
+                  "#335c67", "#a60f2d", "#d4820a"),
         stringsAsFactors = FALSE
       )
 
@@ -257,7 +259,7 @@ mod_step_3_project_info_server <- function(id, state) {
               style = "height:30px; padding-right:5px"
             ),
             tags$span(
-              tr(section_name),
+              tags$b(tr(section_name)),
               style = glue::glue("color:{section_color}")
             )
           ),
