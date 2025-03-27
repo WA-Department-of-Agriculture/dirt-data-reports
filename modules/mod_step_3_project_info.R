@@ -1,8 +1,15 @@
 mod_step_3_project_info_ui <- function(id, state) {
   ns <- NS(id)
 
-  # read in english mapping file
-  mapping <- read.csv(paste0("quarto/english/measurement_dictionary.csv"))
+  # read in mapping file
+  mapping <- read.csv(
+    paste0(
+      "quarto/",
+      state$language(),
+      "/measurement_dictionary.csv"
+    ),
+    encoding = "UTF-8"
+  )
 
   measurement_choices <- mapping %>%
     split(.$type) %>%
@@ -13,8 +20,17 @@ mod_step_3_project_info_ui <- function(id, state) {
       "<div>{name}</div><div style='display:none'>{aliases}</div>"
     ))
 
-  measurement_selected <- mapping$file_name
-
+  # Get the abbr column from the uploaded data dictionary
+  measurement_in_dictionary <- state$data_dictionary$abbr
+  
+  # Match the abbr column with the aliases and get the file_name to pre-select
+  # the uploaded measurements in the measurement definition picker
+  measurement_selected <- mapping |>
+    dplyr::select(c(aliases, file_name)) |>
+    tidyr::separate_longer_delim(cols = aliases, delim = "; ") |>
+    dplyr::filter(aliases %in% measurement_in_dictionary) |>
+    dplyr::pull(file_name)
+  
   # fix values so they don't update unless changed
   project_name_val <- isolate(
     state$project_info_vals$project_name %||% ""
