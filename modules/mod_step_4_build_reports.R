@@ -25,7 +25,7 @@ mod_step_4_build_reports_ui <- function(id, state) {
       selected = isolate(state$step_4_vals$format) %||% c("docx"),
       justified = TRUE
     ),
-    downloadButton(ns("report"), "Build Report", style = "margin-top:20px")
+    downloadButton(ns("report"), "Build Reports", style = "margin-top:20px")
   )
 }
 
