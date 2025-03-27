@@ -16,7 +16,7 @@ mod_step_4_build_reports_ui <- function(id, state) {
         label = "Select Report Formats",
         choices = c("<div style='text-align:center;'><i class='fas fa-file-word fa-2x'></i><br><span>Word</span></div>" = "docx",
                     "<div style='text-align:center;'><i class='fas fa-file-code fa-2x'></i><br><span>HTML</span></div>" = "html"),
-        selected = isolate(state$step_4_vals$format) %||% c("html", "docx"),
+        selected = isolate(state$step_4_vals$format) %||% c("docx"),
         justified = TRUE
       ),
       
