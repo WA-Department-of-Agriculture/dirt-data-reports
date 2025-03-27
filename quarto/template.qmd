@@ -31,9 +31,9 @@ fig-height: 3.5
 fig-dpi: 300
 params:
   data_file: "spanish-test.xlsx"
-  year: "2023"
+  year: "2024"
   language: "spanish"
-  producer_id: "WUY05"
+  producer_id: "GEH01"
   project_name: "Sample Project"
   project_results: "Intro to the project results section."
   project_summary: "This is a summary."
