@@ -69,22 +69,22 @@ fs::dir_create(path)
 #| output: false
 
 # Get the list of available font families
-fonts <- system_fonts()
-families <- unique(fonts$family)
-
-# Check if Arial is available
-if (!("Arial" %in% families)) {
-  systemfonts::register_font(
-    name = "Arial",
-    plain = "www/fonts/Arial.ttf",
-    bold = "www/fonts/Arial-Bold.ttf",
-    italic = "www/fonts/Arial-Italic.ttf",
-    bolditalic = "www/fonts/Arial-Bold-Italic.ttf"
-  )
-  message("Arial font registered successfully.")
-} else {
-  message("Arial font is already registered.")
-}
+# fonts <- system_fonts()
+# families <- unique(fonts$family)
+# 
+# # Check if Arial is available
+# if (!("Arial" %in% families)) {
+#   systemfonts::register_font(
+#     name = "Arial",
+#     plain = "www/fonts/Arial.ttf",
+#     bold = "www/fonts/Arial-Bold.ttf",
+#     italic = "www/fonts/Arial-Italic.ttf",
+#     bolditalic = "www/fonts/Arial-Bold-Italic.ttf"
+#   )
+#   message("Arial font registered successfully.")
+# } else {
+#   message("Arial font is already registered.")
+# }
 
 # EDIT: Replace any font names and colors to match your branding.
 header_font <- "Georgia"

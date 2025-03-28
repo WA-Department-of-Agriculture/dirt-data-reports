@@ -146,7 +146,7 @@ a:hover {
   font-weight: bold;
 }
 
-#modal-preview h2 {
+#modal-preview h2, #modal-preview h3 {
   font-family: "Georgia";
   color: var(--deep-green);
   font-size: 25px;

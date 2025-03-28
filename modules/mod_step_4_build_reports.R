@@ -72,6 +72,15 @@ mod_step_4_build_reports_server <- function(id, state) {
         )
       )
     })
+    
+    #disable build report button if no producers selected
+    observe({
+      if (is.null(input$producer_id) || length(input$producer_id) == 0) {
+        shinyjs::disable("report")
+      } else {
+        shinyjs::enable("report")
+      }
+    })
 
     # Store inputs in state
     observeEvent(input$year, {
@@ -87,143 +96,93 @@ mod_step_4_build_reports_server <- function(id, state) {
     # Download handler
     output$report <- downloadHandler(
       filename = function() {
-        paste0("soil_reports_", Sys.Date(), ".zip")
+        paste0("soil_reports_", format(Sys.time(), "%Y-%m-%d_%H-%M"), ".zip")
       },
       content = function(file) {
-        
         shinybusy::show_modal_spinner(
           spin = "flower",
           color = "#023B2C",
           text = "Building Reports..."
         )
+        
         formats <- input$format
         producers <- input$producer_id
         year <- input$year
         project_info <- state$project_info()
         language <- state$language()
-
-        # Step 1: Set up paths
-        original_template <- file.path("quarto", "template.qmd")
-        if (!file.exists(original_template)) stop("Template file not found!")
-
+        
+        # Step 1: Create unique temp directory
         temp_dir <- tempfile("report_build_")
-        dir.create(temp_dir)
-
-        # Define temp directory
-        temp_dir <- tempdir()
-
-        # Copy template into temp dir
-        template_copy <- file.path(temp_dir, "template.qmd")
-        file.copy(original_template, template_copy)
-
-        section_template_copy <- file.path(temp_dir, "section_template.qmd")
-        file.copy("quarto/section_template.qmd", section_template_copy)
-
-
-        # Create 'styles' subdirectory in the temp directory
-        styles_dir <- file.path(temp_dir, "styles")
-        dir.create(styles_dir, recursive = TRUE, showWarnings = FALSE)
-
-        # Copy stylings into the styles subdirectory
-        file.copy(
-          "quarto/styles/styles.css",
-          file.path(styles_dir, "styles.css")
-        )
-        file.copy(
-          "quarto/styles/word-template.docx",
-          file.path(styles_dir, "word-template.docx")
-        )
-
-        # create fig-output subdirectory
-        fig_output_dir <- file.path(temp_dir, "styles")
-        dir.create(fig_output_dir, recursive = TRUE, showWarnings = FALSE)
-
-
-        # Copy fonts from www/fonts dir and include in temp dir under www/fonts
-        original_fonts_dir <- file.path("www", "fonts")
-        fonts_copy_dir <- file.path(temp_dir, "www", "fonts")
-
-        # Create the directory if it doesn't exist
-        dir.create(fonts_copy_dir, recursive = TRUE, showWarnings = FALSE)
-
-        # Copy each font file
-        file.copy(
-          from = list.files(
-            original_fonts_dir,
-            full.names = TRUE,
-            recursive = TRUE
-          ),
-          to = fonts_copy_dir,
-          recursive = TRUE
-        )
-
-
-        # copy language folder and all of its contents
-        original_lang_dir <- file.path("quarto", language)
-        lang_dir_copy <- file.path(temp_dir, language)
-        dir.create(lang_dir_copy, recursive = TRUE, showWarnings = FALSE)
-        file.copy(
-          from = list.files(
-            original_lang_dir,
-            full.names = TRUE,
-            recursive = TRUE
-          ),
-          to = lang_dir_copy,
-          recursive = TRUE
-        )
-
-
-        # copy images folder and all of its contents
-        original_images_dir <- file.path("quarto", "images")
-        image_dir_copy <- file.path(temp_dir, "images")
-        dir.create(image_dir_copy, recursive = TRUE, showWarnings = FALSE)
-        file.copy(
-          from = list.files(
-            original_images_dir,
-            full.names = TRUE,
-            recursive = TRUE
-          ),
-          to = image_dir_copy,
-          recursive = TRUE
-        )
-
-        # create workbook with uploaded data & data dictionary, save to temp dir
-        write_xlsx(
-          list(
-            "Data" = state$data,
-            "Data Dictionary" = state$data_dictionary
-          ),
-          path = paste0(temp_dir, "/data.xlsx")
-        )
-
+        dir.create(temp_dir, recursive = TRUE)
+        on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+        
+        # Step 2: Build render_df
         render_df <- expand.grid(
           producer_id = producers,
           fmt = formats,
           stringsAsFactors = FALSE
         ) |>
-          mutate(
+          dplyr::mutate(
             output_file = paste0(year, "_", producer_id, ".", fmt)
           )
-
-        withProgress(message = "Rendering reports", value = 0, {
+        
+        total_steps <- nrow(render_df) + 2
+        failed_reports <- character(0)      
+        
+        withProgress(message = "Building reports", value = 0, {
+          
+          # ✅ Step 1: Copy templates, styles, and inputs
+          incProgress(1 / total_steps, detail = "Preparing files...")
+          
+          # Copy templates
+          file.copy("quarto/template.qmd", file.path(temp_dir, "template.qmd"))
+          file.copy("quarto/section_template.qmd", file.path(temp_dir, "section_template.qmd"))
+          
+          # Copy styles
+          styles_dir <- file.path(temp_dir, "styles")
+          dir.create(styles_dir, showWarnings = FALSE)
+          file.copy("quarto/styles/styles.css", styles_dir)
+          file.copy("quarto/styles/word-template.docx", styles_dir)
+          
+          # Copy language folder
+          lang_src <- file.path("quarto", language)
+          lang_dest <- file.path(temp_dir, language)
+          dir.create(lang_dest, showWarnings = FALSE)
+          file.copy(list.files(lang_src, full.names = TRUE, recursive = TRUE), to = lang_dest, recursive = TRUE)
+          
+          # Copy images
+          img_src <- file.path("quarto", "images")
+          img_dest <- file.path(temp_dir, "images")
+          dir.create(img_dest, showWarnings = FALSE)
+          file.copy(list.files(img_src, full.names = TRUE, recursive = TRUE), to = img_dest, recursive = TRUE)
+          
+          # Write uploaded data
+          writexl::write_xlsx(
+            list(
+              "Data" = state$data,
+              "Data Dictionary" = state$data_dictionary
+            ),
+            path = file.path(temp_dir, "data.xlsx")
+          )
+          
+          # Step 2–n: Render reports
           withr::with_dir(temp_dir, {
             for (i in seq_len(nrow(render_df))) {
               row <- render_df[i, ]
-              incProgress(1 / nrow(render_df), detail = row$output_file)
-
-              # quarto report parameters
+              incProgress(1 / total_steps, detail = paste("Rendering", row$output_file))
+              
               params <- list(
                 data_file = "data.xlsx",
-                year = input$year,
+                year = year,
                 producer_id = row$producer_id,
-                language = state$language(),
+                language = language,
                 project_name = project_info$project_name,
                 project_results = project_info$project_results,
                 project_summary = project_info$project_summary,
                 looking_forward = project_info$looking_forward,
                 measures = project_info$measurement_definitions
               )
-
+              
               tryCatch(
                 {
                   quarto::quarto_render(
@@ -234,25 +193,45 @@ mod_step_4_build_reports_server <- function(id, state) {
                   )
                 },
                 error = function(e) {
-                  warning(glue::glue(
-                    "Failed to render {row$output_file}: {e$message}"
-                  ))
+                  warning(glue::glue("Failed to render {row$output_file}: {e$message}"))
+                  failed_reports <<- c(failed_reports, row$output_file)
                 }
               )
             }
           })
+          
+          # Final Step: Zip Reports
+          incProgress(1 / total_steps, detail = "Zipping reports...")
+          
+          report_files <- list.files(
+            temp_dir,
+            pattern = "\\.(html|docx)$",
+            full.names = TRUE
+          )
+          
+          zip::zip(zipfile = file, files = report_files, mode = "cherry-pick")
         })
-
-        # Step 4: Copy all output files from temp dir and zip them
-        report_files <- list.files(
-          temp_dir,
-          pattern = "\\.(html|docx)$",
-          full.names = TRUE
-        )
-        zip::zip(zipfile = file, files = report_files, mode = "cherry-pick")
-
+        
         shinybusy::remove_modal_spinner()
+        
+        # Show final result
+        if (length(failed_reports) > 0) {
+          shinyalert::shinyalert(
+            title = "Some Reports Failed to Generate",
+            text = paste("The following reports failed:", paste(failed_reports, collapse = ", ")),
+            type = "error",
+            confirmButtonCol = "#335C67"
+          )
+        } else {
+          shinyalert::shinyalert(
+            title = "Reports Are Done Generating!",
+            text = "Check your Downloads folder for the zipped reports.",
+            confirmButtonCol = "#335C67",
+            type = "success"
+          )
+        }
       }
     )
+    
   })
 }

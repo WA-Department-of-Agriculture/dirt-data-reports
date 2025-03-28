@@ -54,8 +54,8 @@ if (out_type == "html") {
     purrr::pluck(group) |>
     convert_ggiraph(
       plot,
-      plot_name = group,
-      body_font = body_font
+      plot_name = group
+      #body_font = body_font
     )
 }
 ```
