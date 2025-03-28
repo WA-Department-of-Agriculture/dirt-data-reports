@@ -395,42 +395,50 @@ h1, h2, h3 {
 
 .navbar > .container-fluid:first-child {
   padding:0px 15px;}
-
-.banner {
-      width:100%;
-      height:100vh;
-      color:white;
-      padding:10px 25px;
-      display: flex;
-      align-items: center;
+.banner-bg {
+  position: relative;
+  background-image: url('pictures/soil_v2.jpeg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 60vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  overflow: hidden;
 }
 
-.banner-bg {
-      background-image: url('pictures/soil_v2.jpeg');
-      height: 100vh;
-      width:100%;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
-    }
-    
 .banner-overlay {
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        background-color: rgba(0, 0, 0, 0.7); /* Slight black overlay */
-      }
-      
- .banner-content {
-    position: absolute;
-    width:65%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    text-align: center;
-    }
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1;
+}
+
+.banner-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+}
+
+.banner-content h1 {
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+.banner-content p {
+  font-size: 18px;
+  color: #e4e4e4;
+  margin-bottom: 25px;
+}
+
 
 .container {
   width: 100%;

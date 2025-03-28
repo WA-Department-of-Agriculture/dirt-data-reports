@@ -13,14 +13,14 @@ ui <- navbarPage(
       tags$div(
         class = "title-name",
         style = "font-size:16px",
-        "Soil Health App"
+        "Dirt Data Reports"
       )
     )
   ),
   windowTitle = "Soil Health Reports",
   id = "main_page",
   collapsible = TRUE,
-  selected = "page_build_reports",
+  selected = "page_home",
   header = tags$head(
     tags$link(
       rel = "stylesheet",

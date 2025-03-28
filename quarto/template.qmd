@@ -72,7 +72,15 @@ fs::dir_create(path)
 fonts <- system_fonts()
 families <- unique(fonts$family)
 
-# Check if Arial is available
+# systemfonts::register_font(
+#   name = "Arial",
+#   plain = "www/fonts/Arial.ttf",
+#   bold = "www/fonts/Arial-Bold.ttf",
+#   italic = "www/fonts/Arial-Italic.ttf",
+#   bolditalic = "www/fonts/Arial-Bold-Italic.ttf"
+# )
+
+#Check if Arial is available
 if (!("Arial" %in% families)) {
   systemfonts::register_font(
     name = "Arial",

@@ -160,11 +160,11 @@ mod_step_4_build_reports_server <- function(id, state) {
           fonts_dest <- file.path(temp_dir, "www", "fonts")
           dir.create(fonts_dest, recursive = TRUE, showWarnings = FALSE)
           
-          file.copy(
-            from = list.files(fonts_src, full.names = TRUE),
-            to = fonts_dest,
-            overwrite = TRUE
-          )
+          file.copy("www/fonts/Arial.ttf", fonts_dest)
+          file.copy("www/fonts/Arial-Bold.ttf", fonts_dest)
+          file.copy("www/fonts/Arial-Italic.ttf", fonts_dest)
+          file.copy("www/fonts/Arial-Bold-Italic.ttf", fonts_dest)
+          
           
           # Write uploaded data
           writexl::write_xlsx(
