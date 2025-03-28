@@ -5,7 +5,7 @@ account: wsda
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 14346691
-bundleId: 10020645
+bundleId: 10020681
 url: https://wsda.shinyapps.io/soil-health/
 version: 1
 asMultiple: FALSE

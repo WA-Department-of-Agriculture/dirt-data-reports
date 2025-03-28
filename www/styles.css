@@ -44,6 +44,11 @@ a#build-step4-report:not(.disabled) {
   color: white;
 }
 
+/* Disconnect screen font color) */
+.severed p {
+  color:white;
+}
+
 .home-btn {
     color: white;
     background-color: var(--slate-blue);
