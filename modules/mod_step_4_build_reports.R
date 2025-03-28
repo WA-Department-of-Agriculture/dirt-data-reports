@@ -156,6 +156,16 @@ mod_step_4_build_reports_server <- function(id, state) {
           dir.create(img_dest, showWarnings = FALSE)
           file.copy(list.files(img_src, full.names = TRUE, recursive = TRUE), to = img_dest, recursive = TRUE)
           
+          fonts_src <- "www/fonts"
+          fonts_dest <- file.path(temp_dir, "www", "fonts")
+          dir.create(fonts_dest, recursive = TRUE, showWarnings = FALSE)
+          
+          file.copy(
+            from = list.files(fonts_src, full.names = TRUE),
+            to = fonts_dest,
+            overwrite = TRUE
+          )
+          
           # Write uploaded data
           writexl::write_xlsx(
             list(
