@@ -29,6 +29,14 @@ a:hover {
     filter: brightness(100%);
 }
 
+
+.buttons .prev, .buttons .next, .buttons .build {
+    width: 100px;
+    background: var(--deep-green);
+    color: white;
+    border: none;
+}
+
 .home-btn {
     color: white;
     background-color: var(--slate-blue);

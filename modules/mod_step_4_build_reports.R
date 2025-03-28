@@ -90,8 +90,12 @@ mod_step_4_build_reports_server <- function(id, state) {
         paste0("soil_reports_", Sys.Date(), ".zip")
       },
       content = function(file) {
-        shinybusy::show_modal_spinner(text = "Building reports...")
-
+        
+        shinybusy::show_modal_spinner(
+          spin = "flower",
+          color = "#023B2C",
+          text = "Building Reports..."
+        )
         formats <- input$format
         producers <- input$producer_id
         year <- input$year

@@ -58,6 +58,17 @@ ui <- navbarPage(
 )
 
 server <- function(input, output, session) {
+  
+  #when app disconnects, sever message
+  sever::sever(
+    html = sever_default(
+      title = "Pause", 
+      subtitle = "You've been inactive for too long. Click reload to refresh page.", 
+      button = "Reload", 
+      button_class = "default"), 
+    bg_color = "#023B2C"
+  )
+  
   mod_home_server("home")
   mod_build_reports_server("build")
   mod_learn_more_server("learn")
