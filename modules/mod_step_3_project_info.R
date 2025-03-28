@@ -68,8 +68,7 @@ mod_step_3_project_info_ui <- function(id, state) {
       label = tags$span(
         tags$b("Optional"),
         ": Learn how to further customize your text and reports."
-      ),
-      icon = icon("circle-info")
+      )
     ),
     br(),
     textInput(
@@ -105,19 +104,16 @@ mod_step_3_project_info_ui <- function(id, state) {
       mode = "markdown",
       height = "150px"
     ),
-    tags$label("Measurement Definitions"),
-    p(
-      class = "form-text",
-      "Selected definitions will be included in the 'What We Measured in Your Soil' section. Measurements are pre-selected based on the",
-      tags$b("abbr"),
-      "column in your uploaded",
-      tags$b("Data Dictionary"),
-      "tab but should be reviewed as we may call these measurements something different than your abbreviation.",
-      "To remove measurements from the tables and plots in the 'Project Results' section, remove them from both the",
-      tags$b("Data"),
-      "and",
-      tags$b("Data Dictionary"),
-      "tabs of your spreadsheet and re-upload in Step 2."
+    tags$label(
+      `for` = "measurement_definitions",
+      actionLink(label="Measurement Definitions", inputId = ns("definitions_modal"), 
+             style = paste(
+               "border-bottom: 1px dotted #333;",
+               "cursor: pointer;",
+               "color: inherit;",
+               "text-decoration: none;"
+             )
+      )
     ),
     shinyWidgets::pickerInput(
       inputId = ns("measurement_definitions"),
@@ -133,6 +129,19 @@ mod_step_3_project_info_ui <- function(id, state) {
       ),
       multiple = TRUE
     ),
+    # p(
+    #   class = "form-text",
+    #   "Selected definitions will be included in the 'What We Measured in Your Soil' section. Measurements are pre-selected based on the",
+    #   tags$b("abbr"),
+    #   "column in your uploaded",
+    #   tags$b("Data Dictionary"),
+    #   "tab but should be reviewed as we may call these measurements something different than your abbreviation.",
+    #   "To remove measurements from the tables and plots in the 'Project Results' section, remove them from both the",
+    #   tags$b("Data"),
+    #   "and",
+    #   tags$b("Data Dictionary"),
+    #   "tabs of your spreadsheet and re-upload in Step 2."
+    # ),
     bslib::tooltip(
       trigger = tags$span(
         tags$label("Project Results"),
@@ -195,6 +204,87 @@ mod_step_3_project_info_server <- function(id, state) {
         md = "about_customization"
       )
     })
+    
+    observeEvent(input$definitions_modal, {
+      
+      # Normalize selected abbreviations from user-uploaded data
+      selected_abbrs <- trimws(state$data_dictionary$abbr)
+      
+      # Load and rename the measurement dictionary
+      raw_measure_mapping <- read.csv(
+        paste0("quarto/", state$language(), "/measurement_dictionary.csv"),
+        encoding = "UTF-8"
+      ) |>
+        dplyr::select(name, aliases) |>
+        dplyr::rename(
+          Measurement = name,
+          Abbreviations = aliases
+        )
+      
+      # Process the mapping: split aliases, match against selected, style pills
+      processed_mapping <- raw_measure_mapping |>
+        dplyr::mutate(
+          # Split alias string into a list of terms
+          alias_terms = purrr::map(Abbreviations, ~ strsplit(.x, ";\\s*")[[1]] |> trimws()),
+          
+          # Flag if any alias matches selected_abbrs
+          has_match = purrr::map_lgl(alias_terms, ~ any(.x %in% selected_abbrs)),
+          
+          # Bold the Measurement name if there is a match
+          Measurement = ifelse(
+            has_match,
+            paste0("**", Measurement, "**"),
+            Measurement
+          ),
+          
+          # Convert aliases to styled pill HTML
+          Abbreviations = purrr::map_chr(alias_terms, function(terms) {
+            paste0(
+              purrr::map_chr(terms, function(term) {
+                matched <- term %in% selected_abbrs
+                style <- if (matched) {
+                  "background-color:#d4edda; border:1px solid #28a745; color:#155724;"
+                } else {
+                  "background-color:#f0f0f0; border:1px solid #ccc; color:#333;"
+                }
+                glue::glue("<span style='{style} border-radius:12px; padding:2px 8px; margin:4px 2px; display:inline-block; font-size:0.85em;'>{term}</span>")
+              }),
+              collapse = " "
+            )
+          })
+        )
+      
+      # Count how many measurements had at least one matched alias
+      num_matched <- sum(processed_mapping$has_match)
+      
+      # Create GT table
+      measure_table <- processed_mapping |>
+        dplyr::select(Measurement, Abbreviations) |>
+        gt::gt() |>
+        gt::fmt_markdown(columns = everything()) |>
+        gt::cols_label(
+          Measurement = gt::md("**Measurement**"),
+          Abbreviations = gt::md("**Abbreviations**")
+        )
+      
+      # Show modal
+      showModal(modalDialog(
+        title = "Understanding Measurement Definitions",
+        size = "l",
+        div(
+          tags$p("Selected definitions will appear in the ", tags$b("What We Measured in Your Soil"), " section."),
+          tags$p("These are pre-selected based on the ", tags$code("abbr"), " column in your uploaded Data Dictionary, but please review them — we may use different names than your abbreviations."),
+          tags$p("To exclude a measurement from the ", tags$b("Project Results"), " section, remove it from both the Data and Data Dictionary tabs in your spreadsheet before re-uploading in Step 2."),
+          tags$hr(),
+          HTML(glue::glue("<p>Based on your upload, we matched your abbreviations with <strong>{num_matched}</strong> measurement{if (num_matched != 1) 's' else ''}.</p>")),
+          htmltools::HTML(gt::as_raw_html(measure_table))
+        ),
+        easyClose = TRUE,
+        footer = modalButton("Close")
+      ))
+    })
+    
+    
 
     # Save all values into state
     observe({
@@ -241,15 +331,9 @@ mod_step_3_project_info_server <- function(id, state) {
         section_name = c(
           "Biological",
           "Physical",
-          "Chemical",
-          "Biológico",
-          "Físico",
-          "Químico"
+          "Chemical"
         ),
         color = c(
-          "#335c67",
-          "#a60f2d",
-          "#d4820a",
           "#335c67",
           "#a60f2d",
           "#d4820a"
@@ -259,12 +343,13 @@ mod_step_3_project_info_server <- function(id, state) {
 
       # Create tab panels
       tabs <- lapply(names(grouped_measures), function(section_name) {
-        image <- selected_mapping$type[
+        #neutral translation to english
+        type <- selected_mapping$type[
           selected_mapping$section_name == section_name
         ][1]
-        image_path <- paste0("pictures/", tolower(image), ".png")
+        image_path <- paste0("pictures/", tolower(type), ".png")
         section_color <- section_colors$color[
-          section_colors$section_name == section_name
+          section_colors$section_name == type
         ]
 
         tabPanel(
@@ -298,6 +383,7 @@ mod_step_3_project_info_server <- function(id, state) {
       showModal(modalDialog(
         title = "Preview Sections",
         div(
+          id = "modal-preview",
           tags$h2(input$project_name),
           tags$h3(tr("project_summary")),
           HTML(markdown::markdownToHTML(
