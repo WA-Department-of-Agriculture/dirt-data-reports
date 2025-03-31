@@ -1,169 +1,6 @@
 mod_home_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    tags$head(
-      tags$style(HTML("
-        .banner-bg {
-          position: relative;
-          background: url('pictures/soil_v2.jpeg') center center / cover no-repeat;
-          height: 400px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          color: white;
-        }
-
-.banner-overlay {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(5, 8, 8, 0.76);
-  z-index: 1;
-}
-        .banner-content {
-          position: relative;
-          z-index: 2;
-          padding: 20px;
-          max-width: 800px;
-        }
-
-        .banner-content h1 {
-          font-size: 40px;
-          margin-bottom: 15px;
-        }
-
-        .banner-content p {
-          font-size: 18px;
-          color: #e4e4e4;
-        }
-
-        .home-btn, .secondary-btn {
-          font-weight: bold;
-          padding: 12px 24px;
-          border-radius: 30px;
-          border: none;
-          cursor: pointer;
-          transition: background-color 0.3s ease;
-        }
-
-        .home-btn {
-          background-color: #FCB040;
-          color: black;
-        }
-
-        .home-btn:hover {
-          background-color: #FCB040;
-          color: white;
-        }
-
-        .secondary-btn {
-          background-color: transparent;
-          color: white;
-          border: 2px solid white;
-        }
-
-        .secondary-btn:hover {
-          background-color: white;
-          color: #1a1a1a;
-        }
-
-        .button-wrapper {
-          display: flex;
-          justify-content: center;
-          flex-wrap: wrap;
-          gap: 12px;
-          margin-top: 20px;
-        }
-
-        .button-wrapper .home-btn,
-        .button-wrapper .secondary-btn {
-          min-width: 180px;
-        }
-
-        @media (max-width: 600px) {
-          .button-wrapper {
-            flex-direction: column;
-            align-items: center;
-          }
-
-          .button-wrapper .home-btn,
-          .button-wrapper .secondary-btn {
-            width: 100%;
-            max-width: 280px;
-          }
-
-          .button-wrapper .home-btn {
-            margin-bottom: 10px;
-          }
-
-          .button-wrapper .secondary-btn {
-            margin-bottom: 0;
-          }
-        }
-
-        .steps-section {
-          background-color: #f4f4f4;
-          padding: 40px;
-          padding-bottom:80px;
-          text-align: center;
-        }
-
-        .steps-section h2 {
-          font-size: 28px;
-          font-weight: bold;
-        }
-
-        .steps-grid {
-          display: grid;
-          gap: 30px;
-          max-width: 1000px;
-          margin: 0 auto;
-        }
-
-        @media (min-width: 800px) {
-          .steps-grid {
-            grid-template-columns: repeat(4, 1fr);
-          }
-        }
-
-        @media (min-width: 640px) and (max-width: 799px) {
-          .steps-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
-
-        @media (max-width: 639px) {
-          .steps-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        .step-card {
-          background: white;
-          padding: 30px;
-          border-radius: 10px;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-
-        .step-icon {
-          font-size: 32px;
-          color: #023B2C;
-          margin-bottom: 15px;
-        }
-
-        .step-card h3 {
-          font-size: 18px;
-          font-weight: bold;
-          margin-bottom: 10px;
-        }
-
-        .step-card p {
-          font-size: 14px;
-          color: #555;
-        }
-      "))
-    ),
-    
     # Banner Section
     tags$div(
       class = "banner-bg",
@@ -171,7 +8,7 @@ mod_home_ui <- function(id) {
       tags$div(
         class = "banner-content",
         h1("DIRT DATA REPORTS"),
-        p(style = 'padding:0px 20px', "Brought to you by the Washington State Department of Agriculture and the Washington Soil Health Initiative. Build custom soil health reports for each participant in your soil sampling project in four steps."),
+        p(style = 'padding:0px 20px', "Generate customized soil health reports for your sampling project. Brought to you by the Washington State Department of Agriculture and the Washington Soil Health Initiative."),
         tags$div(
           class = "button-wrapper",
           actionButton(
@@ -189,37 +26,53 @@ mod_home_ui <- function(id) {
     ),
     
     # Steps Section
-    tags$div(
-      class = "steps-section",
-      h2("HOW IT WORKS"),
-      p(style='margin-bottom:40px', "Generate reports about your soil health in 4 simple steps"),
+    tags$section(
+      class = "section-block section-light",
+      tags$div(class="section-header", 
+        h2("HOW IT WORKS"),
+        p("Build custom soil health reports for each participant in your soil sampling project in four steps")
+      ),
       tags$div(
         class = "steps-grid",
         tags$div(
           class = "step-card",
           tags$div(class = "step-icon", tags$i(class = "fas fa-download")),
           h3("Step 1"),
-          p("Download the Excel template. Replace example data with your own.")
+          HTML("<p><b>Download</b> the Excel template. Replace example data with your own.</p>")
         ),
         tags$div(
           class = "step-card",
           tags$div(class = "step-icon", tags$i(class = "fas fa-table")),
           h3("Step 2"),
-          p("Upload and validate your data file.")
+          HTML("<p><b>Upload</b> and validate your data file.</p>")
         ),
         tags$div(
           class = "step-card",
           tags$div(class = "step-icon", tags$i(class = "fas fa-cog")),
           h3("Step 3"),
-          p("Customize with project-specific information.")
+          HTML("<p><b>Customize</b> with project-specific information.</p>")
         ),
         tags$div(
           class = "step-card",
           tags$div(class = "step-icon", tags$i(class = "fas fa-file-alt")),
           h3("Step 4"),
-          p("Generate custom reports for all participants.")
+          HTML("<p><b>Build</b> custom reports for all participants.</p>")
         )
       )
+    ),
+    tags$section(
+      class="section-block",
+      tags$div(class='section-header', 
+               h2("ABOUT THE REPORTS")
+      ),
+      tags$div(class='col-2', style='gap:40px!important',
+          tags$div(
+            HTML("<p style='text-align:left!important;font-size:18px!important;'>Soil Health Reports summarize key indicators from your soil samples to help you better understand <b>biological</b>, <b>chemical</b>, and <b>physical</b> soil properties. Each report compares participant results to other samples in your project and interprets results using benchmarks grounded in soil health research. These reports are designed to be clear, customizable, and informative—whether you're a grower, researcher, or educator.</p>")
+            ),
+          tags$div(
+                   tags$img(style='width:100%;min-width:300px;', src="pictures/report-example.png")
+          )
+     )
     )
   )
 }
