@@ -67,7 +67,7 @@ mod_home_ui <- function(id) {
       ),
       tags$div(class='col-2', style='gap:40px!important',
           tags$div(
-            HTML("<p style='text-align:left!important;font-size:18px!important;'>Soil Health Reports summarize key indicators from your soil samples to help you better understand <b>biological</b>, <b>chemical</b>, and <b>physical</b> soil properties. Each report compares participant results to other samples in your project and interprets results using benchmarks grounded in soil health research. These reports are designed to be clear, customizable, and informative—whether you're a grower, researcher, or educator.</p>")
+            HTML("<p style='text-align:left!important;font-size:18px!important;'>Dirt data reports summarize the latest soil health research on key indicators to increase understanding of <b>biological</b>, <b>chemical</b>, and <b>physical</b> soil properties. Each report compares participant results to other samples within the project, offering valuable context for interpreting soil data and empowering participants to better manage soil health.</p>")
             ),
           tags$div(
                    tags$img(style='width:100%;min-width:300px;', src="pictures/report-example.png")
