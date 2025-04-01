@@ -273,10 +273,10 @@ mod_step_3_project_info_server <- function(id, state) {
         size = "l",
         div(
           tags$p("Selected definitions will appear in the ", tags$b("What We Measured in Your Soil"), " section."),
-          tags$p("These are pre-selected based on the ", tags$code("abbr"), " column in your uploaded Data Dictionary, but please review them — we may use different names than your abbreviations."),
+          tags$p("These are pre-selected based on the ", tags$b("abbr"), " column in your uploaded Data Dictionary, but please review them — we may use different names than your abbreviations."),
           tags$p("To exclude a measurement from the ", tags$b("Project Results"), " section, remove it from both the Data and Data Dictionary tabs in your spreadsheet before re-uploading in Step 2."),
           tags$hr(),
-          HTML(glue::glue("<p>Based on your upload, we matched your abbreviations with <strong>{num_matched}</strong> measurement{if (num_matched != 1) 's' else ''}.</p>")),
+          HTML(glue::glue("<p>Your uploaded abbreviations (highlighted in green) matched <strong>{num_matched}</strong> measurement definition{if (num_matched != 1) 's' else ''} (bolded).</p>")),
           htmltools::HTML(gt::as_raw_html(measure_table))
         ),
         easyClose = TRUE,
