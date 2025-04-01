@@ -16,6 +16,8 @@
   --active-green: #22b648e6;
 }
 
+
+
 /* -----------------------------------------
    Global Styles
 ----------------------------------------- */
@@ -147,6 +149,7 @@ h1, h2, h3 {
   background-color: var(--deep-green);
   padding: 4rem 1.5rem;
   color: white;
+  position:relative;
 }
 
 .footer-container {
@@ -652,10 +655,9 @@ a#build-step4-report:not(.disabled) {
    Stepper & Steps
 ----------------------------------------- */
 
+
 .stepper {
   width: 250px;
-  z-index: -1;
-  background-color: ##e0ddd9;
   padding: 20px;
   padding-top: 40px;
   border-right: 2px solid #eeeeee;
