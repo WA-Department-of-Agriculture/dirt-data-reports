@@ -221,13 +221,13 @@ results_long <- data |>
   dplyr::mutate(
     dplyr::across(
       # EDIT: replace with the column range of your soil measurements
-      12:num_cols,
+      11:num_cols,
       as.numeric
     )
   ) |>
   tidyr::pivot_longer(
     # EDIT: replace with the column range of your soil measurements
-    cols = 12:num_cols,
+    cols = 11:num_cols,
     names_to = "measurement"
   ) |>
   dplyr::inner_join(dictionary, by = c("measurement" = "column_name")) |>
