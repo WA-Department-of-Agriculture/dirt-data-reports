@@ -60,13 +60,13 @@ Your feedback is welcome as the team works on updates and new features. You are 
 
 ### Example HTML
 
-Below is an example of an HTML output. You can also access it here on this [site](https://soils-example-html.netlify.app/).
+Below is an example of an HTML output. You can also access it here on this [site](https://dirt-data-reports-example-html.netlify.app/).
 
-<iframe src="https://soils-example-html.netlify.app/" width="100%" height="500" style="border: none;"></iframe>
+<iframe src="https://dirt-data-reports-example-html.netlify.app/" width="100%" height="500" style="border: none;"></iframe>
 
 ### Example Word
 
 <div style="position: relative; width: 100%; padding-bottom: 75%;">
-    <iframe src="https://drive.google.com/file/d/1VsRDa4zzzevCVYK17RvtbxHVu2nELCUc/preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;">
+    <iframe src="https://drive.google.com/file/d/1oCIhlzok_2xHjnREjhEwGaBkouLb8YNB/preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;">
     </iframe>
 </div>
