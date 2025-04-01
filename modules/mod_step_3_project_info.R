@@ -39,7 +39,7 @@ mod_step_3_project_info_ui <- function(id, state) {
     state$project_info_vals$project_summary %||% "Thank the participating farmer. Consider including information related to how many samples you've taken, in how many crops and regions. Identify the project team and acknowledge support from your funders and collaborators."
   )
   project_results_val <- isolate(
-    state$project_info_vals$project_results_val %||% "Below are tables and graphs describing the measurements from your soils. Each point represents a sample we collected. Take a look to see how your fields compare to others in the project. All samples were collected from **[EDIT: SOIL DEPTH (e.g. 0-6 inches, or 0-30 cm)]**."
+    state$project_info_vals$project_results %||% "Below are tables and graphs describing the measurements from your soils. Each point represents a sample we collected. Take a look to see how your fields compare to others in the project. All samples were collected from **[EDIT: SOIL DEPTH (e.g. 0-6 inches, or 0-30 cm)]**."
   )
   looking_forward_val <- isolate(
     state$project_info_vals$looking_forward %||% "Consider describing how this data will be used. Are you building decision support tools? Publications? Will you be speaking at upcoming field days or conferences about this work? Soils data can be confusing… let your audience know that this is just the start of the conversation! Thank participants once again."
