@@ -786,6 +786,16 @@ a#build-step4-report:not(.disabled) {
   font-family: "Arial";
 }
 
+.tabbable .tab-content .content {
+  padding:0px!important;
+}
+
+.tabbable .tab-content img {
+  display: flex;
+  flex-direction: row;
+  max-width: 50%;
+}
+
 
 /* -----------------------------------------
    Banners
