@@ -52,7 +52,9 @@ Future updates include expanding the types of comparisons a user can make (e.g. 
 
 ## **Where can I see the source code & provide feedback?**
 
-To view the source code, explore the WSDA [GitHub repository](https://github.com/WA-Department-of-Agriculture/soil-health-report-generator). If you have a feature request or would like to report a bug, please [submit an issue](https://github.com/WA-Department-of-Agriculture/soil-health-report-generator/issues) or contact Jadey Ryan at [jryan\@agr.wa.gov](mailto:jryan@agr.wa.gov).
+To view the source code, explore the WSDA [GitHub repository](https://github.com/WA-Department-of-Agriculture/soil-health-report-generator). 
+
+Your feedback is welcome as the team works on updates and new features. You are encouraged to share your experience using the tool and how recipients respond to these reports through this [form](https://arcg.is/1zPbbL1).
 
 ## **Can I see examples of the reports?**
 

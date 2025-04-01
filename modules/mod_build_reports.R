@@ -13,7 +13,7 @@ mod_build_reports_ui <- function(id) {
             tags$div(class = "form-section",
                 tags$a(
                   style = "width:100%;display:flex;margin-bottom:10px;justify-content:end;",
-                  href = "https://github.com/WA-Department-of-Agriculture/soil-health-report-generator/issues",
+                  href = "https://arcg.is/1zPbbL1",
                   target = "_blank",
                   "Report Issue"
                 ),

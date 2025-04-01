@@ -9,17 +9,17 @@ mod_footer_ui <- function(id) {
           class = "footer-nav",
           actionLink(inputId=ns("footer_build_reports"), label = "Build Reports", class = "footer-link"),
           actionLink(inputId=ns("footer_learn_more"),label= "Learn More", class = "footer-link"),
-          a(class = "footer-link", "Report Issue")
+          tags$a(target = "_blank", href="https://arcg.is/1zPbbL1", class = "footer-link", "Report Issue")
         ),
         tags$div(
           class = "footer-social",
-          tags$a(href = "https://agr.wa.gov/departments/land-and-water/natural-resources/soil-health/", class = "footer-icon", span(class = "sr-only", "Site"), icon("globe")),
-          tags$a(href = "mailto:washi@agr.wa.gov", class = "footer-icon", span(class = "sr-only", "Email"), icon("envelope")),
-          tags$a(href = "https://github.com/WA-Department-of-Agriculture/", class = "footer-icon", span(class = "sr-only", "GitHub"), icon("github")),
-          tags$a(href = "https://www.linkedin.com/company/wsdagov/", class = "footer-icon", span(class = "sr-only", "LinkedIn"), icon("linkedin")),
-          tags$a(href = "https://www.facebook.com/WAStateDeptAg/", class = "footer-icon", span(class = "sr-only", "Facebook"), icon("facebook")),
-          tags$a(href = "https://www.instagram.com/WSDAgov/", class = "footer-icon", span(class = "sr-only", "Instagram"), icon("instagram")),
-          tags$a(href = "https://www.youtube.com/user/WSDAgov/", class = "footer-icon", span(class = "sr-only", "Youtube"), icon("youtube")),
+          tags$a(target = "_blank", href = "https://agr.wa.gov/departments/land-and-water/natural-resources/soil-health/", class = "footer-icon", span(class = "sr-only", "Site"), icon("globe")),
+          tags$a(target = "_blank", href = "mailto:washi@agr.wa.gov", class = "footer-icon", span(class = "sr-only", "Email"), icon("envelope")),
+          tags$a(target = "_blank", href = "https://github.com/WA-Department-of-Agriculture/", class = "footer-icon", span(class = "sr-only", "GitHub"), icon("github")),
+          tags$a(target = "_blank", href = "https://www.linkedin.com/company/wsdagov/", class = "footer-icon", span(class = "sr-only", "LinkedIn"), icon("linkedin")),
+          tags$a(target = "_blank", href = "https://www.facebook.com/WAStateDeptAg/", class = "footer-icon", span(class = "sr-only", "Facebook"), icon("facebook")),
+          tags$a(target = "_blank", href = "https://www.instagram.com/WSDAgov/", class = "footer-icon", span(class = "sr-only", "Instagram"), icon("instagram")),
+          tags$a(target = "_blank", href = "https://www.youtube.com/user/WSDAgov/", class = "footer-icon", span(class = "sr-only", "Youtube"), icon("youtube")),
         ),
         tags$p(class = "footer-copy", "©2025 Washington State Department of Agriculture. All rights reserved.")
       )
