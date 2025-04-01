@@ -1,10 +1,6 @@
 <!--section:project_results-->
 ## Project Results
 
-Below are tables and graphs describing the physical, biological, and chemical
-measurements from your soils. Each point represents a sample we collected. Take
-a look to see how your fields compare to others in the project. All samples were
-collected from 
 
 <!--section:soil_health-->
 ## Soil Health

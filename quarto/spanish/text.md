@@ -1,10 +1,6 @@
 <!--section:project_results-->
 ## Resultados del proyecto
 
-A continuación, se muestran tablas y gráficos para la textura, los indicadores
-de salud del suelo y las pruebas de fertilidad del suelo. Cada punto representa
-una muestra de este proyecto. Eche un vistazo para ver cómo se comparan sus
-campos con otros en el proyecto. Todas las muestras se colectaron de 
 
 <!--section:soil_health-->
 ## Salud del suelo
