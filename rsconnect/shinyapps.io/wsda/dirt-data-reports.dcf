@@ -1,0 +1,12 @@
+name: dirt-data-reports
+title: dirt-data-reports
+username: wsda
+account: wsda
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 14396697
+bundleId: 10038717
+url: https://wsda.shinyapps.io/dirt-data-reports/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
