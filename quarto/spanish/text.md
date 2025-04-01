@@ -81,16 +81,7 @@ suelo"](https://youtu.be/-ED-gGk4yb8?si=fxfnxqrRqhkGDaiu).
 
 <!--section:acknowledgements-->
 ## Reconocimiento
-La plantilla de informe sobre la salud del suelo utilizada para generar este
-informe fue desarrollada por el Departamento de Agricultura del Estado de
-Washington y la Universidad Estatal de Washington (WSU) como parte de la
-Iniciativa sobre la Salud del Suelo de Washington. El contenido y las figuras
-fueron adaptadas de la publicación de estension universitaria de el estado de
-Washington [#FS378E Soil Health in Washington
-Vineyards](https://pubs.extension.wsu.edu/soil-health-in-washington-vineyards).
+Este informe se generó con la herramienta [Dirt Data Reports tool](https://wsda.shinyapps.io/dirt-data-reports/). El Departamento de Agricultura del Estado de Washington (WSDA) desarrolló con base en [el paquete R {soils}](https://wa-department-of-agriculture.github.io/soils/), creado por el WSDA y la Universidad Estatal de Washington como parte de la [Iniciativa sobre la Salud del Suelo de Washington](https://washingtonsoilhealthinitiative.com/). El contenido y las figuras fueron adaptadas de la publicación de estension universitaria de el estado de Washington [#FS378E Soil Health in Washington Vineyards](https://pubs.extension.wsu.edu/soil-health-in-washington-vineyards).
 
-El texto del reporte y las imágenes fueron traducidas por Erica Tello, Eber
-Rivera, y Kate Smith con WSU Food Systems y Skagit County Extension como parte
-del programa de USDA NRCS Innovación en la conservación, dirigido por Viva Farms
-(grant number NR22-13G004).
+El texto del reporte y las imágenes fueron traducidas por Erica Tello, Eber Rivera, y Kate Smith con WSU Food Systems y Skagit County Extension como parte del programa de USDA NRCS Innovación en la conservación, dirigido por Viva Farms (grant number NR22-13G004).
 

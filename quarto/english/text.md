@@ -73,11 +73,5 @@ Learn more about interpreting your soil health results by watching Dani Gelardi'
 
 <!--section:acknowledgements-->
 ## Acknowledgements
-This report was generated using the [{soils} R
-package](https://wa-department-of-agriculture.github.io/soils/). {soils} was
-developed by the Washington State Department of Agriculture and Washington State
-University, as part of the Washington Soil Health Initiative. Text and figures
-were adapted from [WSU Extension publication #FS378E Soil Health in Washington
-Vineyards](https://pubs.extension.wsu.edu/soil-health-in-washington-vineyards).
-Learn more about {soils} in this [blog post](https://washingtonsoilhealthinitiative.com/2024/03/soils-an-r-package-for-soil-health-reporting/) or this [webinar](https://youtu.be/_8m7fTjSEOk?si=ikrCASdchiB6rDC2).
+This report was generated using the [Dirt Data Reports tool](https://wsda.shinyapps.io/dirt-data-reports/). Dirt Data Reports was developed by the Washington State Department of Agriculture (WSDA) based on the [{soils} R package](https://wa-department-of-agriculture.github.io/soils/), created by WSDA and Washington State University as part of the [Washington Soil Health Initiative](https://washingtonsoilhealthinitiative.com/). Text and figures were adapted from [WSU Extension publication #FS378E Soil Health in Washington Vineyards](https://pubs.extension.wsu.edu/soil-health-in-washington-vineyards).
 
