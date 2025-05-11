@@ -30,7 +30,7 @@ mod_home_ui <- function(id) {
       class = "section-block section-light",
       tags$div(class="section-header", 
         h2("HOW IT WORKS"),
-        p("Build custom soil health reports for each participant in your soil sampling project in four steps")
+        p("Build custom soil health reports for each participant in your soil sampling project in four steps.")
       ),
       tags$div(
         class = "steps-grid",
