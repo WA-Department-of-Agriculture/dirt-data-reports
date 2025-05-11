@@ -41,6 +41,7 @@ ui <- navbarPage(
          f.parentNode.insertBefore(j,f);
        })(window,document,'script','dataLayer','GTM-WT9XJ9LG');"
     )),
+    #fontawesome css, replace this with latest if needed
     tags$link(
       rel = "stylesheet",
       href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
@@ -54,6 +55,7 @@ ui <- navbarPage(
       rel = "shortcut icon",
       href = "pictures/wshi.png"
     ),
+    #javascript
     tags$script(src = "scripts/toc.js"),
     tags$script(src = "scripts/stepper.js"),
     shinyjs::useShinyjs(),
@@ -89,10 +91,14 @@ server <- function(input, output, session) {
     bg_color = "#023B2C"
   )
   
+
+  
   mod_home_server("home")
   mod_build_reports_server("build")
   mod_learn_more_server("learn")
   
+  
+
 
   # Redirect when logo/title is clicked
   observeEvent(input$title, {

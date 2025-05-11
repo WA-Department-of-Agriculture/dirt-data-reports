@@ -125,3 +125,25 @@ show_modal <- function(title, id, md) {
     )
   )
 }
+
+
+#Taken from Tan Ho to get user timezone: https://github.com/tanho63/tantastic/blob/main/R/shiny_timezone.R
+use_client_tz <- function(inputId = "_client_tz"){
+  shiny::tagList(
+    shiny::tags$input(type = "text", id = inputId, style = "display: none;"),
+    shiny::tags$script(
+      paste0('
+      $(function() {
+        var time_now = new Intl.DateTimeFormat().resolvedOptions().timeZone
+        $("input#', inputId, '").val(time_now)
+      });
+    ')
+    )
+  )
+}
+
+#Taken from Tan Ho to get user timezone: https://github.com/tanho63/tantastic/blob/main/R/shiny_timezone.R
+get_client_tz <- function(inputId = "_client_tz", session = shiny::getDefaultReactiveDomain()) {
+  tz <- shiny::isolate(session$input[[inputId]])
+  return(tz)
+}

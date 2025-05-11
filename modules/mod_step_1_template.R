@@ -49,6 +49,10 @@ mod_step_1_template_ui <- function(id, state) {
 
 mod_step_1_template_server <- function(id, state) {
   moduleServer(id, function(input, output, session) {
+    
+    
+   
+    
     # Save value into state
     observe({
       state$step_1_vals$language <- input$language
@@ -62,6 +66,7 @@ mod_step_1_template_server <- function(id, state) {
         md = "about_template"
       )
     })
+    
 
     # Template download logic
     output$download_template <- downloadHandler(

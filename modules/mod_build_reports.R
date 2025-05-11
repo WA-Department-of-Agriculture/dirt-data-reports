@@ -2,6 +2,13 @@ mod_build_reports_ui <- function(id) {
   ns <- NS(id)
   
   tagList(
+    #add timezone to a hidden input
+    tags$script(HTML("
+      Shiny.addCustomMessageHandler('getTimeZone', function(message) {
+        var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        Shiny.setInputValue('build-user_timezone', tz);
+      });
+    ")),
     tags$div(class = "container-reports",
         tags$div(style='display:flex',
             # Vertical Side Stepper (clickable vertical steps)
@@ -46,13 +53,23 @@ mod_build_reports_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
+    #trigger to get user timezone
+    observe({
+      session$sendCustomMessage("getTimeZone", list())
+    })
+    
+    
     # This holds the current step (shared across submodules)
     state <- reactiveValues(
       current_step = 1,
       step_2_valid = FALSE,
-      step_3_valid = FALSE)
-    
+      step_3_valid = FALSE,
+      user_timezone = NULL)
 
+    observe({
+      state$user_timezone<-input$user_timezone
+    })
+    
     
     output$stepper_ui <- renderUI({
       tagList(

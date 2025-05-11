@@ -1,38 +1,45 @@
 mod_step_4_build_reports_ui <- function(id, state) {
   ns <- NS(id)
-
-  div(
-    class = "form-content",
-    h4(class = "form-step", "Step 4"),
-    h2(class = "form-title", "Build Reports"),
-    p(
-      class = "form-text",
-      "Choose the year and up to five producers to build reports for. Producer IDs listed will automatically update based on the year selected. Reports will be generated in a zip file within your Downloads folder."
-    ),
+  
+  tagList(
+    useShinyjs(),  
+    tags$script(HTML("
+      Shiny.addCustomMessageHandler('getTimeZone', function(message) {
+        var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        Shiny.setInputValue('user_timezone', tz);
+      });
+    ")),
     div(
-      class = "col-2",
-      # Render year and producer inputs dynamically
-      uiOutput(ns("year_input")),
-      uiOutput(ns("producer_input"))
-    ),
-    shinyWidgets::checkboxGroupButtons(
-      inputId = ns("format"),
-      label = "Select Report Formats",
-      choices = c(
-        "<div style='text-align:center;'><i class='fas fa-file-word fa-2x'></i><br><span>Word</span></div>" = "docx",
-        "<div style='text-align:center;'><i class='fas fa-file-code fa-2x'></i><br><span>HTML</span></div>" = "html"
+      class = "form-content",
+      h4(class = "form-step", "Step 4"),
+      h2(class = "form-title", "Build Reports"),
+      p(
+        class = "form-text",
+        "Choose the year and up to five producers to build reports for..."
       ),
-      selected = isolate(state$step_4_vals$format) %||% c("docx"),
-      justified = TRUE
-    ),
-    div(
-      class = "alert alert-warning d-flex align-items-center",
-      style = "margin:20px 0px",
-      role = "alert",
-      shiny::icon("triangle-exclamation", class = "me-2"),
-      tags$span("Note: Depending on the number of reports selected, the report generation process can take several minutes. Please remain in the session until download is complete.")
-    ),
-    downloadButton(ns("report"), "Build Reports", style = "margin-top:20px")
+      div(class = "col-2",
+          uiOutput(ns("year_input")),
+          uiOutput(ns("producer_input"))
+      ),
+      shinyWidgets::checkboxGroupButtons(
+        inputId = ns("format"),
+        label = "Select Report Formats",
+        choices = c(
+          "<div style='text-align:center;'><i class='fas fa-file-word fa-2x'></i><br><span>Word</span></div>" = "docx",
+          "<div style='text-align:center;'><i class='fas fa-file-code fa-2x'></i><br><span>HTML</span></div>" = "html"
+        ),
+        selected = isolate(state$step_4_vals$format) %||% c("docx"),
+        justified = TRUE
+      ),
+      div(
+        class = "alert alert-warning d-flex align-items-center",
+        style = "margin:20px 0px",
+        role = "alert",
+        shiny::icon("triangle-exclamation", class = "me-2"),
+        tags$span("Note: Depending on the number of reports, this process may take several minutes. Please do not exist the session before the reports are downloaded.")
+      ),
+      downloadButton(ns("report"), "Build Reports", style = "margin-top:20px")
+    )
   )
 }
 
@@ -42,6 +49,13 @@ mod_step_4_build_reports_ui <- function(id, state) {
 mod_step_4_build_reports_server <- function(id, state) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+    
+    observe({
+      print(glue::glue("User time zone: {getDefaultReactiveDomain()$input$user_timezone}"))
+    })
+    
+
 
     # Render year input
     output$year_input <- renderUI({
@@ -53,6 +67,8 @@ mod_step_4_build_reports_server <- function(id, state) {
         selected = isolate(state$step_4_vals$year) %||% state$years[1]
       )
     })
+    
+
 
     # Render producer input
     output$producer_input <- renderUI({
@@ -88,6 +104,10 @@ mod_step_4_build_reports_server <- function(id, state) {
         shinyjs::enable("report")
       }
     })
+    
+    # observe({
+    #   print(state$user_timezone)
+    # })
 
     # Store inputs in state
     observeEvent(input$year, {
@@ -103,7 +123,13 @@ mod_step_4_build_reports_server <- function(id, state) {
     # Download handler
     output$report <- downloadHandler(
       filename = function() {
-        paste0("soil_reports_", format(Sys.time(), "%Y-%m-%d_%H-%M"), ".zip")
+        local_time <- if (is.null(state$user_timezone)) {
+          format(Sys.time(), "%Y-%m-%d_%H-%M-%S")
+        } else {
+          format(with_tz(Sys.time(), state$user_timezone), "%Y-%m-%d_%H-%M-%S")
+        }
+        
+        paste0("soil_reports_", local_time, ".zip")
       },
       content = function(file) {
         shinybusy::show_modal_spinner(
