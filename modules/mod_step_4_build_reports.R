@@ -25,6 +25,13 @@ mod_step_4_build_reports_ui <- function(id, state) {
       selected = isolate(state$step_4_vals$format) %||% c("docx"),
       justified = TRUE
     ),
+    div(
+      class = "alert alert-warning d-flex align-items-center",
+      style = "margin:20px 0px",
+      role = "alert",
+      shiny::icon("triangle-exclamation", class = "me-2"),
+      tags$span("Note: Depending on the number of reports selected, the report generation process can take several minutes. Please remain in the session until download is complete.")
+    ),
     downloadButton(ns("report"), "Build Reports", style = "margin-top:20px")
   )
 }

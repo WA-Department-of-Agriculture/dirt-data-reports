@@ -145,15 +145,16 @@ validate_data_file <- function(file, req_fields) {
       )
     }
     
-    actual_types <- sapply(data, typeof)
-    expected_types <-
-      set_names(map_r_type(req_fields_data$var_type),
-                req_fields_data$var)
+    #skip check of data type if ALL records are blank for column, gets interpreted as logical type (default)
+    non_blank_vars <- sapply(data[req_fields_data$var], function(col) !all(is.na(col)))
+    
+    actual_types <- sapply(data[, names(non_blank_vars)[non_blank_vars], drop = FALSE], typeof)
+    expected_types <- set_names(map_r_type(req_fields_data$var_type), req_fields_data$var)
     
     mismatched_types <- req_fields_data %>%
       filter(var_type != "-") %>%
-      filter(var %in% names(actual_types) &
-               map_r_type(var_type) != actual_types[var]) %>%
+      filter(var %in% names(actual_types)) %>%
+      filter(map_r_type(var_type) != actual_types[var]) %>%
       mutate(actual_type = actual_types[var])
     
     if (nrow(mismatched_types) > 0) {
@@ -179,7 +180,7 @@ validate_data_file <- function(file, req_fields) {
   if (check2) {
     missing_values <- data %>%
       select(all_of(required_value_columns)) %>%
-      summarise(across(everything(), ~ sum(is.na(.)), .names = "missing_{.col}"))
+      summarise(across(everything(), ~ sum(is.na(.)), .names = "{.col}"))
     
     missing_cols <-
       names(missing_values)[colSums(missing_values) > 0]
