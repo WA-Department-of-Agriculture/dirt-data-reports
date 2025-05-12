@@ -18,8 +18,8 @@ mod_step_2_upload_ui <- function(id, state) {
     class = "form-content",
     h4(class = "form-step", "Step 2"),
     h2(class = "form-title", "Upload Data"),
-    p(
-      "Upload your completed template to validate the data. Any checks that fail will be printed below in an error message. Please correct these errors and then re-upload."
+    p(class="form-text",
+      "Upload your completed template to check for errors. If any issues are found, an error message will appear below. Please fix the errors in your file and upload it again. For your privacy, no data is stored or saved by this tool."
     ),
     actionLink(
       ns("requirement_info"),

@@ -58,7 +58,6 @@ mod_build_reports_server <- function(id) {
       session$sendCustomMessage("getTimeZone", list())
     })
     
-    
     # This holds the current step (shared across submodules)
     state <- reactiveValues(
       current_step = 1,

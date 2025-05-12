@@ -61,7 +61,7 @@ mod_step_3_project_info_ui <- function(id, state) {
         ns("redirect_learn_more"),
         "Learn More"
       ),
-      "for full examples of the reports."
+      "for full examples of the reports. "
     ),
     actionLink(
       inputId = ns("customize"),
@@ -69,6 +69,13 @@ mod_step_3_project_info_ui <- function(id, state) {
         tags$b("Optional"),
         ": Learn how to further customize your text and reports."
       )
+    ),
+    div(
+      class = "alert alert-warning d-flex align-items-center",
+      style = "margin:20px 0px",
+      role = "alert",
+      shiny::icon("triangle-exclamation", class = "me-2"),
+      tags$span("Note: Your text won't be saved and will be lost if you exit this session or after 15 minutes of inactivity. Please save a copy separately.")
     ),
     br(),
     textInput(
