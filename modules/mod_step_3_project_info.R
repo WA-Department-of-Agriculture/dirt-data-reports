@@ -114,12 +114,7 @@ mod_step_3_project_info_ui <- function(id, state) {
     tags$label(
       `for` = "measurement_definitions",
       actionLink(label="Measurement Definitions", inputId = ns("definitions_modal"), 
-             style = paste(
-               "border-bottom: 1px dotted #333;",
-               "cursor: pointer;",
-               "color: inherit;",
-               "text-decoration: none;"
-             )
+             class = "a"
       )
     ),
     shinyWidgets::pickerInput(
