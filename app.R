@@ -96,7 +96,7 @@ server <- function(input, output, session) {
   mod_home_server("home")
   mod_build_reports_server("build")
   mod_learn_more_server("learn")
-  
+  mod_footer_server("footer")
   
 
 
