@@ -1,6 +1,6 @@
 mod_step_2_upload_ui <- function(id, state) {
   ns <- NS(id)
-
+  
   # Display message if file already uploaded
   uploaded_msg <- isolate({
     if (!is.null(state$step_2_vals$file_name)) {
@@ -13,7 +13,7 @@ mod_step_2_upload_ui <- function(id, state) {
       NULL
     }
   })
-
+  
   div(
     class = "form-content",
     h4(class = "form-step", "Step 2"),
@@ -36,7 +36,7 @@ mod_step_2_upload_ui <- function(id, state) {
 mod_step_2_upload_server <- function(id, state) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-
+    
     observeEvent(input$requirement_info, {
       show_modal(
         title = "Data Check",
@@ -44,16 +44,16 @@ mod_step_2_upload_server <- function(id, state) {
         md = "about_validation"
       )
     })
-
+    
     observeEvent(input$upload_file, {
       req_fields <- read.csv("files/required-fields.csv")
-
+      
       # Remove previous messages
       removeUI(
         selector = paste0("#", ns("error_message"), " > *"),
         immediate = TRUE
       )
-
+      
       # Validate the uploaded file
       validation_results <- tryCatch(
         validate_data_file(input$upload_file$datapath, req_fields),
@@ -66,12 +66,12 @@ mod_step_2_upload_server <- function(id, state) {
           return(NULL)
         }
       )
-
+      
       if (is.null(validation_results)) {
         state$step_2_valid <- FALSE
         return()
       }
-
+      
       if (length(validation_results) == 0) {
         # ✅ All checks passed
         insertUI(
@@ -79,7 +79,7 @@ mod_step_2_upload_server <- function(id, state) {
           where = "beforeEnd",
           ui = div(class = "alert alert-success", "All checks passed!")
         )
-
+        
         # read in both data and data dictionary files
         uploaded_data <- readxl::read_xlsx(
           input$upload_file$datapath,
@@ -89,13 +89,13 @@ mod_step_2_upload_server <- function(id, state) {
           input$upload_file$datapath,
           sheet = "Data Dictionary"
         )
-
-
+        
+        
         # Save to state
         state$step_2_valid <- TRUE
         state$step_2_vals$file_name <- input$upload_file$name
         state$step_2_vals$data <- uploaded_data
-
+        
         # Used by Step 4
         state$years <- sort(unique(uploaded_data$year), decreasing = TRUE)
         state$producer_ids <- uploaded_data %>%

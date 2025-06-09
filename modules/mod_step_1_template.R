@@ -1,9 +1,9 @@
 mod_step_1_template_ui <- function(id, state) {
   ns <- NS(id)
-
+  
   # Get stored value or default to English
   language_val <- isolate(state$step_1_vals$language %||% "english")
-
+  
   tags$div(
     class = "form-content",
     h4(class = "form-step", "Step 1"),
@@ -46,18 +46,87 @@ mod_step_1_template_ui <- function(id, state) {
   )
 }
 
-
 mod_step_1_template_server <- function(id, state) {
   moduleServer(id, function(input, output, session) {
+    ns <- session$ns
     
     
-   
+    # Track previous language to detect changes
+    prev_language <- reactiveVal(NULL)
     
-    # Save value into state
-    observe({
-      state$step_1_vals$language <- input$language
+    # Handle language changes
+    observeEvent(input$language, {
+      current_lang <- input$language
+      
+      # If this is not the first time and language actually changed
+      if (!is.null(prev_language()) && prev_language() != current_lang) {
+        
+        # Only show modal if user has already uploaded data (step 2 completed)
+        if (state$step_2_valid) {
+          # Show confirmation dialog
+          showModal(modalDialog(
+            title = "Language Change Detected",
+            div(
+              p("Changing the language will require you to download the new template and re-upload your data."),
+              p(strong("Do you want to continue?"))
+            ),
+            footer = tagList(
+              actionButton(ns("confirm_reset"), "Change Language", class = "btn btn-warning", style="color:black"),
+              modalButton("Cancel")
+            ),
+            easyClose = FALSE
+          ))
+          
+          # Temporarily revert the input until confirmed
+          updateRadioGroupButtons(session, "language", selected = prev_language())
+          return()
+        } else {
+          # No data uploaded yet, allow free language change
+          prev_language(current_lang)
+          state$step_1_vals$language <- current_lang
+        }
+      } else {
+        # For initial load, just update stored values
+        prev_language(current_lang)
+        state$step_1_vals$language <- current_lang
+      }
     })
-
+    
+    # Handle confirmation of language change (only when data was uploaded)
+    observeEvent(input$confirm_reset, {
+      removeModal()
+      
+      # Get the intended new language (from what user originally selected)
+      new_language <- if (prev_language() == "english") "spanish" else "english"
+      
+      # Show notification
+      showNotification(
+        "Language changed. Please download the new template and re-upload your data.",
+        type = "warning",
+        duration = 5
+      )
+      
+      # Reset Steps 2-4 validation and data, but preserve Step 3 text inputs
+      state$step_2_valid <- FALSE
+      state$step_3_valid <- FALSE
+      
+      # Clear Step 2 and 4 state, but preserve Step 3 project info text
+      state$step_2_vals <- list()
+      state$step_4_vals <- list()
+      # Note: Intentionally NOT clearing state$step_3_vals to preserve text inputs
+      
+      # Clear data-dependent state
+      state$data <- NULL
+      state$data_dictionary <- NULL
+      state$years <- NULL
+      state$producer_ids <- NULL
+      
+      # Update to the new language
+      updateRadioGroupButtons(session, "language", selected = new_language)
+      prev_language(new_language)
+      state$step_1_vals$language <- new_language
+    })
+    
     # Modal for help
     observeEvent(input$about_template, {
       show_modal(
@@ -67,7 +136,6 @@ mod_step_1_template_server <- function(id, state) {
       )
     })
     
-
     # Template download logic
     output$download_template <- downloadHandler(
       filename = function() {
@@ -82,7 +150,7 @@ mod_step_1_template_server <- function(id, state) {
         file.copy(template_file, file)
       }
     )
-
+    
     # Provide global access to the current language
     state$language <- reactive({
       input$language

@@ -17,6 +17,53 @@
 }
 
 
+.modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    display: none;
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+    outline: 0;
+    
+    /* Add flexbox to center the modal */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px; /* Add some padding from screen edges */
+}
+
+/* When modal is shown */
+.modal.show {
+    display: flex;
+}
+
+/* Modal dialog - the actual modal content */
+.modal-dialog {
+    position: relative;
+    width: auto;
+    max-width: 500px; /* Adjust as needed */
+    margin: 0; /* Remove default margins since we're using flexbox */
+    
+    /* Ensure modal doesn't exceed screen height */
+    max-height: calc(100vh - 40px); /* Account for padding */
+    overflow-y: auto;
+}
+
+/* Optional: Add animation for smooth appearance */
+.modal.show .modal-dialog {
+    transform: scale(1);
+    transition: transform 0.3s ease;
+}
+
+.modal .modal-dialog {
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
 
 .flower-spinner, .flower-spinner * {
   box-sizing: border-box;
