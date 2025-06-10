@@ -1,9 +1,14 @@
+# Note: This module assumes data_validation.R has been sourced
+# Make sure to source("data_validation.R") before using this module
+
 mod_step_2_upload_ui <- function(id, state) {
   ns <- NS(id)
   
   # Display message if file already uploaded
   uploaded_msg <- isolate({
-    if (!is.null(state$step_2_vals$file_name)) {
+    if (!is.null(state$step_2_vals) && 
+        is.list(state$step_2_vals) && 
+        !is.null(state$step_2_vals$file_name)) {
       div(
         class = "alert alert-info",
         tags$strong("Previously uploaded file: "),
@@ -54,9 +59,20 @@ mod_step_2_upload_server <- function(id, state) {
         immediate = TRUE
       )
       
-      # Validate the uploaded file
+      # Get current language from state (default to english if not set)
+      current_language <- "english"
+      
+      if (!is.null(state$step_1_vals) && !is.null(state$step_1_vals$language)) {
+        current_language <- state$step_1_vals$language
+      } else if (!is.null(state$language) && is.function(state$language)) {
+        lang_val <- state$language()
+        if (!is.null(lang_val)) current_language <- lang_val
+      }
+      
+      # Validate the uploaded file with language parameter
+      # This calls validate_data_file() from data_validation.R
       validation_results <- tryCatch(
-        validate_data_file(input$upload_file$datapath, req_fields),
+        validate_data_file(input$upload_file$datapath, req_fields, current_language),
         error = function(e) {
           insertUI(
             selector = paste0("#", ns("error_message")),
@@ -90,7 +106,6 @@ mod_step_2_upload_server <- function(id, state) {
           sheet = "Data Dictionary"
         )
         
-        
         # Save to state
         state$step_2_valid <- TRUE
         state$step_2_vals$file_name <- input$upload_file$name
@@ -104,6 +119,12 @@ mod_step_2_upload_server <- function(id, state) {
         state$data_dictionary <- uploaded_data_dictionary
       } else {
         # ❌ Validation failed
+        # Flatten nested error lists for display
+        all_errors <- unlist(validation_results, recursive = TRUE)
+        
+        # Convert to native encoding to handle Spanish characters safely
+        all_errors <- sapply(all_errors, enc2native)
+        
         insertUI(
           selector = paste0("#", ns("error_message")),
           where = "beforeEnd",
@@ -113,7 +134,7 @@ mod_step_2_upload_server <- function(id, state) {
             tags$br(),
             tags$br(),
             tags$strong("Validation Errors:"),
-            tags$ul(lapply(validation_results, tags$li))
+            tags$ul(lapply(all_errors, tags$li))
           )
         )
         state$step_2_valid <- FALSE

@@ -45,7 +45,6 @@ mod_step_1_template_ui <- function(id, state) {
     )
   )
 }
-
 mod_step_1_template_server <- function(id, state) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
@@ -71,7 +70,7 @@ mod_step_1_template_server <- function(id, state) {
               p(strong("Do you want to continue?"))
             ),
             footer = tagList(
-              actionButton(ns("confirm_reset"), "Change Language", class = "btn btn-warning", style="color:black"),
+              actionButton(ns("confirm_reset"), "Change Language", class = "btn btn-warning"),
               modalButton("Cancel")
             ),
             easyClose = FALSE
@@ -110,8 +109,14 @@ mod_step_1_template_server <- function(id, state) {
       state$step_2_valid <- FALSE
       state$step_3_valid <- FALSE
       
-      # Clear Step 2 and 4 state, but preserve Step 3 project info text
-      state$step_2_vals <- list()
+      # Safely clear Step 2 and 4 state, preserve Step 3 project info text
+      # Make sure we initialize with proper structure
+      if (is.null(state$step_2_vals)) state$step_2_vals <- list()
+      if (is.null(state$step_4_vals)) state$step_4_vals <- list()
+      
+      # Clear only specific keys rather than entire list
+      state$step_2_vals$file_name <- NULL
+      state$step_2_vals$data <- NULL
       state$step_4_vals <- list()
       # Note: Intentionally NOT clearing state$step_3_vals to preserve text inputs
       
