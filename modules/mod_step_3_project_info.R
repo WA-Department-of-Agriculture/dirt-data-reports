@@ -399,7 +399,13 @@ mod_step_3_project_info_server <- function(id, state) {
             text = input$project_results,
             fragment.only = TRUE
           )),
-          includeMarkdown("<span style='color:crimson'>**Note:** Tables and graphs are not shown in this preview.</span>"),
+          div(
+            class = "alert alert-warning d-flex align-items-center",
+            style = "margin:20px 0px",
+            role = "alert",
+            shiny::icon("triangle-exclamation", class = "me-2"),
+            tags$span("Note: Tables and graphs are not shown in this preview.")
+          ),
           tags$h3(tr("looking_forward")),
           HTML(markdown::markdownToHTML(
             text = input$looking_forward,

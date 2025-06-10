@@ -93,7 +93,9 @@ mod_step_2_upload_server <- function(id, state) {
         insertUI(
           selector = paste0("#", ns("error_message")),
           where = "beforeEnd",
-          ui = div(class = "alert alert-success", "All checks passed!")
+          ui = div(class = "alert alert-success",
+                   shiny::icon("circle-check", style='margin-right:2px'),
+                   "All checks passed!")
         )
         
         # read in both data and data dictionary files
@@ -130,6 +132,7 @@ mod_step_2_upload_server <- function(id, state) {
           where = "beforeEnd",
           ui = div(
             class = "alert alert-danger",
+            shiny::icon("circle-exclamation", style='margin-right:2px'),
             tags$strong("Please review the following errors, correct them in your data spreadsheet, and re-upload."),
             tags$br(),
             tags$br(),

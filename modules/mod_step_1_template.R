@@ -40,7 +40,7 @@ mod_step_1_template_ui <- function(id, state) {
       downloadButton(
         ns("download_template"),
         "Download Template",
-        style = "margin-top:20px;width:320px;"
+        style = "margin-top:24px;width:436px;"
       )
     )
   )
