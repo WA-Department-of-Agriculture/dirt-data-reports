@@ -3,5 +3,4 @@ nitrogen that can be converted (or "mineralized") to plant-available nitrate or
 ammonium. This measurement is taken from a laboratory incubation and can help
 producers estimate how much nitrogen may be released to crops during the growing
 season. Additional information on the measurement and interpretation of PMN can
-be found in this [Extension Publication from Oregon State
-University](https://catalog.extension.oregonstate.edu/sites/catalog/files/project/pdf/em9281.pdf "Extension Publication from Oregon State University").
+be found in this [publication from the NRCS](https://www.nrcs.usda.gov/sites/default/files/2022-10/potentially_mineralizable_nitrogen.pdf).
