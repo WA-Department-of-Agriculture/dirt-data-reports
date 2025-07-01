@@ -173,7 +173,7 @@ mod_step_4_build_reports_server <- function(id, state) {
         pull(producer_id)
       shinyWidgets::pickerInput(
         inputId = ns("producer_id"),
-        label = "Producer IDs",
+        label = "Select Producers (5 max)",
         choices = available_ids,
         selected = isolate(state$step_4_vals$producer_id) %||% NULL,
         multiple = TRUE,
