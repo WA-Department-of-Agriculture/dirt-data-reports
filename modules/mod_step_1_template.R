@@ -102,7 +102,7 @@ mod_step_1_template_server <- function(id, state) {
       showNotification(
         "Language changed. Please download the new template and re-upload your data.",
         type = "warning",
-        duration = 5
+        duration = 8
       )
       
       # Reset Steps 2-4 validation and data, but preserve Step 3 text inputs
