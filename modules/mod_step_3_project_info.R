@@ -1,6 +1,6 @@
 mod_step_3_project_info_ui <- function(id, state) {
   ns <- NS(id)
-
+  
   # read in mapping file
   mapping <- read.csv(
     paste0(
@@ -10,19 +10,19 @@ mod_step_3_project_info_ui <- function(id, state) {
     ),
     encoding = "UTF-8"
   )
-
+  
   measurement_choices <- mapping %>%
     split(.$type) %>%
     map(~ setNames(.x$file_name, .x$aliases))
-
+  
   measurement_content <- mapping %>%
     mutate(content = glue::glue(
       "<div>{name}</div><div style='display:none'>{aliases}</div>"
     ))
-
+  
   # Get the abbr column from the uploaded data dictionary
   measurement_in_dictionary <- state$data_dictionary$abbr
-
+  
   # Match the abbr column with the aliases and get the file_name to pre-select
   # the uploaded measurements in the measurement definition picker
   measurement_selected <- mapping |>
@@ -30,7 +30,7 @@ mod_step_3_project_info_ui <- function(id, state) {
     tidyr::separate_longer_delim(cols = aliases, delim = "; ") |>
     dplyr::filter(aliases %in% measurement_in_dictionary) |>
     dplyr::pull(file_name)
-
+  
   # fix values so they don't update unless changed
   project_name_val <- isolate(
     state$project_info_vals$project_name %||% "Soil Sampling Project"
@@ -47,7 +47,7 @@ mod_step_3_project_info_ui <- function(id, state) {
   measurement_val <- isolate(
     state$project_info_vals$measurement_definitions %||% measurement_selected
   )
-
+  
   div(
     class = "form-content",
     h4(class = "form-step", "Step 3"),
@@ -114,7 +114,7 @@ mod_step_3_project_info_ui <- function(id, state) {
     tags$label(
       `for` = "measurement_definitions",
       actionLink(label="Measurement Definitions", inputId = ns("definitions_modal"), 
-             class = "a"
+                 class = "a"
       )
     ),
     shinyWidgets::pickerInput(
@@ -131,19 +131,6 @@ mod_step_3_project_info_ui <- function(id, state) {
       ),
       multiple = TRUE
     ),
-    # p(
-    #   class = "form-text",
-    #   "Selected definitions will be included in the 'What We Measured in Your Soil' section. Measurements are pre-selected based on the",
-    #   tags$b("abbr"),
-    #   "column in your uploaded",
-    #   tags$b("Data Dictionary"),
-    #   "tab but should be reviewed as we may call these measurements something different than your abbreviation.",
-    #   "To remove measurements from the tables and plots in the 'Project Results' section, remove them from both the",
-    #   tags$b("Data"),
-    #   "and",
-    #   tags$b("Data Dictionary"),
-    #   "tabs of your spreadsheet and re-upload in Step 2."
-    # ),
     bslib::tooltip(
       trigger = tags$span(
         tags$label("Project Results"),
@@ -189,7 +176,58 @@ mod_step_3_project_info_ui <- function(id, state) {
 mod_step_3_project_info_server <- function(id, state) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-
+    
+    # Update measurement definitions picker when language changes
+    observeEvent(state$language(), {
+      req(state$language())
+      
+      # Read in mapping file for new language
+      mapping <- read.csv(
+        paste0(
+          "quarto/",
+          state$language(),
+          "/measurement_dictionary.csv"
+        ),
+        encoding = "UTF-8"
+      )
+      
+      # Recreate measurement choices
+      measurement_choices <- mapping %>%
+        split(.$type) %>%
+        map(~ setNames(.x$file_name, .x$aliases))
+      
+      # Recreate measurement content
+      measurement_content <- mapping %>%
+        mutate(content = glue::glue(
+          "<div>{name}</div><div style='display:none'>{aliases}</div>"
+        ))
+      
+      # Get the abbr column from the uploaded data dictionary
+      measurement_in_dictionary <- state$data_dictionary$abbr
+      
+      # Match the abbr column with the aliases and get the file_name to pre-select
+      # the uploaded measurements in the measurement definition picker
+      measurement_selected <- mapping |>
+        dplyr::select(c(aliases, file_name)) |>
+        tidyr::separate_longer_delim(cols = aliases, delim = "; ") |>
+        dplyr::filter(aliases %in% measurement_in_dictionary) |>
+        dplyr::pull(file_name)
+      
+      # Clear the stored measurement definitions from state to ensure reset
+      if (!is.null(state$project_info_vals)) {
+        state$project_info_vals$measurement_definitions <- NULL
+      }
+      
+      # Update the picker input with new choices and selection
+      shinyWidgets::updatePickerInput(
+        session = session,
+        inputId = "measurement_definitions",
+        choices = measurement_choices,
+        selected = measurement_selected,
+        choicesOpt = list(content = measurement_content$content)
+      )
+    }, ignoreInit = TRUE) # ignoreInit = TRUE prevents this from running on module initialization
+    
     # redirect to Learn More Page - use rootScope to use parent level ids
     observeEvent(input$redirect_learn_more, {
       updateNavbarPage(
@@ -198,7 +236,7 @@ mod_step_3_project_info_server <- function(id, state) {
         selected = "page_learn_more"
       )
     })
-
+    
     observeEvent(input$customize, {
       show_modal(
         title = "More Customization",
@@ -287,7 +325,7 @@ mod_step_3_project_info_server <- function(id, state) {
     })
     
     
-
+    
     # Save all values into state
     observe({
       state$project_info_vals <- list(
@@ -297,17 +335,17 @@ mod_step_3_project_info_server <- function(id, state) {
         project_results = input$project_results,
         looking_forward = input$looking_forward
       )
-
+      
       state$step_3_valid <- !is.null(input$measurement_definitions) &&
         length(input$measurement_definitions) > 0
     })
-
-
+    
+    
     # Preview modal
     observeEvent(input$report_preview, {
       req(state$language())
-
-
+      
+      
       lang_map <- yaml::read_yaml(
         paste0("quarto/", state$language(), "/mapping.yml")
       )
@@ -315,19 +353,19 @@ mod_step_3_project_info_server <- function(id, state) {
         paste0("quarto/", state$language(), "/measurement_dictionary.csv"),
         encoding = "UTF-8"
       )
-
+      
       tr <- function(key) {
         lang_map[[key]] %||% key
       }
-
+      
       selected_mapping <- measure_mapping %>%
         dplyr::filter(file_name %in% input$measurement_definitions)
-
+      
       grouped_measures <- split(
         selected_mapping$file_name,
         selected_mapping$section_name
       )
-
+      
       # Section color mapping
       section_colors <- data.frame(
         section_name = c(
@@ -342,7 +380,7 @@ mod_step_3_project_info_server <- function(id, state) {
         ),
         stringsAsFactors = FALSE
       )
-
+      
       # Create tab panels
       tabs <- lapply(names(grouped_measures), function(section_name) {
         #neutral translation to english
@@ -353,7 +391,7 @@ mod_step_3_project_info_server <- function(id, state) {
         section_color <- section_colors$color[
           section_colors$section_name == type
         ]
-
+        
         tabPanel(
           title = tags$div(
             tags$img(
@@ -380,7 +418,7 @@ mod_step_3_project_info_server <- function(id, state) {
           )
         )
       })
-
+      
       # Show modal with all sections
       showModal(modalDialog(
         title = "Preview Sections",
@@ -416,8 +454,8 @@ mod_step_3_project_info_server <- function(id, state) {
         size = "l"
       ))
     })
-
-
+    
+    
     # Store project info params in state
     state$project_info <- reactive({
       state$project_info_vals
