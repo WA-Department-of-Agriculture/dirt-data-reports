@@ -70,7 +70,7 @@ mod_home_ui <- function(id) {
             HTML("<p style='text-align:left!important;font-size:18px!important;'>Dirt data reports summarize the latest soil health research on key indicators to increase understanding of <b>biological</b>, <b>chemical</b>, and <b>physical</b> soil properties. Each report compares participant results to other samples within the project, offering valuable context for interpreting soil data and empowering participants to better manage soil health.</p>")
             ),
           tags$div(
-                   tags$img(style='width:100%;min-width:300px;', src="pictures/report-example.png")
+                   tags$img(style='max-width:600px;padding:1em', src="pictures/report-example.png")
           )
      )
     )
