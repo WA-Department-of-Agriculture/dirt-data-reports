@@ -1,7 +1,8 @@
 ***Soil pH*** describes how acidic (pH less than 7.0) or alkaline (pH greater
 than 7.0) the soil is, and is a measure of the concentration of hydrogen ions in
-the soil solution. Many essential nutrients like P, Fe, Mn, Zn, Cu, Co, and B
-become less plant-available at alkaline pHs. Other nutrients like Al or B can
+the soil solution. Many essential nutrients like phosphorous (P), iron (Fe),
+manganese (Mn), zinc (Zn), copper, (Cu), cobalt (Co), and boron (B) become less
+plant-available at alkaline pHs. Other nutrients like aluminum (Al) or B can
 become toxic at acidic pHs. Soil pH also greatly affects what microbial
 populations can live in the soil. Soil pH is impacted by inherent qualities of
 the soil such as its age, mineralogy, and rainfall zone. It is also impacted by

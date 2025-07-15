@@ -16,8 +16,7 @@ según las propiedades inherentes del suelo y del paisaje, como la textura, la
 mineralogía, la precipitación y la temperatura. También se ve muy afectado por
 la gestión. Para obtener más información sobre cómo aumentar la SOM, lea sobre
 los [principios de NRCS para mejorar la salud del
-suelo](https://www.nrcs.usda.gov/conservation-basics/natural-resource-concerns/soils/soil-health).
-La SOM es la base de muchos de los beneficios y servicios ecosistémicos que
+suelo](https://www.nrcs.usda.gov/conservation-basics/natural-resource-concerns/soils/soil-health). La SOM es la base de muchos de los beneficios y servicios ecosistémicos que
 proporcionan los suelos. Tiene un gran impacto en casi todas las demás
 propiedades del suelo y, a menudo, se usa como indicador primario de la salud
 del suelo. Sin embargo, SOM puede tardar en cambiar como resultado de la

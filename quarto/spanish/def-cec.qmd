@@ -1,7 +1,6 @@
 ***Capacidad de intercambio catiónico*** (CIC) describe la capacidad del suelo
 para retener un reservorio de nutrientes de liberación lenta, ya que los iones
-cargados positivamente (por ejemplo, NH^4+^,
-K^+^, Ca^2+^, Mg^2+^) en el suelo
+cargados positivamente (por ejemplo, NH^4+^, K^+^, Ca^2+^, Mg^2+^) en el suelo
 son retenidos por sitios cargados negativamente en partículas de arcilla y MOS.
 Si bien la CIC está determinada en parte por la textura del suelo, el aumento de
 la SOM puede aumentar en gran medida la CIC. Los suelos franco arenosos suelen
