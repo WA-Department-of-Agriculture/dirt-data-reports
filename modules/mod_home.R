@@ -8,7 +8,7 @@ mod_home_ui <- function(id) {
       tags$div(
         class = "banner-content",
         h1("DIRT DATA REPORTS"),
-        p(style = 'padding:0px 20px', "Generate customized soil health reports for your sampling project. Brought to you by the Washington State Department of Agriculture and the Washington Soil Health Initiative."),
+        p(style = "padding:0px 20px", "Generate customized soil health reports for your sampling project. Brought to you by the Washington State Department of Agriculture and the Washington Soil Health Initiative."),
         tags$div(
           class = "button-wrapper",
           actionButton(
@@ -24,11 +24,12 @@ mod_home_ui <- function(id) {
         )
       )
     ),
-    
+
     # Steps Section
     tags$section(
       class = "section-block section-light",
-      tags$div(class="section-header", 
+      tags$div(
+        class = "section-header",
         h2("HOW IT WORKS"),
         p("Build custom soil health reports for each participant in your soil sampling project in four steps.")
       ),
@@ -61,18 +62,21 @@ mod_home_ui <- function(id) {
       )
     ),
     tags$section(
-      class="section-block",
-      tags$div(class='section-header', 
-               h2("ABOUT THE REPORTS")
+      class = "section-block",
+      tags$div(
+        class = "section-header",
+        h2("ABOUT THE REPORTS")
       ),
-      tags$div(class='col-2', style='gap:40px!important',
-          tags$div(
-            HTML("<p style='text-align:left!important;font-size:18px!important;'>Dirt data reports summarize the latest soil health research on key indicators to increase understanding of <b>biological</b>, <b>chemical</b>, and <b>physical</b> soil properties. Each report compares participant results to other samples within the project, offering valuable context for interpreting soil data and empowering participants to better manage soil health.</p>")
-            ),
-          tags$div(
-                   tags$img(style='max-width:600px;padding:1em', src="pictures/report-example.png")
-          )
-     )
+      tags$div(
+        class = "col-2",
+        style = "gap:40px!important",
+        tags$div(
+          HTML("<p style='text-align:left!important;font-size:18px!important;'>Dirt data reports summarize the latest soil health research on key indicators to increase understanding of <b>biological</b>, <b>chemical</b>, and <b>physical</b> soil properties. Each report compares participant results to other samples within the project, offering valuable context for interpreting soil data and empowering participants to better manage soil health.</p>")
+        ),
+        tags$div(
+          tags$img(style = "max-width:600px;padding:1em", src = "pictures/report-example.png")
+        )
+      )
     )
   )
 }

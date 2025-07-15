@@ -4,13 +4,15 @@ mod_learn_more_ui <- function(id) {
     create_hero("Learn More", "pictures/default-hero.png"),
     div(
       class = "content-container",
-      div(class = "content",id = "content-area",
-        #to modify content for Learn More please edit the markdown file
+      div(
+        class = "content",
+        id = "content-area",
+        # to modify content for Learn More please edit the markdown file
         includeMarkdown("www/content/learn_more.md")
       ),
-      div(class = "toc-scroll",id = "toc-container",h5("FAQs"))
-    )  
+      div(class = "toc-scroll", id = "toc-container", h5("FAQs"))
     )
+  )
 }
 
 mod_learn_more_server <- function(id) {
