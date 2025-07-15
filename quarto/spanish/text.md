@@ -17,19 +17,15 @@ alimentaria, y garantizar economías rurales prósperas.
 ## Calidades del Suelo Agrícola Saludable
 
 -   Una buena labranza del suelo permite que las raíces penetren
--   El pH casi neutro (6-8) maximiza la disponibilidad de nutrientes para la
-    mayoría de los cultivos
+-   El pH casi neutro (6-8) maximiza la disponibilidad de nutrientes para la mayoría de los cultivos
 -   El pH casi neutro también minimiza la toxicidad de Al y Mn
--   Suministro de nutrientes Suficiente, pero no excesivo, para el crecimiento
-    de los cultivos
+-   Suministro de nutrientes Suficiente, pero no excesivo, para el crecimiento de los cultivos
 -   Pequeña población de patógenos y plagas
 -   Drenaje e infiltración adecuados del suelo
 -   Población microbiana diversa y activa
 -   Banco de semillas de malezas bajas
--   Sin productos químicos residuales o toxinas que puedan dañar el cultivo,
-    incluidas las sales
--   Resistencia a la degradación, como la de la erosión o la escorrentía
-    Superficial
+-   Sin productos químicos residuales o toxinas que puedan dañar el cultivo, incluidas las sales
+-   Resistencia a la degradación por fuentes como la erosión o la escorrentía superficial
 
 <!--section:soil_science-->
 ## Ciencia del suelo 101
@@ -56,9 +52,8 @@ suelo](https://www.nrcs.usda.gov/conservation-basics/natural-resource-concerns/s
 La siguiente tabla describe: 1. Lo que cada indicador ayuda a medir en su suelo;
 2. Si desea que el valor medido sea más alto (más es mejor), más bajo (menos es
 mejor), o en el medio (rango óptimo); y 3. Con qué frecuencia medir cada
-indicador. Nuestro conocimiento de estos indicadores evoluciona rápidamente a
-medida que los investigadores los miden en diversos suelos, sistemas de cultivo
-y climas.
+indicador. Esta tabla refleja nuestro conocimiento actual, aunque la ciencia evoluciona rápidamente a medida que los investigadores miden estos indicadores en diversos suelos, sistemas de cultivo y climas.
+
 
 ![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-more-spanish.png){width="1.5in" fig-alt="Curva de puntuación más es mejor"}![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-optimal-spanish.png){width="1.5in" fig-alt="Curva de puntuación de rango óptimo"}![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-less-spanish.png){width="1.5in" fig-alt="Curva de puntuación de menos es mejor"}
 
@@ -70,8 +65,7 @@ y climas.
 ## Comprender los resultados de la salud del suelo
 
 Para obtener más información sobre cómo interpretar los resultados de la salud
-del suelo, vea el seminario web de Dani Gelardi ["Comprender las pruebas de
-suelo"](https://youtu.be/-ED-gGk4yb8?si=fxfnxqrRqhkGDaiu).
+del suelo, vea ["Comprender las pruebas de suelo"](https://youtu.be/-ED-gGk4yb8?si=fxfnxqrRqhkGDaiu) el seminario web de la Iniciativa sobre la Salud del Suelo de Washington.
 
 <!--section:your_fields-->
 ## Su campos

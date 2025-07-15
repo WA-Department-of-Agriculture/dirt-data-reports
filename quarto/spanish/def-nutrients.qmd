@@ -1,7 +1,7 @@
 ***Los nutrientes esenciales de las plantas*** incluyen macronutrientes como el
 nitrógeno (N), el fósforo (P), el potasio (K), el calcio (Ca), el magnesio (Mg)
 y el azufre (S), y los micronutrientes (requeridos en cantidades
-comparativamente más pequeñas) como el hierro (Fe), el zinc (Zn), el cobre (C),
+comparativamente más pequeñas) como el hierro (Fe), el zinc (Zn), el cobre (Cu),
 el boro (B) y el manganeso (Mn). Por lo general, estos elementos se expresan en
 partes por millón, lo que equivale a miligramos por kilogramo (1 ppm = 1 mg/kg).
 Cada uno de estos elementos es necesario para la producción de cultivos, aunque
@@ -12,4 +12,4 @@ al equilibrio y la reposición de los nutrientes esenciales de las plantas a
 través de las prácticas y principios de construcción de la salud del suelo.
 Puede encontrar más información sobre los nutrientes esenciales para las plantas
 en esta [Guía de interpretación de pruebas de suelo de
-OSU](https://catalog.extension.oregonstate.edu/ec1478).
+Universidad Estatal de Oregón](https://catalog.extension.oregonstate.edu/ec1478).

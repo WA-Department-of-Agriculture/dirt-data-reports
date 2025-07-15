@@ -22,7 +22,7 @@ proporcionan los suelos. Tiene un gran impacto en casi todas las demás
 propiedades del suelo y, a menudo, se usa como indicador primario de la salud
 del suelo. Sin embargo, SOM puede tardar en cambiar como resultado de la
 gestión. Debido a esto, se han desarrollado muchos otros indicadores para
-detectar componentes más sensibles en SOM. Sigue leyendo para saber más.
+detectar componentes más sensibles dentro del SOM. Sigue leyendo para saber más.
 
 <!-- Image below around text for docx -->
 

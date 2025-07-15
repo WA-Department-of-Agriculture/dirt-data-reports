@@ -11,7 +11,6 @@ las partículas de arcilla tienen una gran superficie y carga eléctrica y crean
 pequeños poros en el suelo. Los suelos con alto contenido de arena tienen poros
 más grandes y no pueden retener tanta agua.
 
-![Figura que muestra comparaciones de tamaño de partículas de suelo (arena, limo
+![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/ball-texture-spanish.png){width="3in" fig-align="left" fig-alt="Figura que muestra comparaciones de tamaño de partículas de suelo (arena, limo
 y arcilla) con elementos circulares comunes (baloncesto, pelota de golf y
-semillas de
-amapola)](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/ball-texture-spanish.png){width="3in" fig-align="left"}
+semillas de amapola)"}

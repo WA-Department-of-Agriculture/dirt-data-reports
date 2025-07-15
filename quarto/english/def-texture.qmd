@@ -9,6 +9,6 @@ matter, and water than sandy soils. This is because clay particles have high
 surface area and electrical charge and create small soil pores. Soils with high
 sand content have larger pores, and cannot hold as much water.
 
-![Figure showing size comparisons of soil particles (sand, silt, and clay) to
+![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/ball-texture.png){width="3in" fig-align="left" fig-alt="Figure showing size comparisons of soil particles (sand, silt, and clay) to
 common circular items (basketball, golf ball, and poppy
-seed)](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/ball-texture.png){width="3in" fig-align="left"}
+seed)"}

@@ -16,15 +16,14 @@ economies.
 ## Qualities of a Healthy Agricultural Soil
 
 -   Good soil tilth allows roots to penetrate
--   Near neutral pH (6--8) maximizes nutrient availability for most crops, and
-    minimizes Al and Mn toxicity
+-   Near neutral pH (6--8) maximizes nutrient availability for most crops, and minimizes Al and Mn toxicity
 -   Sufficient---but not excessive---nutrient supply for crop growth
 -   Small population of plant pathogens and pests
 -   Adequate soil drainage and infiltration
 -   Diverse and active microbial population
 -   Low weed seed bank
 -   No residual chemicals or toxins that may harm the crop, including salts
--   Resistance to degradation such as from erosion or surface runoff
+-   Resistance to degradation from sources like erosion or surface runoff
 
 <!--section:soil_science-->
 ## Soil Science 101
@@ -47,11 +46,7 @@ health](https://www.nrcs.usda.gov/conservation-basics/natural-resource-concerns/
 <!--section:indicators-->
 ## Soil Health Indicators
 
-The below table describes: 1. What each indicator helps measure in your soil; 2.
-Whether you want the measured value to be higher (more is better), lower (less
-is better), or in the middle (optimal range); and 3. How often to measure each
-indicator. Our understanding of these indicators is rapidly evolving as
-researchers measure them in diverse soils, cropping systems, and climates.
+The below table describes: 1. What each indicator helps measure in your soil; 2. Whether you want the measured value to be higher (more is better), lower (less is better), or in the middle (optimal range); and 3. How often to measure each indicator. This table reflects our current understanding, though the science is rapidly evolving as researchers measure these indicators in diverse soils, cropping systems, and climates.
 
 ![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-more.png){width="1.5in" fig-alt="More is better scoring curve"}![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-optimal.png){width="1.5in" fig-alt="Optimal range scoring curve"}![](https://raw.githack.com/WA-Department-of-Agriculture/soils/main/figures/curve-less.png){width="1.5in" fig-alt="Less is better scoring curve"}
 
@@ -63,7 +58,7 @@ fig-alt="Infographic titled How to Get Quality Results. Be Consistent: sample at
 
 ## Understanding Soil Health Results
 
-Learn more about interpreting your soil health results by watching Dani Gelardi's webinar ["Understanding Soil Tests"](https://youtu.be/-ED-gGk4yb8?si=fxfnxqrRqhkGDaiu).
+Learn more about interpreting your soil health results by watching this ["Understanding Soil Tests"](https://youtu.be/-ED-gGk4yb8?si=fxfnxqrRqhkGDaiu) webinar from the Washington Soil Health Initiative.
 
 <!--section:your_fields-->
 ## Your Fields
