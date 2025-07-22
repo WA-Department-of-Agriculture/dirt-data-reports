@@ -143,7 +143,7 @@ mod_step_1_template_server <- function(id, state) {
     # Template download logic
     output$download_template <- downloadHandler(
       filename = function() {
-        paste0("soil-data-template-", Sys.Date(), ".xlsx")
+        paste0("soil-data-template-", input$language, "-", Sys.Date(), ".xlsx")
       },
       content = function(file) {
         template_file <- if (input$language == "spanish") {
