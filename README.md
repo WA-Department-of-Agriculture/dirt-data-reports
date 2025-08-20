@@ -42,3 +42,9 @@ Lastly, these directories also include a series of qmd files for measurement def
 ## Deployment / Hosting
 
 The application is hosted on shinyapps.io.
+
+## Citation
+
+To cite Dirt Data Reports, please use:
+
+> Ryan, J.; Shapiro, T.; McIlquham, M.; Michel, L.; Potter, T.; Griffin LaHue, D.; Gelardi, D. Dirt Data Reports, 2025. https://wsda.shinyapps.io/dirt-data-reports/. 
