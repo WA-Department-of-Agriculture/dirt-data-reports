@@ -1,5 +1,7 @@
 # Soil Health Reports
 
+<img width="1728" height="905" alt="dirt-data-reports" src="https://github.com/user-attachments/assets/1564608a-7069-4d40-b8c8-0a8677807bc8" />
+
 ## About
 
 The purpose of this Shiny application is to make soil health reports easily accessible by providing a no-code interface for users to upload and generate reports. The application works with the `soils` package to create a thorough analysis, including charts and tables to synthesize information about the user's crops. The main engine to create the reports is **`quarto`.** Users can select to generate reports in English or Spanish, and also have the option to download report formats in **html** or **docx**.
