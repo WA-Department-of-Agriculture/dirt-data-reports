@@ -253,7 +253,7 @@ results_long <- data |>
 ```
 
 ```{r get-producer-info}
-# Ensure 'farm_name' exist; create if missing
+# Ensure 'farm_name' exists; create if missing
 if (!"farm_name" %in% names(results_long)) results_long$farm_name <- NA
 
 # Fill missing farm names with fallback labels

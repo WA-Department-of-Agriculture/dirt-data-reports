@@ -3,7 +3,8 @@ mod_step_4_build_reports_ui <- function(id, state) {
 
   tagList(
     useShinyjs(),
-    tags$style(HTML("
+    tags$style(HTML(
+      "
   .progress-section {
     display: flex;
     flex-direction: column;
@@ -81,8 +82,10 @@ mod_step_4_build_reports_ui <- function(id, state) {
     from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }
   }
-")),
-    tags$script(HTML("
+"
+    )),
+    tags$script(HTML(
+      "
   Shiny.addCustomMessageHandler('updateProgressModal', function(data) {
     document.getElementById('progressTitle').textContent = data.step;
     document.getElementById('progressBar').style.width = data.percent + '%';
@@ -120,7 +123,8 @@ mod_step_4_build_reports_ui <- function(id, state) {
     $('#shiny-modal').modal('hide');
   };
   });
-")),
+"
+    )),
     div(
       class = "form-content",
       h4(class = "form-step", "Step 4"),
@@ -154,7 +158,9 @@ mod_step_4_build_reports_server <- function(id, state) {
     ns <- session$ns
 
     observe({
-      print(glue::glue("User time zone: {getDefaultReactiveDomain()$input$user_timezone}"))
+      print(glue::glue(
+        "User time zone: {getDefaultReactiveDomain()$input$user_timezone}"
+      ))
     })
 
     output$year_input <- renderUI({
@@ -191,14 +197,17 @@ mod_step_4_build_reports_server <- function(id, state) {
     })
 
     observe({
-      if (is.null(input$producer_id) || length(input$producer_id) == 0 ||
-        is.null(input$format) || length(input$format) == 0) {
+      if (
+        is.null(input$producer_id) ||
+          length(input$producer_id) == 0 ||
+          is.null(input$format) ||
+          length(input$format) == 0
+      ) {
         shinyjs::disable("report")
       } else {
         shinyjs::enable("report")
       }
     })
-
 
     observeEvent(input$year, {
       state$step_4_vals$year <- input$year
@@ -249,9 +258,15 @@ mod_step_4_build_reports_server <- function(id, state) {
                 style = "margin:20px 0px",
                 role = "alert",
                 shiny::icon("triangle-exclamation", class = "me-2"),
-                tags$span("Note: Depending on the number of reports, this process may take several minutes. Please do not exist the session before the reports are downloaded.")
+                tags$span(
+                  "Note: Depending on the number of reports, this process may take several minutes. Please do not exit the session before the reports are downloaded."
+                )
               ),
-              tags$div(id = "progressTitle", class = "progress-title", "Starting..."),
+              tags$div(
+                id = "progressTitle",
+                class = "progress-title",
+                "Starting..."
+              ),
               tags$div(
                 class = "progress-wrapper",
                 tags$div(id = "progressBar", class = "progress-bar", "0%")
@@ -274,10 +289,16 @@ mod_step_4_build_reports_server <- function(id, state) {
               id = "errorMessage",
               class = "message",
               style = "display:none;",
-              tags$i(class = "fas fa-exclamation-triangle", style = "color:#e74c3c;"),
+              tags$i(
+                class = "fas fa-exclamation-triangle",
+                style = "color:#e74c3c;"
+              ),
               tags$h3("Some reports failed."),
               tags$p(id = "errorText", ""),
-              tags$ul(id = "errorList", style = "text-align:left; max-height:150px; overflow-y:auto; padding-left: 1.2rem;"),
+              tags$ul(
+                id = "errorList",
+                style = "text-align:left; max-height:150px; overflow-y:auto; padding-left: 1.2rem;"
+              ),
               div(
                 style = "display:flex;justify-content:space-between;margin-top:10px",
                 tags$button(
@@ -298,22 +319,21 @@ mod_step_4_build_reports_server <- function(id, state) {
           )
         ))
 
-
-        runjs("
+        runjs(
+          "
       document.getElementById('progressBar').style.width = '0%';
       document.getElementById('progressBar').textContent = '0%';
       document.getElementById('progressTitle').textContent = 'Generating Report 0 of 0';
       document.getElementById('successMessage').style.display = 'none';
       document.getElementById('dynamicCloseBtn').style.display = 'none';
-    ")
+    "
+        )
 
         formats <- input$format
         producers <- input$producer_id
         year <- input$year
         project_info <- state$project_info()
         language <- state$language()
-
-
 
         temp_dir <- tempfile("report_build_")
         dir.create(temp_dir, recursive = TRUE)
@@ -323,15 +343,22 @@ mod_step_4_build_reports_server <- function(id, state) {
           producer_id = producers,
           fmt = formats,
           stringsAsFactors = FALSE
-        ) |> mutate(output_file = paste0(year, "_", producer_id, ".", fmt))
+        ) |>
+          mutate(output_file = paste0(year, "_", producer_id, ".", fmt))
 
         total_steps <- nrow(render_df) + 2
         failed_reports <- character(0)
 
-        session$sendCustomMessage("updateProgressModal", list(step = "Copying Files", percent = 5))
+        session$sendCustomMessage(
+          "updateProgressModal",
+          list(step = "Copying Files", percent = 5)
+        )
 
         file.copy("quarto/template.qmd", file.path(temp_dir, "template.qmd"))
-        file.copy("quarto/section_template.qmd", file.path(temp_dir, "section_template.qmd"))
+        file.copy(
+          "quarto/section_template.qmd",
+          file.path(temp_dir, "section_template.qmd")
+        )
 
         styles_dir <- file.path(temp_dir, "styles")
         dir.create(styles_dir, showWarnings = FALSE)
@@ -341,12 +368,20 @@ mod_step_4_build_reports_server <- function(id, state) {
         lang_src <- file.path("quarto", language)
         lang_dest <- file.path(temp_dir, language)
         dir.create(lang_dest, showWarnings = FALSE)
-        file.copy(list.files(lang_src, full.names = TRUE, recursive = TRUE), to = lang_dest, recursive = TRUE)
+        file.copy(
+          list.files(lang_src, full.names = TRUE, recursive = TRUE),
+          to = lang_dest,
+          recursive = TRUE
+        )
 
         img_src <- file.path("quarto", "images")
         img_dest <- file.path(temp_dir, "images")
         dir.create(img_dest, showWarnings = FALSE)
-        file.copy(list.files(img_src, full.names = TRUE, recursive = TRUE), to = img_dest, recursive = TRUE)
+        file.copy(
+          list.files(img_src, full.names = TRUE, recursive = TRUE),
+          to = img_dest,
+          recursive = TRUE
+        )
 
         fonts_src <- "www/fonts"
         fonts_dest <- file.path(temp_dir, "www", "fonts")
@@ -369,7 +404,9 @@ mod_step_4_build_reports_server <- function(id, state) {
         withr::with_dir(temp_dir, {
           for (i in seq_len(nrow(render_df))) {
             row <- render_df[i, ]
-            progress_step <- glue::glue("Generating Report {i}/{nrow(render_df)}: {row$output_file}")
+            progress_step <- glue::glue(
+              "Generating Report {i}/{nrow(render_df)}: {row$output_file}"
+            )
             percent_complete <- floor((i + 1) / total_steps * 100)
 
             session$sendCustomMessage(
@@ -379,7 +416,6 @@ mod_step_4_build_reports_server <- function(id, state) {
                 percent = percent_complete
               )
             )
-
 
             params <- list(
               data_file = "data.xlsx",
@@ -403,24 +439,36 @@ mod_step_4_build_reports_server <- function(id, state) {
                 )
               },
               error = function(e) {
-                warning(glue::glue("Failed to render {row$output_file}: {e$message}"))
+                warning(glue::glue(
+                  "Failed to render {row$output_file}: {e$message}"
+                ))
                 failed_reports <<- c(failed_reports, row$output_file)
               }
             )
           }
         })
 
-        session$sendCustomMessage("updateProgressModal", list(step = "Zipping Files", percent = 100))
+        session$sendCustomMessage(
+          "updateProgressModal",
+          list(step = "Zipping Files", percent = 100)
+        )
         # Sys.sleep(1)  # give it a moment to render
-        report_files <- list.files(temp_dir, pattern = "\\.(html|docx)$", full.names = TRUE)
+        report_files <- list.files(
+          temp_dir,
+          pattern = "\\.(html|docx)$",
+          full.names = TRUE
+        )
         zip::zip(zipfile = file, files = report_files, mode = "cherry-pick")
 
-
         if (length(failed_reports) == 0) {
-          success_msg <- glue::glue("All {nrow(render_df)} reports generated successfully. Please check your Downloads folder.")
+          success_msg <- glue::glue(
+            "All {nrow(render_df)} reports generated successfully. Please check your Downloads folder."
+          )
           session$sendCustomMessage("showSuccessModal", success_msg)
         } else {
-          fail_msg <- glue::glue("Successfully generated {nrow(render_df) - length(failed_reports)} of {nrow(render_df)} reports. Files with errors are listed below. Please try again or report an issue.")
+          fail_msg <- glue::glue(
+            "Successfully generated {nrow(render_df) - length(failed_reports)} of {nrow(render_df)} reports. Files with errors are listed below. Please try again or report an issue."
+          )
           session$sendCustomMessage(
             "showErrorModal",
             list(
