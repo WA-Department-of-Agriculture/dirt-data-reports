@@ -69,7 +69,7 @@ fs::dir_create(path)
 #| output: false
 
 # Get the list of available font families
-fonts <- system_fonts()
+fonts <- systemfonts::system_fonts()
 families <- unique(fonts$family)
 
 # systemfonts::register_font(
@@ -186,8 +186,8 @@ selected_measures <- measurement_dictionary |>
 
 # unique measure types, e.g. Biological, Physical, Etc
 distinct_selected_measure_types <- selected_measures |>
-  distinct(section_name) |>
-  pull(section_name)
+  dplyr::distinct(section_name) |>
+  dplyr::pull(section_name)
 
 ### READ IN DATA FILE
 data <- readxl::read_xlsx(params$data_file, sheet = "Data")
@@ -933,10 +933,17 @@ if (!NA %in% gis_df$longitude & !NA %in% gis_df$latitude) {
     crs = "+proj=lonlat"
   ) |>
     sf::st_transform(3857)
+  
+  # override get_zoom within get_tiles to avoid issue when total_tiles is less
+  # than 4. this grabs the max zoom with with < 10 tiles
+  res <- maptiles:::get_bbox_and_proj(df_sf)
+  gz <- slippymath::bbox_tile_query(res$bbox_lonlat)
+  zoom <- max(gz[gz$total_tiles < 10, "zoom"])
 
   basetiles <- maptiles::get_tiles(
     df_sf,
-    provider = "Esri.WorldStreetMap",
+    zoom = zoom,
+    provider = "Esri.WorldImagery",
     cachedir = tempdir(),
     retina = TRUE
   )
