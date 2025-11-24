@@ -473,7 +473,7 @@ mod_step_4_build_reports_server <- function(id, state) {
             "showErrorModal",
             list(
               message = fail_msg,
-              files = failed_reports
+              files = as.list(failed_reports)
             )
           )
         }

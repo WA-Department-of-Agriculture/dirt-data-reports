@@ -380,6 +380,30 @@ validate_data_file <- function(file, req_fields, language = "english") {
         )
     }
   }
+  
+  ### Check 8.5: Validate percent columns are within 0-100 range
+  percent_columns <- c("sand_percent", "silt_percent", "clay_percent")
+  present_percent_cols <- intersect(percent_columns, colnames(data))
+  
+  if (length(present_percent_cols) > 0) {
+    out_of_range_cols <- character(0)
+    
+    for (col in present_percent_cols) {
+      values <- data[[col]]
+      values <- values[!is.na(values)] 
+      
+      if (length(values) > 0 && any(values < 0 | values > 100)) {
+        out_of_range_cols <- c(out_of_range_cols, col)
+      }
+    }
+    
+    if (length(out_of_range_cols) > 0) {
+      error_list$check8_5 <- paste(
+        "Values out of range (must be 0-100) in columns:",
+        paste(out_of_range_cols, collapse = ", ")
+      )
+    }
+  }
 
   ### Check 9: Do additional columns in 'Data' match values in 'Data Dictionary'? (Moved after Check 6)
   if (check4 && length(colnames(data)) > 0) { # If dictionary is valid and we have data columns
