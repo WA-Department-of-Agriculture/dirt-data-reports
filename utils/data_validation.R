@@ -381,29 +381,39 @@ validate_data_file <- function(file, req_fields, language = "english") {
     }
   }
   
-  ### Check 8.5: Validate percent columns are within 0-100 range
+  ### Check 8.5: Validate percent columns are within 0-100 rang, add sample IDs, truncate if more than 5
   percent_columns <- c("sand_percent", "silt_percent", "clay_percent")
   present_percent_cols <- intersect(percent_columns, colnames(data))
   
   if (length(present_percent_cols) > 0) {
-    out_of_range_cols <- character(0)
-    
     for (col in present_percent_cols) {
-      values <- data[[col]]
-      values <- values[!is.na(values)] 
       
-      if (length(values) > 0 && any(values < 0 | values > 100)) {
-        out_of_range_cols <- c(out_of_range_cols, col)
+      # Find rows with out of range values OR NA value
+      out_of_range_mask <- is.na(data[[col]]) | data[[col]] < 0 | data[[col]] > 100
+      
+      if (any(out_of_range_mask)) {
+
+        bad_sample_ids <- data$sample_id[out_of_range_mask]
+        bad_sample_ids <- bad_sample_ids[!is.na(bad_sample_ids)]
+        
+        if (length(bad_sample_ids) > 0) {
+          if (length(bad_sample_ids) <= 5) {
+            sample_msg <- paste0("Check sample IDs - ", paste(bad_sample_ids, collapse = ", "))
+          } else {
+            sample_msg <- "More than 5 samples with error"
+          }
+          
+          error_list[[paste0("check8_5_", col)]] <- paste0(
+            "Values out of range for ", col, " (0-100): ", sample_msg
+          )
+        }
       }
     }
-    
-    if (length(out_of_range_cols) > 0) {
-      error_list$check8_5 <- paste(
-        "Values out of range (must be 0-100) in columns:",
-        paste(out_of_range_cols, collapse = ", ")
-      )
-    }
   }
+  
+  #Values out of range for silt percent: Sample 1234, Sample 5555, Sample 333, Sample 789, and 3 others.
+  #Values out of range for clay percent:
+  #Values out of range for 
 
   ### Check 9: Do additional columns in 'Data' match values in 'Data Dictionary'? (Moved after Check 6)
   if (check4 && length(colnames(data)) > 0) { # If dictionary is valid and we have data columns
