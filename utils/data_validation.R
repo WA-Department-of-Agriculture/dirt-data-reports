@@ -20,8 +20,9 @@ validate_uniqueness <- function(data, req_fields) {
     }
 
     # Ensure all columns exist in the data
-    if (var_name %in% colnames(data) &&
-      all(group_by_vars %in% colnames(data))) {
+    if (
+      var_name %in% colnames(data) && all(group_by_vars %in% colnames(data))
+    ) {
       if (length(group_by_vars) == 1 && group_by_vars == var_name) {
         # Case where var_name itself must be unique (e.g., sample_id is globally unique)
         duplicates <- data %>%
@@ -50,7 +51,13 @@ validate_uniqueness <- function(data, req_fields) {
           # Create a readable summary of the groups with duplicates
           dup_summary <- duplicates %>%
             group_by(across(all_of(group_by_vars))) %>%
-            summarise(duplicate_values = paste(unique(!!sym(var_name)), collapse = ", "), .groups = "drop")
+            summarise(
+              duplicate_values = paste(
+                unique(!!sym(var_name)),
+                collapse = ", "
+              ),
+              .groups = "drop"
+            )
 
           error_list[[var_name]] <- paste(
             "Duplicate values found in",
@@ -58,16 +65,24 @@ validate_uniqueness <- function(data, req_fields) {
             "within grouping of",
             paste(group_by_vars, collapse = ", "),
             ". Affected groups:",
-            paste(apply(dup_summary, 1, function(row) {
-              paste(
-                "(",
-                paste(group_by_vars, "=", row[group_by_vars], collapse = ", "),
-                ") has duplicate",
-                var_name,
-                "values:",
-                row[["duplicate_values"]]
-              )
-            }), collapse = "; ")
+            paste(
+              apply(dup_summary, 1, function(row) {
+                paste(
+                  "(",
+                  paste(
+                    group_by_vars,
+                    "=",
+                    row[group_by_vars],
+                    collapse = ", "
+                  ),
+                  ") has duplicate",
+                  var_name,
+                  "values:",
+                  row[["duplicate_values"]]
+                )
+              }),
+              collapse = "; "
+            )
           )
         }
       }
@@ -107,10 +122,14 @@ validate_measurement_groups <- function(data_dict, language) {
   valid_groups <- enc2native(measurement_groups[[language]])
 
   if (!"measurement_group" %in% colnames(data_dict)) {
-    return(list(measurement_groups = "Missing 'measurement_group' column in Data Dictionary"))
+    return(list(
+      measurement_groups = "Missing 'measurement_group' column in Data Dictionary"
+    ))
   }
 
-  actual_groups <- data_dict$measurement_group[!is.na(data_dict$measurement_group)]
+  actual_groups <- data_dict$measurement_group[
+    !is.na(data_dict$measurement_group)
+  ]
   actual_groups <- enc2native(actual_groups)
 
   invalid_groups <- setdiff(actual_groups, valid_groups)
@@ -140,7 +159,12 @@ check_raw_duplicate_headers <- function(file) {
   # Check Data sheet headers
   tryCatch(
     {
-      data_headers <- read_xlsx(file, sheet = "Data", col_names = FALSE, n_max = 1)
+      data_headers <- read_xlsx(
+        file,
+        sheet = "Data",
+        col_names = FALSE,
+        n_max = 1
+      )
       data_headers <- as.character(data_headers[1, ])
       data_headers <- data_headers[!is.na(data_headers)] # Remove NA headers
 
@@ -158,7 +182,12 @@ check_raw_duplicate_headers <- function(file) {
   # Check Data Dictionary sheet headers
   tryCatch(
     {
-      dict_headers <- read_xlsx(file, sheet = "Data Dictionary", col_names = FALSE, n_max = 1)
+      dict_headers <- read_xlsx(
+        file,
+        sheet = "Data Dictionary",
+        col_names = FALSE,
+        n_max = 1
+      )
       dict_headers <- as.character(dict_headers[1, ])
       dict_headers <- dict_headers[!is.na(dict_headers)] # Remove NA headers
 
@@ -189,7 +218,10 @@ validate_data_file <- function(file, req_fields, language = "english") {
 
   if (!check1) {
     error_list$check1 <-
-      paste("Missing sheets:", paste(setdiff(required_sheets, sheets_present), collapse = ", "))
+      paste(
+        "Missing sheets:",
+        paste(setdiff(required_sheets, sheets_present), collapse = ", ")
+      )
     return(error_list) # Critical failure, stop further checks
   }
 
@@ -205,7 +237,10 @@ validate_data_file <- function(file, req_fields, language = "english") {
         "Duplicate column headers found in Data sheet:",
         paste(duplicate_info$data_duplicates, collapse = ", ")
       )
-      duplicated_columns <- c(duplicated_columns, duplicate_info$data_duplicates)
+      duplicated_columns <- c(
+        duplicated_columns,
+        duplicate_info$data_duplicates
+      )
     }
 
     if (length(duplicate_info$dict_duplicates) > 0) {
@@ -262,7 +297,9 @@ validate_data_file <- function(file, req_fields, language = "english") {
   # Check if any required columns were duplicated (separate error)
   duplicated_required <- intersect(required_columns, duplicated_columns)
   if (length(duplicated_required) > 0) {
-    if (is.null(error_list$check3)) error_list$check3 <- list()
+    if (is.null(error_list$check3)) {
+      error_list$check3 <- list()
+    }
     error_list$check3$duplicated_required <- paste(
       "Required columns have duplicate headers (fix duplicates before proceeding):",
       paste(duplicated_required, collapse = ", ")
@@ -301,7 +338,8 @@ validate_data_file <- function(file, req_fields, language = "english") {
   }
 
   ### Check 6: Does 'Data' have at least one additional column? (Moved before Check 9)
-  if (length(colnames(data)) > 0) { # If we have any columns
+  if (length(colnames(data)) > 0) {
+    # If we have any columns
     additional_columns <- setdiff(colnames(data), required_columns)
     if (length(additional_columns) < 1) {
       error_list$check6 <-
@@ -327,10 +365,16 @@ validate_data_file <- function(file, req_fields, language = "english") {
     }
 
     # skip check of data type if ALL records are blank for column, gets interpreted as logical type (default)
-    non_blank_vars <- sapply(data[available_req_fields_for_types$var], function(col) !all(is.na(col)))
+    non_blank_vars <- sapply(
+      data[available_req_fields_for_types$var],
+      function(col) !all(is.na(col))
+    )
 
     if (any(non_blank_vars)) {
-      actual_types <- sapply(data[, names(non_blank_vars)[non_blank_vars], drop = FALSE], typeof)
+      actual_types <- sapply(
+        data[, names(non_blank_vars)[non_blank_vars], drop = FALSE],
+        typeof
+      )
 
       mismatched_types <- available_req_fields_for_types %>%
         filter(var_type != "-") %>%
@@ -381,8 +425,43 @@ validate_data_file <- function(file, req_fields, language = "english") {
     }
   }
 
+  ### Check 8.5: Validate percent columns are within 0-100 range, add sample IDs, truncate if more than 5
+  percent_columns <- c("sand_percent", "silt_percent", "clay_percent")
+  present_percent_cols <- intersect(percent_columns, colnames(data))
+
+  if (length(present_percent_cols) > 0) {
+    for (col in present_percent_cols) {
+      # Find rows with out of range values
+      out_of_range_mask <- data[[col]] < 0 |
+        data[[col]] > 100
+
+      if (any(out_of_range_mask)) {
+        bad_sample_ids <- data$sample_id[out_of_range_mask]
+        bad_sample_ids <- bad_sample_ids[!is.na(bad_sample_ids)]
+
+        if (length(bad_sample_ids) > 0) {
+          if (length(bad_sample_ids) <= 5) {
+            sample_msg <- paste0(
+              "Check sample IDs: ",
+              paste(bad_sample_ids, collapse = ", ")
+            )
+          } else {
+            sample_msg <- "More than 5 samples have out of range values"
+          }
+
+          error_list[[paste0("check8_5_", col)]] <- paste0(
+            col,
+            " values should be between 0 and 100. ",
+            sample_msg
+          )
+        }
+      }
+    }
+  }
+
   ### Check 9: Do additional columns in 'Data' match values in 'Data Dictionary'? (Moved after Check 6)
-  if (check4 && length(colnames(data)) > 0) { # If dictionary is valid and we have data columns
+  if (check4 && length(colnames(data)) > 0) {
+    # If dictionary is valid and we have data columns
     additional_columns <- setdiff(colnames(data), required_columns)
     all_data_columns <- colnames(data)
     dict_column_names <- data_dict$column_name
@@ -393,8 +472,10 @@ validate_data_file <- function(file, req_fields, language = "english") {
     # Check 2: Data Dictionary entries should correspond to actual columns (required or additional)
     missing_in_data <- setdiff(dict_column_names, all_data_columns)
 
-    if (length(missing_in_dict) > 0 ||
-      length(missing_in_data) > 0) {
+    if (
+      length(missing_in_dict) > 0 ||
+        length(missing_in_data) > 0
+    ) {
       error_messages <- c()
 
       if (length(missing_in_dict) > 0) {

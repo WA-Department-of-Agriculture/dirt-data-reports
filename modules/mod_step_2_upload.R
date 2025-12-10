@@ -6,9 +6,11 @@ mod_step_2_upload_ui <- function(id, state) {
 
   # Display message if file already uploaded
   uploaded_msg <- isolate({
-    if (!is.null(state$step_2_vals) &&
-      is.list(state$step_2_vals) &&
-      !is.null(state$step_2_vals$file_name)) {
+    if (
+      !is.null(state$step_2_vals) &&
+        is.list(state$step_2_vals) &&
+        !is.null(state$step_2_vals$file_name)
+    ) {
       div(
         class = "alert alert-info",
         tags$strong("Previously uploaded file: "),
@@ -25,7 +27,7 @@ mod_step_2_upload_ui <- function(id, state) {
     h2(class = "form-title", "Upload Data"),
     p(
       class = "form-text",
-      "Upload your completed template to check for errors. If any issues are found, an error message will appear below. Please fix the errors in your file and upload it again. For your privacy, no data is stored or saved by this tool."
+      "Upload your completed template to check for errors. If any issues are found, an error message will appear below. Please fix the errors in your file and upload it again. For your privacy, no data are stored or saved by this tool."
     ),
     actionLink(
       ns("requirement_info"),
@@ -73,7 +75,11 @@ mod_step_2_upload_server <- function(id, state) {
       # Validate the uploaded file with language parameter
       # This calls validate_data_file() from data_validation.R
       validation_results <- tryCatch(
-        validate_data_file(input$upload_file$datapath, req_fields, current_language),
+        validate_data_file(
+          input$upload_file$datapath,
+          req_fields,
+          current_language
+        ),
         error = function(e) {
           insertUI(
             selector = paste0("#", ns("error_message")),
@@ -136,7 +142,9 @@ mod_step_2_upload_server <- function(id, state) {
           ui = div(
             class = "alert alert-danger",
             shiny::icon("circle-exclamation", style = "margin-right:2px"),
-            tags$strong("Please review the following errors, correct them in your data spreadsheet, and re-upload."),
+            tags$strong(
+              "Please review the following errors, correct them in your data spreadsheet, and re-upload."
+            ),
             tags$br(),
             tags$br(),
             tags$strong("Validation Errors:"),
