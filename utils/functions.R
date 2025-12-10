@@ -8,7 +8,10 @@ read_qmd_as_md <- function(file_path) {
   content <- paste(lines, collapse = "\n")
 
   # ✅ Remove Quarto-specific div markers
-  content <- str_remove_all(content, "(?s)::: \\{\\.content-visible unless-format=\"html\"\\}.*?:::")
+  content <- str_remove_all(
+    content,
+    "(?s)::: \\{\\.content-visible unless-format=\"html\"\\}.*?:::"
+  )
 
   # Remove attributes inside `{}` (like `{width="5.8in" fig-alt="..."}`)
   content <- str_replace_all(content, "\\{[^}]+\\}", "")
@@ -31,8 +34,6 @@ read_qmd_as_md <- function(file_path) {
 
   return(content)
 }
-
-
 
 
 create_hero <- function(title, image_url) {
@@ -76,11 +77,11 @@ create_hero <- function(title, image_url) {
 }
 customButtonInput <-
   function(
-  inputId,
-  choices,
-  multi = FALSE,
-  selected = NULL,
-  icons = NULL
+    inputId,
+    choices,
+    multi = FALSE,
+    selected = NULL,
+    icons = NULL
   ) {
     choices_json <- jsonlite::toJSON(choices, auto_unbox = TRUE)
     selected_json <- jsonlite::toJSON(selected, auto_unbox = TRUE)
@@ -100,7 +101,10 @@ customButtonInput <-
           ""
         }
         icon_tag <- if (!is.null(icons) && label %in% names(icons)) {
-          tags$i(style = "font-size:32px; margin-bottom:10px;", class = icons[[label]])
+          tags$i(
+            style = "font-size:32px; margin-bottom:10px;",
+            class = icons[[label]]
+          )
         } else {
           NULL
         }
@@ -124,7 +128,8 @@ show_modal <- function(title, id, md) {
         includeMarkdown(normalizePath(paste0("www/content/", md, ".md"))),
       ),
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "xl"
     )
   )
 }
