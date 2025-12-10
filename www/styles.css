@@ -186,7 +186,7 @@ h1, h2, h3 {
 .modal-dialog {
     position: relative;
     width: auto;
-    max-width: 500px; /* Adjust as needed */
+    max-width: 800px; /* Adjust as needed */
     margin: 0; /* Remove default margins since we're using flexbox */
     
     /* Ensure modal doesn't exceed screen height */
@@ -1117,6 +1117,6 @@ a#build-step4-report:not(.disabled) {
     }
     
     .modal-dialog{		
-    width: 65%;		
+    width: 85%;		
 }
 }
