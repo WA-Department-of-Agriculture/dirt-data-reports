@@ -43,14 +43,7 @@ params:
 
 ```{r set-up}
 
-library(systemfonts)
-library(webshot2)
-library(soils)
-library(tidyverse)
-library(flextable)
-library(readxl)
-library(glue)
-
+library(rlang)
 
 # Get output file type
 out_type <- knitr::opts_knit$get("rmarkdown.pandoc.to")
@@ -358,7 +351,7 @@ project_summary <- soils::summarize_by_project(results_long) |>
   )
 ```
 
-```{r combine-producer-and-summarie}
+```{r combine-producer-and-summarize}
 # Combine producer table with summaries
 producer_table <- producer_samples |>
   dplyr::select(
@@ -426,7 +419,7 @@ rm(physical)
 search <- paste0("(^1 ", tr("fields"), ")|NA")
 
 tables <- groups |>
-  purrr::map(~ filter(.x, !grepl(search, !!sym(tr("field_or_average")))))
+  purrr::map(~ dplyr::filter(.x, !grepl(search, !!sym(tr("field_or_average")))))
 
 # Order list of tables based on how they appear in dictionary. Important that
 # tables and headers are in the same order for the make-flextables chunk.
@@ -442,7 +435,7 @@ headers <- results_long |>
   as.list() |>
   rlang::set_names() |>
   purrr::map(\(group) {
-    get_table_headers(dictionary, group) |>
+    soils::get_table_headers(dictionary, group) |>
       dplyr::mutate(dplyr::across(
         c(1, 2),
         \(x) gsub("Field or Average", tr("field_or_average"), x)
@@ -463,7 +456,7 @@ table_list <- list2DF(
       soils::format_ft_colors(
         lighter_color = lighter_color,
         darker_color = darker_color,
-        language = str_to_title(params$language)
+        language = stringr::str_to_title(params$language)
       ) |>
       soils::style_ft(
         header_font = header_font,
@@ -676,14 +669,14 @@ plot_list <- df_plot |>
       size = category,
       shape = category,
       alpha = category,
-      language = str_to_title(params$language)
+      language = stringr::str_to_title(params$language)
     ) |>
       # Set color, size, shape, alpha scales
-      set_scales(
+      soils::set_scales(
         primary_color = primary_color,
         secondary_color = secondary_color,
         other_color = other_color,
-        language = str_to_title(params$language)
+        language = stringr::str_to_title(params$language)
       ) +
       # Apply facet strip plot theme
       soils::theme_facet_strip(
@@ -779,7 +772,7 @@ flextable::flextable(qualities) |>
 for (measure_type in distinct_selected_measure_types) {
   # Get measures belonging to this type
   measures_in_type <- selected_measures |>
-    filter(section_name == measure_type)
+    dplyr::filter(section_name == measure_type)
 
   # Measure group image path
   image <- paste0("![](images/", tolower(measures_in_type$type[1]), ".png)")
@@ -808,7 +801,7 @@ for (measure_type in distinct_selected_measure_types) {
 for (measure_type in distinct_selected_measure_types) {
   # Get measures belonging to this type
   measures_in_type <- selected_measures |>
-    filter(section_name == measure_type)
+    dplyr::filter(section_name == measure_type)
 
   # Measure group image path
   image <- paste0(

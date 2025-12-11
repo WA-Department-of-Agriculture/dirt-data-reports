@@ -52,10 +52,9 @@ table_list |>
 if (out_type == "html") {
   plot_list |>
     purrr::pluck(group) |>
-    convert_ggiraph(
+    soils::convert_ggiraph(
       plot,
       plot_name = group
-      #body_font = body_font
     )
 }
 ```
