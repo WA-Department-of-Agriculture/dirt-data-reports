@@ -1,22 +1,23 @@
-library(tidyverse)
-library(readxl)
+library(rlang)
 
 validate_uniqueness <- function(data, req_fields) {
   error_list <- list()
 
-  unique_checks <- req_fields |> filter(unique_by != "-")
+  unique_checks <- req_fields |> dplyr::filter(unique_by != "-")
 
   for (i in seq_len(nrow(unique_checks))) {
     var_name <- unique_checks$var[i]
 
     # Improved parsing to handle R syntax: c("var1", "var2") and simple comma-separated: var1, var2
-    group_by_vars <- if (str_detect(unique_checks$unique_by[i], "^c\\(")) {
+    group_by_vars <- if (
+      stringr::str_detect(unique_checks$unique_by[i], "^c\\(")
+    ) {
       # Handle R syntax: c("var1", "var2")
-      str_extract_all(unique_checks$unique_by[i], '"([^"]+)"')[[1]] %>%
-        str_remove_all('"')
+      stringr::str_extract_all(unique_checks$unique_by[i], '"([^"]+)"')[[1]] %>%
+        stringr::str_remove_all('"')
     } else {
       # Handle simple comma-separated: var1, var2
-      str_split(unique_checks$unique_by[i], ",\\s*")[[1]]
+      stringr::str_split(unique_checks$unique_by[i], ",\\s*")[[1]]
     }
 
     # Ensure all columns exist in the data
@@ -26,8 +27,8 @@ validate_uniqueness <- function(data, req_fields) {
       if (length(group_by_vars) == 1 && group_by_vars == var_name) {
         # Case where var_name itself must be unique (e.g., sample_id is globally unique)
         duplicates <- data %>%
-          count(!!sym(var_name)) %>%
-          filter(n > 1)
+          dplyr::count(!!sym(var_name)) %>%
+          dplyr::filter(n > 1)
 
         if (nrow(duplicates) > 0) {
           error_list[[var_name]] <- paste(
@@ -41,17 +42,20 @@ validate_uniqueness <- function(data, req_fields) {
         # Case where var_name must be unique within a grouping of multiple columns
         # Check for actual duplicates within each group
         duplicates <- data %>%
-          group_by(across(all_of(group_by_vars))) %>%
-          add_count(!!sym(var_name), name = "field_count") %>%
-          filter(field_count > 1) %>%
-          distinct(across(all_of(c(group_by_vars, var_name)))) %>%
-          ungroup()
+          dplyr::group_by(dplyr::across(dplyr::all_of(group_by_vars))) %>%
+          dplyr::add_count(!!sym(var_name), name = "field_count") %>%
+          dplyr::filter(field_count > 1) %>%
+          dplyr::distinct(dplyr::across(dplyr::all_of(c(
+            group_by_vars,
+            var_name
+          )))) %>%
+          dplyr::ungroup()
 
         if (nrow(duplicates) > 0) {
           # Create a readable summary of the groups with duplicates
           dup_summary <- duplicates %>%
-            group_by(across(all_of(group_by_vars))) %>%
-            summarise(
+            dplyr::group_by(dplyr::across(dplyr::all_of(group_by_vars))) %>%
+            dplyr::summarise(
               duplicate_values = paste(
                 unique(!!sym(var_name)),
                 collapse = ", "
@@ -139,7 +143,7 @@ validate_measurement_groups <- function(data_dict, language) {
       "Invalid measurement_group values found in Data Dictionary:",
       paste(invalid_groups, collapse = ", "),
       ". Valid options for",
-      str_to_title(language),
+      stringr::str_to_title(language),
       "are:",
       paste(valid_groups, collapse = ", ")
     )
@@ -182,7 +186,7 @@ check_raw_duplicate_headers <- function(file) {
   # Check Data Dictionary sheet headers
   tryCatch(
     {
-      dict_headers <- read_xlsx(
+      dict_headers <- readxl::read_xlsx(
         file,
         sheet = "Data Dictionary",
         col_names = FALSE,
@@ -206,13 +210,13 @@ check_raw_duplicate_headers <- function(file) {
 }
 
 validate_data_file <- function(file, req_fields, language = "english") {
-  req_fields_data <- req_fields |> filter(sheet == "Data")
-  req_fields_dd <- req_fields |> filter(sheet == "Data Dictionary")
+  req_fields_data <- req_fields |> dplyr::filter(sheet == "Data")
+  req_fields_dd <- req_fields |> dplyr::filter(sheet == "Data Dictionary")
 
   error_list <- list()
 
   ### Check 1: Does the xlsx file have 'Data' and 'Data Dictionary' tabs?
-  sheets_present <- excel_sheets(file)
+  sheets_present <- readxl::excel_sheets(file)
   required_sheets <- c("Data", "Data Dictionary")
   check1 <- all(required_sheets %in% sheets_present)
 
@@ -256,14 +260,14 @@ validate_data_file <- function(file, req_fields, language = "english") {
 
   # Load the sheets (readxl will auto-fix duplicate names)
   data <- tryCatch(
-    read_excel(file, sheet = "Data"),
+    readxl::read_excel(file, sheet = "Data"),
     error = function(e) {
       error_list$check1 <- paste("Error reading Data sheet:", e$message)
       return(NULL)
     }
   )
   data_dict <- tryCatch(
-    read_excel(file, sheet = "Data Dictionary"),
+    readxl::read_excel(file, sheet = "Data Dictionary"),
     error = function(e) {
       error_list$check1 <-
         paste("Error reading Data Dictionary sheet:", e$message)
@@ -327,8 +331,8 @@ validate_data_file <- function(file, req_fields, language = "english") {
   ## Check 5: Are required unique columns truly unique?
   # Only check uniqueness for columns that exist and don't have header duplicates
   available_req_fields <- req_fields_data %>%
-    filter(var %in% colnames(data)) %>% # Only check columns that exist
-    filter(!var %in% duplicated_columns)
+    dplyr::filter(var %in% colnames(data)) %>% # Only check columns that exist
+    dplyr::filter(!var %in% duplicated_columns)
 
   if (nrow(available_req_fields) > 0) {
     unique_check <- validate_uniqueness(data, available_req_fields)
@@ -350,12 +354,12 @@ validate_data_file <- function(file, req_fields, language = "english") {
   ### Check 7: Are all required columns the right data type?
   # Only check data types for columns that exist and don't have header duplicates
   available_req_fields_for_types <- req_fields_data %>%
-    filter(var %in% colnames(data)) %>% # Only check columns that exist
-    filter(!var %in% duplicated_columns)
+    dplyr::filter(var %in% colnames(data)) %>% # Only check columns that exist
+    dplyr::filter(!var %in% duplicated_columns)
 
   if (nrow(available_req_fields_for_types) > 0) {
     map_r_type <- function(data_type) {
-      case_when(
+      dplyr::case_when(
         data_type == "int" ~ "integer",
         data_type == "double" ~ "double",
         data_type == "char" ~ "character",
@@ -377,10 +381,10 @@ validate_data_file <- function(file, req_fields, language = "english") {
       )
 
       mismatched_types <- available_req_fields_for_types %>%
-        filter(var_type != "-") %>%
-        filter(var %in% names(actual_types)) %>%
-        filter(map_r_type(var_type) != actual_types[var]) %>%
-        mutate(actual_type = actual_types[var])
+        dplyr::filter(var_type != "-") %>%
+        dplyr::filter(var %in% names(actual_types)) %>%
+        dplyr::filter(map_r_type(var_type) != actual_types[var]) %>%
+        dplyr::mutate(actual_type = actual_types[var])
 
       if (nrow(mismatched_types) > 0) {
         error_list$check7 <- paste(
@@ -403,15 +407,19 @@ validate_data_file <- function(file, req_fields, language = "english") {
   # Only check missing values for columns that exist and don't have header duplicates
   required_value_columns <-
     req_fields_data |>
-    filter(missing_allowed == "FALSE") |>
-    filter(var %in% colnames(data)) |> # Only check columns that exist
-    filter(!var %in% duplicated_columns) |> # Skip duplicated columns
-    pull(var)
+    dplyr::filter(missing_allowed == "FALSE") |>
+    dplyr::filter(var %in% colnames(data)) |> # Only check columns that exist
+    dplyr::filter(!var %in% duplicated_columns) |> # Skip duplicated columns
+    dplyr::pull(var)
 
   if (length(required_value_columns) > 0) {
     missing_values <- data %>%
-      select(all_of(required_value_columns)) %>%
-      summarise(across(everything(), ~ sum(is.na(.)), .names = "{.col}"))
+      dplyr::select(dplyr::all_of(required_value_columns)) %>%
+      dplyr::summarise(dplyr::across(
+        dplyr::everything(),
+        ~ sum(is.na(.)),
+        .names = "{.col}"
+      ))
 
     missing_cols <-
       names(missing_values)[colSums(missing_values) > 0]
