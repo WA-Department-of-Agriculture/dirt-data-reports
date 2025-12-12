@@ -8,5 +8,9 @@
 .Ruserdata
 .Rproj.user/
 .Rproj.user/**
+
+# Quarto output
 /figure-output
 /quarto/figure-output
+quarto/template.docx
+quarto/template.html
