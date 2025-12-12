@@ -443,7 +443,7 @@ validate_data_file <- function(file, req_fields, language = "english") {
       out_of_range_mask <- data[[col]] < 0 |
         data[[col]] > 100
 
-      if (any(out_of_range_mask)) {
+      if (any(out_of_range_mask, na.rm = TRUE)) {
         bad_sample_ids <- data$sample_id[out_of_range_mask]
         bad_sample_ids <- bad_sample_ids[!is.na(bad_sample_ids)]
 
