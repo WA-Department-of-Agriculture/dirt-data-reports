@@ -42,7 +42,6 @@ params:
 ---
 
 ```{r set-up}
-
 library(rlang)
 
 # Get output file type
@@ -65,15 +64,7 @@ fs::dir_create(path)
 fonts <- systemfonts::system_fonts()
 families <- unique(fonts$family)
 
-# systemfonts::register_font(
-#   name = "Arial",
-#   plain = "www/fonts/Arial.ttf",
-#   bold = "www/fonts/Arial-Bold.ttf",
-#   italic = "www/fonts/Arial-Italic.ttf",
-#   bolditalic = "www/fonts/Arial-Bold-Italic.ttf"
-# )
-
-#Check if Arial is available
+# Check if Arial is available
 if (!("Arial" %in% families)) {
   systemfonts::register_font(
     name = "Arial",
@@ -427,7 +418,6 @@ tables <- tables[measurement_groups]
 ```
 
 ```{r get-headers-for-flextable}
- 
 # Map function to each measurement group, resulting in a new df with
 # abbreviations and units in a list for make_ft()
 headers <- results_long |>
@@ -656,7 +646,6 @@ if (make_tt) {
 ```
 
 ```{r make-strip-plots}
- 
 # Split df_plot into a list with each measurement group in its own plot
 plot_list <- df_plot |>
   split(df_plot$measurement_group) |>
@@ -926,7 +915,7 @@ if (!NA %in% gis_df$longitude & !NA %in% gis_df$latitude) {
     crs = "+proj=lonlat"
   ) |>
     sf::st_transform(3857)
-  
+
   # override get_zoom within get_tiles to avoid issue when total_tiles is less
   # than 4. this grabs the max zoom with with < 10 tiles
   res <- maptiles:::get_bbox_and_proj(df_sf)
