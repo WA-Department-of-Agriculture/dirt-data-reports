@@ -11,5 +11,5 @@ latitude,double,TRUE,-,Data
 texture,char,FALSE,-,Data
 measurement_group,char,FALSE,-,Data Dictionary
 column_name,char,FALSE,-,Data Dictionary
-abbr,char,FALSE,-,Data Dictionary
+abbr,char,FALSE,abbr,Data Dictionary
 unit,char,TRUE,-,Data Dictionary
