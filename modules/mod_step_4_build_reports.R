@@ -224,7 +224,10 @@ mod_step_4_build_reports_server <- function(id, state) {
         local_time <- if (is.null(state$user_timezone)) {
           format(Sys.time(), "%Y-%m-%d_%H-%M-%S")
         } else {
-          format(with_tz(Sys.time(), state$user_timezone), "%Y-%m-%d_%H-%M-%S")
+          format(
+            lubridate::with_tz(Sys.time(), state$user_timezone),
+            "%Y-%m-%d_%H-%M-%S"
+          )
         }
         paste0("soil_reports_", local_time, ".zip")
       },
