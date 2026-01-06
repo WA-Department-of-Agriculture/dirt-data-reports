@@ -8,12 +8,18 @@ mod_home_ui <- function(id) {
       tags$div(
         class = "banner-content",
         h1("DIRT DATA REPORTS"),
-        p(style = "padding:0px 20px", "Generate customized soil health reports for your sampling project. Brought to you by the Washington State Department of Agriculture and the Washington Soil Health Initiative."),
+        p(
+          style = "padding:0px 20px",
+          "Generate customized soil health reports for your sampling project. Brought to you by the Washington State Department of Agriculture and the Washington Soil Health Initiative."
+        ),
         tags$div(
           class = "button-wrapper",
           actionButton(
             ns("redirect_build_reports"),
-            label = tagList(tags$i(class = "fas fa-seedling"), " Build Reports"),
+            label = tagList(
+              tags$i(class = "fas fa-seedling"),
+              " Build Reports"
+            ),
             class = "home-btn"
           ),
           actionButton(
@@ -31,7 +37,9 @@ mod_home_ui <- function(id) {
       tags$div(
         class = "section-header",
         h2("HOW IT WORKS"),
-        p("Build custom soil health reports for each participant in your soil sampling project in four steps.")
+        p(
+          "Build custom soil health reports for each participant in your soil sampling project in four steps."
+        )
       ),
       tags$div(
         class = "steps-grid",
@@ -39,7 +47,9 @@ mod_home_ui <- function(id) {
           class = "step-card",
           tags$div(class = "step-icon", tags$i(class = "fas fa-download")),
           h3("Step 1"),
-          HTML("<p><b>Download</b> the Excel template. Replace example data with your own.</p>")
+          HTML(
+            "<p><b>Download</b> the Excel template. Replace example data with your own.</p>"
+          )
         ),
         tags$div(
           class = "step-card",
@@ -71,16 +81,20 @@ mod_home_ui <- function(id) {
         class = "col-2",
         style = "gap:40px!important",
         tags$div(
-          HTML("<p style='text-align:left!important;font-size:18px!important;'>Dirt data reports summarize the latest soil health research on key indicators to increase understanding of <b>biological</b>, <b>chemical</b>, and <b>physical</b> soil properties. Each report compares participant results to other samples within the project, offering valuable context for interpreting soil data and empowering participants to better manage soil health.</p>")
+          HTML(
+            "<p style='text-align:left!important;font-size:18px!important;'>Dirt data reports summarize the latest soil health research on key indicators to increase understanding of <b>biological</b>, <b>chemical</b>, and <b>physical</b> soil properties. Each report compares participant results to other samples within the project, offering valuable context for interpreting soil data and empowering participants to better manage soil health.</p>"
+          )
         ),
         tags$div(
-          tags$img(style = "max-width:600px;padding:1em", src = "pictures/report-example.png")
+          tags$img(
+            style = "max-width:600px;padding:1em",
+            src = "pictures/report-example.png"
+          )
         )
       )
     )
   )
 }
-
 
 
 mod_home_server <- function(id) {

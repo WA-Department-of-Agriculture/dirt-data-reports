@@ -49,7 +49,6 @@ mod_step_1_template_server <- function(id, state) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-
     # Track previous language to detect changes
     prev_language <- reactiveVal(NULL)
 
@@ -65,18 +64,28 @@ mod_step_1_template_server <- function(id, state) {
           showModal(modalDialog(
             title = "Language Change Detected",
             div(
-              p("Changing the language will require you to download the new template and re-upload your data."),
+              p(
+                "Changing the language will require you to download the new template and re-upload your data."
+              ),
               p(strong("Do you want to continue?"))
             ),
             footer = tagList(
-              actionButton(ns("confirm_reset"), "Change Language", class = "btn btn-warning"),
+              actionButton(
+                ns("confirm_reset"),
+                "Change Language",
+                class = "btn btn-warning"
+              ),
               modalButton("Cancel")
             ),
             easyClose = FALSE
           ))
 
           # Temporarily revert the input until confirmed
-          updateRadioGroupButtons(session, "language", selected = prev_language())
+          updateRadioGroupButtons(
+            session,
+            "language",
+            selected = prev_language()
+          )
           return()
         } else {
           # No data uploaded yet, allow free language change
@@ -110,8 +119,12 @@ mod_step_1_template_server <- function(id, state) {
 
       # Safely clear Step 2 and 4 state, preserve Step 3 project info text
       # Make sure we initialize with proper structure
-      if (is.null(state$step_2_vals)) state$step_2_vals <- list()
-      if (is.null(state$step_4_vals)) state$step_4_vals <- list()
+      if (is.null(state$step_2_vals)) {
+        state$step_2_vals <- list()
+      }
+      if (is.null(state$step_4_vals)) {
+        state$step_4_vals <- list()
+      }
 
       # Clear only specific keys rather than entire list
       state$step_2_vals$file_name <- NULL

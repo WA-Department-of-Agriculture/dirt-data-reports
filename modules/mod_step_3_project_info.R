@@ -13,12 +13,14 @@ mod_step_3_project_info_ui <- function(id, state) {
 
   measurement_choices <- mapping %>%
     split(.$type) %>%
-    map(~ setNames(.x$file_name, .x$aliases))
+    purrr::map(~ setNames(.x$file_name, .x$aliases))
 
   measurement_content <- mapping %>%
-    mutate(content = glue::glue(
-      "<div>{name}</div><div style='display:none'>{aliases}</div>"
-    ))
+    dplyr::mutate(
+      content = glue::glue(
+        "<div>{name}</div><div style='display:none'>{aliases}</div>"
+      )
+    )
 
   # Get the abbr column from the uploaded data dictionary
   measurement_in_dictionary <- state$data_dictionary$abbr
@@ -36,13 +38,16 @@ mod_step_3_project_info_ui <- function(id, state) {
     state$project_info_vals$project_name %||% "Soil Sampling Project"
   )
   project_summary_val <- isolate(
-    state$project_info_vals$project_summary %||% "Thank the participating farmer. Consider including information related to how many samples you've taken, in how many crops and regions. Identify the project team and acknowledge support from your funders and collaborators."
+    state$project_info_vals$project_summary %||%
+      "Thank the participating farmer. Consider including information related to how many samples you've taken, in how many crops and regions. Identify the project team and acknowledge support from your funders and collaborators."
   )
   project_results_val <- isolate(
-    state$project_info_vals$project_results %||% "Below are tables and graphs describing the measurements from your soils. Each point represents a sample we collected. Take a look to see how your fields compare to others in the project. All samples were collected from **[EDIT: SOIL DEPTH (e.g. 0-6 inches, or 0-30 cm)]**."
+    state$project_info_vals$project_results %||%
+      "Below are tables and graphs describing the measurements from your soils. Each point represents a sample we collected. Take a look to see how your fields compare to others in the project. All samples were collected from **[EDIT: SOIL DEPTH (e.g. 0-6 inches, or 0-30 cm)]**."
   )
   looking_forward_val <- isolate(
-    state$project_info_vals$looking_forward %||% "Consider describing how this data will be used. Are you building decision support tools? Publications? Will you be speaking at upcoming field days or conferences about this work? Soils data can be confusing… let your audience know that this is just the start of the conversation! Thank participants once again."
+    state$project_info_vals$looking_forward %||%
+      "Consider describing how this data will be used. Are you building decision support tools? Publications? Will you be speaking at upcoming field days or conferences about this work? Soils data can be confusing… let your audience know that this is just the start of the conversation! Thank participants once again."
   )
   measurement_val <- isolate(
     state$project_info_vals$measurement_definitions %||% measurement_selected
@@ -75,7 +80,9 @@ mod_step_3_project_info_ui <- function(id, state) {
       style = "margin:20px 0px",
       role = "alert",
       shiny::icon("triangle-exclamation", class = "me-2"),
-      tags$span("Note: Your text won't be saved and will be lost if you exit this session or after 15 minutes of inactivity. Please save a copy separately.")
+      tags$span(
+        "Note: Your text won't be saved and will be lost if you exit this session or after 15 minutes of inactivity. Please save a copy separately."
+      )
     ),
     br(),
     textInput(
@@ -174,7 +181,6 @@ mod_step_3_project_info_ui <- function(id, state) {
 }
 
 
-
 mod_step_3_project_info_server <- function(id, state) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
@@ -198,13 +204,15 @@ mod_step_3_project_info_server <- function(id, state) {
         # Recreate measurement choices
         measurement_choices <- mapping %>%
           split(.$type) %>%
-          map(~ setNames(.x$file_name, .x$aliases))
+          purrr::map(~ setNames(.x$file_name, .x$aliases))
 
         # Recreate measurement content
         measurement_content <- mapping %>%
-          mutate(content = glue::glue(
-            "<div>{name}</div><div style='display:none'>{aliases}</div>"
-          ))
+          dplyr::mutate(
+            content = glue::glue(
+              "<div>{name}</div><div style='display:none'>{aliases}</div>"
+            )
+          )
 
         # Get the abbr column from the uploaded data dictionary
         measurement_in_dictionary <- state$data_dictionary$abbr
@@ -270,10 +278,16 @@ mod_step_3_project_info_server <- function(id, state) {
       processed_mapping <- raw_measure_mapping |>
         dplyr::mutate(
           # Split alias string into a list of terms
-          alias_terms = purrr::map(Abbreviations, ~ strsplit(.x, ";\\s*")[[1]] |> trimws()),
+          alias_terms = purrr::map(
+            Abbreviations,
+            ~ strsplit(.x, ";\\s*")[[1]] |> trimws()
+          ),
 
           # Flag if any alias matches selected_abbrs
-          has_match = purrr::map_lgl(alias_terms, ~ any(.x %in% selected_abbrs)),
+          has_match = purrr::map_lgl(
+            alias_terms,
+            ~ any(.x %in% selected_abbrs)
+          ),
 
           # Bold the Measurement name if there is a match
           Measurement = ifelse(
@@ -292,7 +306,9 @@ mod_step_3_project_info_server <- function(id, state) {
                 } else {
                   "background-color:#f0f0f0; border:1px solid #ccc; color:#333;"
                 }
-                glue::glue("<span style='{style} border-radius:12px; padding:2px 8px; margin:4px 2px; display:inline-block; font-size:0.85em;'>{term}</span>")
+                glue::glue(
+                  "<span style='{style} border-radius:12px; padding:2px 8px; margin:4px 2px; display:inline-block; font-size:0.85em;'>{term}</span>"
+                )
               }),
               collapse = " "
             )
@@ -317,19 +333,31 @@ mod_step_3_project_info_server <- function(id, state) {
         title = "Understanding Measurement Definitions",
         size = "l",
         div(
-          tags$p("Selected definitions will appear in the ", tags$b("What We Measured in Your Soil"), " section."),
-          tags$p("These are pre-selected based on the ", tags$b("abbr"), " column in your uploaded Data Dictionary, but please review them — we may use different names than your abbreviations."),
-          tags$p("To exclude a measurement from the ", tags$b("Project Results"), " section, remove it from both the Data and Data Dictionary tabs in your spreadsheet before re-uploading in Step 2."),
+          tags$p(
+            "Selected definitions will appear in the ",
+            tags$b("What We Measured in Your Soil"),
+            " section."
+          ),
+          tags$p(
+            "These are pre-selected based on the ",
+            tags$b("abbr"),
+            " column in your uploaded Data Dictionary, but please review them — we may use different names than your abbreviations."
+          ),
+          tags$p(
+            "To exclude a measurement from the ",
+            tags$b("Project Results"),
+            " section, remove it from both the Data and Data Dictionary tabs in your spreadsheet before re-uploading in Step 2."
+          ),
           tags$hr(),
-          HTML(glue::glue("<p>Your uploaded abbreviations (highlighted in green) matched <strong>{num_matched}</strong> measurement definition{if (num_matched != 1) 's' else ''} (bolded).</p>")),
+          HTML(glue::glue(
+            "<p>Your uploaded abbreviations (highlighted in green) matched <strong>{num_matched}</strong> measurement definition{if (num_matched != 1) 's' else ''} (bolded).</p>"
+          )),
           htmltools::HTML(gt::as_raw_html(measure_table))
         ),
         easyClose = TRUE,
         footer = modalButton("Close")
       ))
     })
-
-
 
     # Save all values into state
     observe({
@@ -345,11 +373,9 @@ mod_step_3_project_info_server <- function(id, state) {
         length(input$measurement_definitions) > 0
     })
 
-
     # Preview modal
     observeEvent(input$report_preview, {
       req(state$language())
-
 
       lang_map <- yaml::read_yaml(
         paste0("quarto/", state$language(), "/mapping.yml")
@@ -459,7 +485,6 @@ mod_step_3_project_info_server <- function(id, state) {
         size = "l"
       ))
     })
-
 
     # Store project info params in state
     state$project_info <- reactive({

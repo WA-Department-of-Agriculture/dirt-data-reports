@@ -3,12 +3,14 @@ mod_build_reports_ui <- function(id) {
 
   tagList(
     # add timezone to a hidden input
-    tags$script(HTML("
+    tags$script(HTML(
+      "
       Shiny.addCustomMessageHandler('getTimeZone', function(message) {
         var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
         Shiny.setInputValue('build-user_timezone', tz);
       });
-    ")),
+    "
+    )),
     tags$div(
       class = "container-reports",
       tags$div(
@@ -33,11 +35,19 @@ mod_build_reports_ui <- function(id) {
             tags$div(
               class = "progress-bar-header",
               tags$span(class = "progress-title", "Step Progress"),
-              tags$span(id = "progress-step-text", class = "progress-step-text", "1/4")
+              tags$span(
+                id = "progress-step-text",
+                class = "progress-step-text",
+                "1/4"
+              )
             ),
             tags$div(
               class = "progress-bar-wrapper",
-              tags$div(id = "progress-bar", class = "progress-bar", style = "width: 25%;")
+              tags$div(
+                id = "progress-bar",
+                class = "progress-bar",
+                style = "width: 25%;"
+              )
             )
           ),
           # Form Content
@@ -72,7 +82,6 @@ mod_build_reports_server <- function(id) {
       state$user_timezone <- input$user_timezone
     })
 
-
     output$stepper_ui <- renderUI({
       tagList(
         tags$div(
@@ -82,7 +91,10 @@ mod_build_reports_server <- function(id) {
           title = "Start here",
           onclick = paste0("setStep(this, '", ns("step_click"), "')"),
           tags$div(class = "step-circle", icon("download")),
-          tags$div(div(class = "step-num", "Step 1"), div(class = "step-text", "Download Template"))
+          tags$div(
+            div(class = "step-num", "Step 1"),
+            div(class = "step-text", "Download Template")
+          )
         ),
         tags$div(
           id = ns("step_2"),
@@ -91,7 +103,10 @@ mod_build_reports_server <- function(id) {
           title = "Upload your completed data template",
           onclick = paste0("setStep(this, '", ns("step_click"), "')"),
           tags$div(class = "step-circle", icon("table")),
-          tags$div(div(class = "step-num", "Step 2"), div(class = "step-text", "Upload Data"))
+          tags$div(
+            div(class = "step-num", "Step 2"),
+            div(class = "step-text", "Upload Data")
+          )
         ),
         tags$div(
           id = ns("step_3"),
@@ -101,10 +116,19 @@ mod_build_reports_server <- function(id) {
             if (state$current_step == 3) "active"
           ),
           `data-step` = 3,
-          title = if (!state$step_2_valid) "Please upload valid data in Step 2 first",
-          onclick = if (state$step_2_valid) paste0("setStep(this, '", ns("step_click"), "')") else NULL,
+          title = if (!state$step_2_valid) {
+            "Please upload valid data in Step 2 first"
+          },
+          onclick = if (state$step_2_valid) {
+            paste0("setStep(this, '", ns("step_click"), "')")
+          } else {
+            NULL
+          },
           div(class = "step-circle", icon("gear")),
-          div(div(class = "step-num", "Step 3"), div(class = "step-text", "Project Info"))
+          div(
+            div(class = "step-num", "Step 3"),
+            div(class = "step-text", "Project Info")
+          )
         ),
         div(
           id = ns("step_4"),
@@ -114,14 +138,22 @@ mod_build_reports_server <- function(id) {
             if (state$current_step == 4) "active"
           ),
           `data-step` = 4,
-          title = if (!state$step_2_valid || !state$step_3_valid) "Please complete prior steps",
-          onclick = if (state$step_2_valid && state$step_3_valid) paste0("setStep(this, '", ns("step_click"), "')") else NULL,
+          title = if (!state$step_2_valid || !state$step_3_valid) {
+            "Please complete prior steps"
+          },
+          onclick = if (state$step_2_valid && state$step_3_valid) {
+            paste0("setStep(this, '", ns("step_click"), "')")
+          } else {
+            NULL
+          },
           div(class = "step-circle", icon("file-alt")),
-          div(div(class = "step-num", "Step 4"), div(class = "step-text", "Build Reports"))
+          div(
+            div(class = "step-num", "Step 4"),
+            div(class = "step-text", "Build Reports")
+          )
         )
       )
     })
-
 
     # Step UI loader based on current step
     output$step_ui <- renderUI({
@@ -176,20 +208,22 @@ mod_build_reports_server <- function(id) {
       )
     })
 
-
-
     # Handle Next/Previous button clicks
     observeEvent(input$next_step, {
       if (state$current_step < 4) {
         state$current_step <- state$current_step + 1
-        shinyjs::runjs(glue::glue("setStep(document.querySelector('[data-step=\"{state$current_step}\"]'))"))
+        shinyjs::runjs(glue::glue(
+          "setStep(document.querySelector('[data-step=\"{state$current_step}\"]'))"
+        ))
       }
     })
 
     observeEvent(input$prev_step, {
       if (state$current_step > 1) {
         state$current_step <- state$current_step - 1
-        shinyjs::runjs(glue::glue("setStep(document.querySelector('[data-step=\"{state$current_step}\"]'))"))
+        shinyjs::runjs(glue::glue(
+          "setStep(document.querySelector('[data-step=\"{state$current_step}\"]'))"
+        ))
       }
     })
 
