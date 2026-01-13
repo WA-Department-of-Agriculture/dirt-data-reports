@@ -406,6 +406,20 @@ h1, h2, h3 {
 
 .navbar > .container-fluid:first-child {
   padding:0px 15px;}
+  
+/* -----------------------------------------
+   Filter Options
+----------------------------------------- */
+
+.filter-option-inner-inner {
+  display: block; 
+  overflow:visible;
+}
+
+.filter-option-inner-inner > div:not([style*="display:none"]) {
+  display: inline;
+  white-space:normal;
+}
 
 /* -----------------------------------------
    Footer Styles
