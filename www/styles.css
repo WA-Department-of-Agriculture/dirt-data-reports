@@ -402,6 +402,7 @@ h1, h2, h3 {
 
 .navbar-brand {
   width: 249px;
+  padding:5px 15px!important;
 }
 
 .navbar > .container-fluid:first-child {
