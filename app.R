@@ -7,8 +7,8 @@ ui <- navbarPage(
     tags$div(
       style = "display:flex;gap:8px;align-items:center",
       tags$img(
-        src = "pictures/washi.png",
-        style = "height:20px"
+        src = "pictures/ddr-logo.png",
+        style = "height:40px"
       ),
       tags$div(
         class = "title-name",
@@ -35,8 +35,8 @@ ui <- navbarPage(
       href = "styles.css"
     ),
     tags$link(
-      rel = "shortcut icon",
-      href = "pictures/wshi.png"
+      rel = "shortcut icon", # favicon
+      href = "pictures/ddr-logo.png"
     ),
     # javascript
     tags$script(src = "scripts/toc.js"),
