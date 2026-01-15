@@ -35,8 +35,8 @@ ui <- navbarPage(
       href = "styles.css"
     ),
     tags$link(
-      rel = "shortcut icon",
-      href = "pictures/wshi.png"
+      rel = "shortcut icon", # favicon
+      href = "pictures/ddr-logo.png"
     ),
     # javascript
     tags$script(src = "scripts/toc.js"),
