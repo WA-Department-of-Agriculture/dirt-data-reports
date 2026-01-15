@@ -1,4 +1,13 @@
-# Dirt Data Reports
+
+# Dirt Data Reports <a href="https://wsda.shinyapps.io/dirt-data-reports/"><img src="images/ddr-logo.png" align="right" height="138" /></a>
+
+<!-- badges: start -->
+
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+
+<!-- badges: end -->
 
 ![](images/dirt-data-reports.png)
 
