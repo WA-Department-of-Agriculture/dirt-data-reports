@@ -1,6 +1,3 @@
-library(htmltools)
-
-
 read_qmd_as_md <- function(file_path) {
   lines <- readLines(file_path, warn = FALSE)
 
@@ -8,29 +5,37 @@ read_qmd_as_md <- function(file_path) {
   content <- paste(lines, collapse = "\n")
 
   # ✅ Remove Quarto-specific div markers
-  content <- str_remove_all(
+  content <- stringr::str_remove_all(
     content,
     "(?s)::: \\{\\.content-visible unless-format=\"html\"\\}.*?:::"
   )
 
   # Remove attributes inside `{}` (like `{width="5.8in" fig-alt="..."}`)
-  content <- str_replace_all(content, "\\{[^}]+\\}", "")
+  content <- stringr::str_replace_all(content, "\\{[^}]+\\}", "")
 
   # Remove Quarto's ::: markers
-  content <- str_replace_all(content, ":::", "")
+  content <- stringr::str_replace_all(content, ":::", "")
 
   # Remove HTML comments
-  content <- str_replace_all(content, "<!--.*?-->", "")
+  content <- stringr::str_replace_all(content, "<!--.*?-->", "")
 
   # Convert superscripts (e.g., `NH^~4~+^` → `NH<sup>4+</sup>`)
-  content <- str_replace_all(content, "\\^([0-9+-]+)\\^", "<sup>\\1</sup>")
+  content <- stringr::str_replace_all(
+    content,
+    "\\^([0-9+-]+)\\^",
+    "<sup>\\1</sup>"
+  )
 
   # Ensure image links remain properly formatted with a new line before them
-  content <- str_replace_all(content, "!\\[(.*?)\\]\\((.*?)\\)", "\n![](\\2)\n")
+  content <- stringr::str_replace_all(
+    content,
+    "!\\[(.*?)\\]\\((.*?)\\)",
+    "\n![](\\2)\n"
+  )
 
   # Remove extra spaces introduced during cleaning
-  content <- str_replace_all(content, "\\s+\n", "\n") # Trim spaces before new lines
-  content <- str_replace_all(content, "\n{2,}", "\n\n") # Ensure at most one blank line
+  content <- stringr::str_replace_all(content, "\\s+\n", "\n") # Trim spaces before new lines
+  content <- stringr::str_replace_all(content, "\n{2,}", "\n\n") # Ensure at most one blank line
 
   return(content)
 }
@@ -125,7 +130,9 @@ show_modal <- function(title, id, md) {
       title = title,
       tags$div(
         id = id,
-        includeMarkdown(normalizePath(paste0("www/content/", md, ".md"))),
+        htmltools::includeMarkdown(
+          normalizePath(paste0("www/content/", md, ".md"))
+        ),
       ),
       easyClose = TRUE,
       footer = NULL,

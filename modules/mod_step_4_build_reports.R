@@ -425,10 +425,18 @@ mod_step_4_build_reports_server <- function(id, state) {
               year = year,
               producer_id = row$producer_id,
               language = language,
-              project_name = project_info$project_name,
-              project_results = project_info$project_results,
-              project_summary = project_info$project_summary,
-              looking_forward = project_info$looking_forward,
+              project_name = htmltools::htmlEscape(
+                project_info$project_name
+              ),
+              project_results = htmltools::htmlEscape(
+                project_info$project_results
+              ),
+              project_summary = htmltools::htmlEscape(
+                project_info$project_summary
+              ),
+              looking_forward = htmltools::htmlEscape(
+                project_info$looking_forward
+              ),
               measures = project_info$measurement_definitions
             )
 

@@ -455,17 +455,17 @@ mod_step_3_project_info_server <- function(id, state) {
         title = "Preview Sections",
         div(
           id = "modal-preview",
-          tags$h2(input$project_name),
+          tags$h2(htmltools::htmlEscape(input$project_name)),
           tags$h3(tr("project_summary")),
           HTML(markdown::markdownToHTML(
-            text = input$project_summary,
+            text = htmltools::htmlEscape(input$project_summary),
             fragment.only = TRUE
           )),
           tags$h3(tr("what_we_measured_in_your_soil")),
           tabsetPanel(id = "dynamicTabs", !!!tabs),
           tags$h3(tr("project_results")),
           HTML(markdown::markdownToHTML(
-            text = input$project_results,
+            text = htmltools::htmlEscape(input$project_results),
             fragment.only = TRUE
           )),
           div(
@@ -477,7 +477,7 @@ mod_step_3_project_info_server <- function(id, state) {
           ),
           tags$h3(tr("looking_forward")),
           HTML(markdown::markdownToHTML(
-            text = input$looking_forward,
+            text = htmltools::htmlEscape(input$looking_forward),
             fragment.only = TRUE
           ))
         ),
