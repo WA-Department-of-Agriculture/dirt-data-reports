@@ -174,7 +174,7 @@ distinct_selected_measure_types <- selected_measures |>
   dplyr::pull(section_name)
 
 ### READ IN DATA FILE
-data <- readxl::read_xlsx(params$data_file, sheet = "Data") |> 
+data <- readxl::read_xlsx(params$data_file, sheet = "Data") |>
   # Make sure sample_id and field_id are character
   dplyr::mutate(dplyr::across(c(sample_id, field_id), as.character))
 
@@ -207,13 +207,13 @@ results_long <- data |>
   dplyr::mutate(
     dplyr::across(
       # EDIT: replace with the column range of your soil measurements
-      11:num_cols,
+      11:dplyr::all_of(num_cols),
       as.numeric
     )
   ) |>
   tidyr::pivot_longer(
     # EDIT: replace with the column range of your soil measurements
-    cols = 11:num_cols,
+    cols = 11:dplyr::all_of(num_cols),
     names_to = "measurement"
   ) |>
   dplyr::inner_join(dictionary, by = c("measurement" = "column_name")) |>
