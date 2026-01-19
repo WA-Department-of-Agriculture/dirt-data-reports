@@ -174,7 +174,9 @@ distinct_selected_measure_types <- selected_measures |>
   dplyr::pull(section_name)
 
 ### READ IN DATA FILE
-data <- readxl::read_xlsx(params$data_file, sheet = "Data")
+data <- readxl::read_xlsx(params$data_file, sheet = "Data") |> 
+  # Make sure sample_id and field_id are character
+  dplyr::mutate(dplyr::across(c(sample_id, field_id), as.character))
 
 dictionary <- readxl::read_xlsx(params$data_file, sheet = "Data Dictionary") |>
   dplyr::mutate(
