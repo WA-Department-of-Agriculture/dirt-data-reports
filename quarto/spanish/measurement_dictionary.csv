@@ -13,5 +13,5 @@ Chemical,Químico,Total N,Total N; Total Nitrogen; Nitrógeno total,def-total-n.
 Physical,Físico,Aggregate Stability,Aggregate Stability; Agg. Stability; AS; Wet Aggregate Stability; Wet Agg. Stability; WSA; Estabilidad de agregados,def-aggregate-stability.qmd,La estabilidad de agregados,"Soporte físico, relaciones hídricas, biodiversidad y hábitat, filtración y resiliencia",1-3 años,Más  es mejor
 Physical,Físico,Bulk Density,Bulk Density; BD; Densidad aparente,def-bulk-density.qmd,Densidad aparente,"Soporte físico, relaciones hídricas, biodiversidad y hábitat, filtración y resiliencia",3-5 años,Rango óptimo
 Physical,Físico,Infiltration,Infiltration; Infiltración,def-infiltration.qmd,La infiltración,"Relaciones hídricas, soporte físico",3-5 años,Más  es mejor
-Physical,Físico,Texture,Texture; Soil Texture; Textura; Textura del suelo,def-texture.qmd,,,,
+Physical,Físico,Texture,Texture; Soil Texture; Textura; Textura del suelo; Arena; Limo; Arcilla,def-texture.qmd,,,,
 Physical,Físico,Water Holding Capacity,Water Holding Capacity; WHC; Capacidad de retención de agua,def-whc.qmd,Capacidad de retención de agua (WHC),"Relaciones hídricas, soporte físico",3-5 años,Más  es mejor
