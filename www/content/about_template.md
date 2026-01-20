@@ -62,10 +62,14 @@ of the downloaded template spreadsheet.**
 
 3.  **Measurement results** (columns J–AO: texture through na_mg_kg):
 
-    -   **texture** must be included in all datasets.
+    -   **texture** may be left blank. If at least two of **sand_percent**,
+        **silt_percent**, and **clay_percent** are provided, texture will be
+        classified according to the USDA NRCS.
 
     -   **sand_percent**, **silt_percent**, and **clay_percent** must be between
-        0 and 100.
+        0 and 100 and sum to 100 (+/- 1). For each sample, at least two texture
+        fractions must be provided (the third will be calculated as 100 minus
+        the other two).
 
     -   Delete any columns for measurements not analyzed in your project.
 

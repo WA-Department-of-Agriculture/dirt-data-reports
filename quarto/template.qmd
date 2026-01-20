@@ -178,12 +178,56 @@ data <- readxl::read_xlsx(params$data_file, sheet = "Data") |>
   # Make sure sample_id and field_id are character
   dplyr::mutate(dplyr::across(c(sample_id, field_id), as.character))
 
-dictionary <- readxl::read_xlsx(params$data_file, sheet = "Data Dictionary") |>
+dictionary <- readxl::read_xlsx(params$data_file, sheet = "Data Dictionary")
+```
+
+<!-- Texture validation and classification -->
+
+```{r texture-validate-classify}
+# If sand, silt, and clay columns are present, validate & classify texture
+if (all(c("sand_percent", "silt_percent", "clay_percent") %in% names(data))) {
+  data <- soils::classify_texture(data)
+}
+
+# If texture is in data but not dictionary, add to dictionary before the texture
+# fractions
+if ("texture" %in% names(data) & !"texture" %in% dictionary$column_name) {
+  # Identify where to insert texture (before the first fraction column)
+  insert_before <- which(
+    dictionary$column_name %in%
+      c("sand_percent", "silt_percent", "clay_percent")
+  )[1]
+
+  # Define the texture dictionary row
+  texture_row <- data.frame(
+    measurement_group = tr("physical_group"),
+    column_name = "texture",
+    abbr = tr("texture"),
+    unit = "",
+    stringsAsFactors = FALSE
+  )
+
+  # Insert texture row at the correct position
+  if (!is.na(insert_before)) {
+    dictionary <- dplyr::bind_rows(
+      dictionary[seq_len(insert_before - 1), ],
+      texture_row,
+      dictionary[insert_before:nrow(dictionary), ]
+    )
+  } else {
+    # Fallback: append to the end of Physical group if fractions not present
+    dictionary <- dplyr::bind_rows(dictionary, texture_row)
+  }
+}
+```
+
+<!-- Format measurement labels and set ordering -->
+
+```{r process-dictionary}
+dictionary <- dictionary |>
   dplyr::mutate(
     # Concatenate abbr and unit with html break for the table and plot labels
     abbr_unit = glue::glue("{abbr}<br>{unit}"),
-    # Remove NA if unit is blank
-    abbr_unit = gsub("<br>NA", "", abbr_unit),
     # Set the order of how measurement groups will appear within the report
     # based on the order found in the data dictionary
     group_order = dplyr::cur_group_id(),
@@ -197,6 +241,7 @@ dictionary <- readxl::read_xlsx(params$data_file, sheet = "Data Dictionary") |>
 measurement_groups <- unique(dictionary$measurement_group)
 ```
 
+<!-- Pivot data longer and join with data dictionary -->
 
 ```{r tidy-long}
 # Tidy data and join with dictionary
@@ -354,7 +399,7 @@ producer_table <- producer_samples |>
     abbr,
     value,
     !!tr("field_or_average") := field_id,
-    Textura = texture
+    !!tr("texture") := texture
   )
 
 # Bind together into one df and round values to 2 digits
