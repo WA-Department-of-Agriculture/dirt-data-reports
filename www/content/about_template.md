@@ -5,10 +5,7 @@ of the downloaded template spreadsheet.**
 #### **What data do I need?**
 
 -   You need results from at least one soil sample for at least one soil health
-    measurement, in addition to texture.
-
--   Texture is a required measurement and must be included in both the **Data**
-    tab and the **Data Dictionary** tab.
+    measurement.
 
 -   The more soil samples you include, the more meaningful the project, crop,
     and/or county comparisons will be in each producer’s custom report.
@@ -63,7 +60,7 @@ of the downloaded template spreadsheet.**
 3.  **Measurement results** (columns J–AO: texture through na_mg_kg):
 
     -   **texture** may be left blank. If at least two of **sand_percent**,
-        **silt_percent**, and **clay_percent** are provided, texture will be
+        **silt_percent**, and **clay_percent** are provided, **texture** will be
         classified according to the USDA NRCS.
 
     -   **sand_percent**, **silt_percent**, and **clay_percent** must be between
