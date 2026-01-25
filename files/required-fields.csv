@@ -10,5 +10,5 @@ longitude,double,TRUE,-,Data
 latitude,double,TRUE,-,Data
 measurement_group,char,FALSE,-,Data Dictionary
 column_name,char,FALSE,-,Data Dictionary
-abbr,char,FALSE,abbr,Data Dictionary
+abbr,char,FALSE,"c(""abbr"", ""unit"")",Data Dictionary
 unit,char,TRUE,-,Data Dictionary
