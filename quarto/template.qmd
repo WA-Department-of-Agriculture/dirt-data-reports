@@ -866,18 +866,19 @@ gis_ft <- gis_df |>
     !!tr("crop") := crop,
     !!tr("longitude") := longitude,
     !!tr("latitude") := latitude
-  )
+  ) |> 
+  dplyr::distinct()
 
 # If crop is empty, remove the column from the printed table
 if (all(is.na(gis_ft[[tr("crop")]]))) {
   gis_ft <- gis_ft |>
-    select(-all_of(tr("crop")))
+    dplyr::select(-dplyr::all_of(tr("crop")))
 }
 # If longitude or latitude are empty, remove the columns from the printed table
 if (all(is.na(gis_ft[[tr("longitude")]])) |
   all(is.na(gis_ft[[tr("latitude")]]))) {
   gis_ft <- gis_ft |>
-    select(-any_of(c(tr("longitude"), tr("latitude"))))
+    dplyr::select(-dplyr::any_of(c(tr("longitude"), tr("latitude"))))
 }
 
 gis_ft |>

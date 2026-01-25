@@ -5,6 +5,6 @@ account: wsda
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 14396697
-bundleId: 11450977
+bundleId: 11490118
 url: https://wsda.shinyapps.io/dirt-data-reports/
 version: 1
