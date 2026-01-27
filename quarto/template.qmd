@@ -883,7 +883,8 @@ gis_ft <- gis_df |>
     !!tr("crop") := crop,
     !!tr("longitude") := longitude,
     !!tr("latitude") := latitude
-  )
+  ) |> 
+  dplyr::distinct()
 
 # If crop is empty, remove the column from the printed table
 if (soils::is_column_empty(gis_ft[[tr("crop")]])) {
