@@ -912,10 +912,10 @@ if (soils::is_column_empty(gis_ft[[tr("crop")]])) {
 }
 
 # If longitude or latitude are empty, remove the columns from the printed table
-if (soils::is_column_empty(gis_ft[[tr("longitude")]]) &
+if (soils::is_column_empty(gis_ft[[tr("longitude")]]) ||
   soils::is_column_empty(gis_ft[[tr("latitude")]])) {
   gis_ft <- gis_ft |>
-    dplyr::select(-dplyr::any_of(c(tr("longitude"), tr("latitude"))))
+    dplyr::select(-(c(tr("longitude"), tr("latitude"))))
 }
 
 gis_ft |>
