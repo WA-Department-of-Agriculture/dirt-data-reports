@@ -219,21 +219,36 @@ measurement_groups <- unique(dictionary$measurement_group)
 <!-- Pivot data longer and join with data dictionary -->
 
 ```{r tidy-long}
-# Tidy data and join with dictionary
-num_cols <- ncol(data)
+# OPTIONAL EDIT: If you have extra metadata columns in `data`, add them to this
+# vector. All other columns are assumed to be quantitative measurements and will
+# be coerced to numeric. Non-numeric values (e.g. "ND", "NA", "", "-", "<1")
+# will be converted to NA and excluded from tables and plots.
+metadata_cols <- c(
+  "year",
+  "sample_id",
+  "farm_name",
+  "producer_id",
+  "field_id",
+  "county",
+  "crop",
+  "longitude",
+  "latitude",
+  "texture"
+)
+
+# Get measurement columns
+measurement_cols <- data |>
+  dplyr::select(-dplyr::any_of(metadata_cols)) |>
+  colnames()
+
+# Coerce measurement columns to numeric. This will emit a warning of which
+# columns have coerced a value to NA.
+data <- soils::coerce_to_numeric(data, measurement_cols)
 
 # Tidy data into long format and join with data dictionary
 results_long <- data |>
-  dplyr::mutate(
-    dplyr::across(
-      # EDIT: replace with the column range of your soil measurements
-      11:dplyr::all_of(num_cols),
-      as.numeric
-    )
-  ) |>
   tidyr::pivot_longer(
-    # EDIT: replace with the column range of your soil measurements
-    cols = 11:dplyr::all_of(num_cols),
+    cols = dplyr::all_of(measurement_cols),
     names_to = "measurement"
   ) |>
   dplyr::inner_join(dictionary, by = c("measurement" = "column_name")) |>
@@ -316,54 +331,45 @@ gis_df <- producer_samples |>
 
 
 ```{r calculate-averages}
+# Helper to rename texture if it exists
+safe_rename_texture <- function(df) {
+  if ("Texture" %in% colnames(df)) {
+    df <- dplyr::rename(df, !!tr("texture") := Texture)
+  }
+  if ("texture" %in% colnames(df)) {
+    df <- dplyr::rename(df, !!tr("texture") := texture)
+  }
+  df
+}
+
 # Calculate averages by crop, county, and project
 crop_summary <- results_long |>
   dplyr::filter(!is.na(crop)) |>
-  soils::summarize_by_var(
-    producer_samples,
-    var = crop
-  ) |>
+  soils::summarize_by_var(producer_samples, var = crop) |>
   dplyr::mutate(
     `Field or Average` = gsub("Fields", tr("fields"), `Field or Average`),
     `Field or Average` = gsub("Average", tr("average"), `Field or Average`)
   ) |>
-  dplyr::rename(
-    !!tr("field_or_average") := `Field or Average`,
-    !!tr("texture") := Texture
-  )
+  dplyr::rename(!!tr("field_or_average") := `Field or Average`) |>
+  safe_rename_texture()
 
 county_summary <- results_long |>
   dplyr::filter(!is.na(county)) |>
-  soils::summarize_by_var(
-    producer_samples,
-    var = county
-  ) |>
+  soils::summarize_by_var(producer_samples, var = county) |>
   dplyr::mutate(
     `Field or Average` = gsub("Fields", tr("fields"), `Field or Average`),
     `Field or Average` = gsub("Average", tr("average"), `Field or Average`)
   ) |>
-  dplyr::rename(
-    !!tr("field_or_average") := `Field or Average`,
-    !!tr("texture") := Texture
-  )
+  dplyr::rename(!!tr("field_or_average") := `Field or Average`) |>
+  safe_rename_texture()
 
 project_summary <- soils::summarize_by_project(results_long) |>
   dplyr::mutate(
-    `Field or Average` = gsub(
-      "Fields",
-      tr("fields"),
-      `Field or Average`
-    ),
-    `Field or Average` = gsub(
-      "Project Average",
-      tr("project_average"),
-      `Field or Average`
-    )
+    `Field or Average` = gsub("Fields", tr("fields"), `Field or Average`),
+    `Field or Average` = gsub("Project Average", tr("project_average"), `Field or Average`)
   ) |>
-  dplyr::rename(
-    !!tr("field_or_average") := `Field or Average`,
-    !!tr("texture") := Texture
-  )
+  dplyr::rename(!!tr("field_or_average") := `Field or Average`) |>
+  safe_rename_texture()
 ```
 
 ```{r combine-producer-and-summarize}
@@ -374,8 +380,11 @@ producer_table <- producer_samples |>
     abbr,
     value,
     !!tr("field_or_average") := field_id,
-    !!tr("texture") := texture
-  )
+    dplyr::any_of(
+      if ("texture" %in% names(producer_samples)) "texture" else NULL
+    )
+  ) |> 
+  safe_rename_texture()
 
 # Bind together into one df and round values to 2 digits
 df_table <- dplyr::bind_rows(
@@ -391,49 +400,60 @@ df_table <- dplyr::bind_rows(
 
 ```{r split-into-groups}
 # Split into list with each measurement group as its own df and pivot wider
-groups <- df_table |>
+tables <- df_table |>
   split(df_table$measurement_group) |>
   purrr::map(\(x) {
+    # Only include texture if present
+    id_cols <- if (tr("texture") %in% names(x)) {
+      c(tr("field_or_average"), tr("texture"))
+    } else {
+      tr("field_or_average")
+    }
+
     tidyr::pivot_wider(
       x,
-      id_cols = c(tr("field_or_average"), tr("texture")),
+      id_cols = dplyr::all_of(id_cols),
       names_from = abbr
     )
   })
 ```
 
-```{r physical-group-tweaks}
+```{r physical-group-texture}
 # Special wrangling for texture
 
-# Extract physical df from averages list
-physical <- setNames(
-  list(groups[[tr("physical_group")]]),
-  tr("physical_group")
-)
+# Only proceed if texture exists in any dataframe
+if (any(purrr::map_lgl(tables, ~ tr("texture") %in% names(.x)))) {
+  # Extract physical df from averages list
+  if (tr("physical_group") %in% names(tables)) {
+    physical <- setNames(
+      list(tables[[tr("physical_group")]]),
+      tr("physical_group")
+    )
+  } else {
+    physical <- list()
+  }
 
-# Remove texture from all dataframes except physical
-groups <- purrr::map(
-  subset(
-    groups,
-    !(names(groups) == tr("physical_group"))
-  ),
-  \(x) dplyr::select(x, -!!tr("texture"))
-)
+  # Remove texture from all dataframes except physical
+  tables <- purrr::map(
+    subset(
+      tables,
+      !(names(tables) == tr("physical_group"))
+    ),
+    \(x) dplyr::select(x, -!!tr("texture"))
+  )
 
-# Add physical df back to the averages list
-groups <- c(groups, physical)
-
-# Remove this intermediate variable from env
-rm(physical)
+  # Add physical df back to the averages list
+  tables <- c(tables, physical)
+}
 ```
 
 ```{r remove-rows-with-one-observation}
 # Delete any county or crop averages where n = 1 or county/crop is blank.
 
-# e.g. ^1 Fields)|NA or ^1 Campos)|NA
-search <- paste0("(^1 ", tr("fields"), ")|NA")
+# e.g. (1 Fields)|NA or (1 Campos)|NA
+search <- paste0("\\(1 ", tr("fields"), ")|NA")
 
-tables <- groups |>
+tables <- tables |>
   purrr::map(~ dplyr::filter(.x, !grepl(search, !!sym(tr("field_or_average")))))
 
 # Order list of tables based on how they appear in dictionary. Important that
@@ -883,7 +903,7 @@ gis_ft <- gis_df |>
     !!tr("crop") := crop,
     !!tr("longitude") := longitude,
     !!tr("latitude") := latitude
-  ) |> 
+  ) |>
   dplyr::distinct()
 
 # If crop is empty, remove the column from the printed table
