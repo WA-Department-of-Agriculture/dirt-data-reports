@@ -1,6 +1,8 @@
 **The template includes example data. Replace these values with your project’s
-sample metadata and measurement results. These same instructions are also
-included in the first tab of the downloaded spreadsheet.**
+sample metadata and measurement results.**
+
+These same instructions are also included in the first tab of the downloaded
+spreadsheet.
 
 #### **What data do I need?**
 
@@ -87,9 +89,9 @@ Review the example structure and format your project data to match.
 
 -   Add columns for any additional measurements you wish to include.
 
-    **Important: Measurement column names in the Data tab must match exactly
+    **Important:** Measurement column names in the Data tab must match exactly
     match the *column_name* values in the Data Dictionary tab. Update the Data
-    Dictionary tab after adding or removing measurements.**
+    Dictionary tab after adding or removing measurements.
 
 #### **How do I fill out the Data Dictionary tab?**
 
