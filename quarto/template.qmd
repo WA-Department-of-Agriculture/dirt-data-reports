@@ -383,7 +383,7 @@ producer_table <- producer_samples |>
     dplyr::any_of(
       if ("texture" %in% names(producer_samples)) "texture" else NULL
     )
-  ) |> 
+  ) |>
   safe_rename_texture()
 
 # Bind together into one df and round values to 2 digits
@@ -487,6 +487,9 @@ table_list <- list2DF(
 ) |>
   purrr::pmap(\(table, header) {
     soils::make_ft(table, header) |>
+      soils::add_field_count_note(
+        language = stringr::str_to_title(params$language)
+      ) |>
       soils::format_ft_colors(
         lighter_color = lighter_color,
         darker_color = darker_color,
@@ -618,7 +621,7 @@ if (make_tt) {
     size = 1.36
   )
 
-  # Next add points for sampe crop
+  # Next add points for same crop
   soils::add_texture_points(
     texture_list[[tr("same_crop")]],
     color = glue::glue("#918D8D", "CC"),
