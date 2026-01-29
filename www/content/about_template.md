@@ -1,101 +1,118 @@
-**The template contains example data that should be replaced with your project's
-sample metadata and results. These instructions are also found in the first tab
-of the downloaded template spreadsheet.**
+**The template includes example data. Replace these values with your project’s
+sample metadata and measurement results. These same instructions are also
+included in the first tab of the downloaded spreadsheet.**
 
 #### **What data do I need?**
 
--   You need results from at least one soil sample for at least one soil health
-    measurement.
+-   You need results from **at least one soil sample** and **at least one soil
+    health measurement**.
 
--   The more soil samples you include, the more meaningful the project, crop,
-    and/or county comparisons will be in each producer’s custom report.
+-   Including more soil samples improves the quality and usefulness of crop-,
+    county-, and project-level comparisons in each producer’s report.
 
--   Each **column** must contain either:
+-   Each column must contain **one of the following**:
 
-    -   Sample metadata (e.g., year, sample_id, producer_id, field_id, etc.)
+    -   Sample metadata (*year*, *sample_id*, *farm_name*, *producer_id*,
+        *field_id*, *county*, *crop*, *latitude*, *longitude*)
 
-    -   Measurement results (e.g., texture, om_percent, etc.)
+    -   Measurement results (e.g., *texture*, *om_percent*, etc.). All
+        measurement results (except *texture*) must be numeric. **Non-numeric
+        values will be coerced to NA**. Clean your data of common character
+        values (e.g., ND, \<1) before uploading.
 
--   Each **row** should represent a single soil sample (with a unique sample_id)
-    with its corresponding metadata and measurement results.
+-   Each row should represent **one unique soil sample**, identified by a unique
+    *sample_id*, along with its associated metadata and measurements.
 
-#### **What are the unique identifiers required?**
+#### **What unique identifiers are required?**
 
--   **sample_id**: A unique identifier for each soil sample (can be any
-    alphanumeric value or a combination of year, producer_id, and field_id).
+-   **sample_id**: A unique identifier for each soil sample. Can be any
+    alphanumeric value or a combination of *year*, *producer_id*, and
+    *field_id*.
 
--   **producer_id**: Reports are generated for each producer_id in a given year.
-    This can be an alphanumeric value or the producer’s name. Note: The tool
-    does not currently support comparisons of soil samples over time.
+-   **producer_id**: Reports are generated for each *producer_id* within a given
+    year. This can be an alphanumeric value or the producer’s name.
 
--   **field_id**: Used to distinguish between different fields if a producer has
-    multiple samples in the same year. This should be unique within a
-    producer_id and year combination and can be any alphanumeric value or a
-    field name assigned by the producer.
+-   **field_id**: Used to distinguish fields when a producer has multiple
+    samples in the same year. Must be unique within a *producer_id* and *year*
+    combination. Can be any alphanumeric value or a producer-assigned field
+    name.
 
 #### **How do I fill out the Data tab?**
 
-1.  Review the example data structure and prepare your project’s data
-    accordingly.
+Review the example structure and format your project data to match.
 
-2.  **Metadata** (columns A–I: year through latitude) should not be deleted:
+**Metadata** (columns A–I: *year* through *longitude*):
 
-    -   **Metadata columns with bold headers** must not contain blanks. Replace
-        example values with your own data.
+-   Do not delete metadata columns.
 
-    -   **Metadata columns with non-bold headers** can have missing values.
-        Replace the example values with your samples' metadata. If a column is
-        not relevant, delete the example values and leave it blank (do not
-        delete the entire column). Missing metadata will be handled in reports
-        (e.g., if farm_name is missing, producer_id will be used instead; if
-        crop is missing, crop averages will be excluded from tables and plots).
+-   Columns with **bold headers** are required and must not contain blanks.
 
-    -   **latitude** and **longitude** must be provided in decimal form.
-        Latitude must be between -90 and 90. Longitude must be between -180
-        and 180. Providing these coordinates is optional. If they are not
-        included, a map will not appear in the report.
+-   Columns with non-bold headers may contain blanks.
 
-<!-- -->
+-   Replace example values with your own metadata.
 
-3.  **Measurement results** (columns J–AO: texture through na_mg_kg):
+-   If a column is not relevant, clear the example values but **do not delete
+    the column**.
 
-    -   **texture** may be left blank. If at least two of **sand_percent**,
-        **silt_percent**, and **clay_percent** are provided, **texture** will be
-        classified according to the USDA NRCS.
+    -   If *farm_name* is missing, *producer_id* is used instead.
 
-    -   **sand_percent**, **silt_percent**, and **clay_percent** must be between
-        0 and 100 and sum to 100 (+/- 1). For each sample, at least two texture
-        fractions must be provided (the third will be calculated as 100 minus
-        the other two).
+    -   If *crop* or *county* are missing, crop and/or county summaries are
+        excluded from tables and plots.
 
-    -   Delete any columns for measurements not analyzed in your project.
+-   *latitude* and *longitude*
 
-    -   Add any additional measurements not included in this template.
+    -   Optional. If missing, the report will not include a map.
 
-    -   **Important**: Measurement column names in the **Data** tab must match
-        the values in the column_name column of the **Data Dictionary** tab.
-        Update the **Data Dictionary** tab after this step.
+    -   Must be provided in decimal degrees.
+
+    -   *latitude*: -90 to 90; *longitude*: -180 to 180.
+
+**Measurement results** (columns J–AO: *texture* through *na_mg_kg*):
+
+-   *texture* may be left blank. If at least two of *sand_percent*,
+    *silt_percent*, and *clay_percent* are provided, *texture* will be
+    classified using [USDA NRCS
+    rules](https://www.nrcs.usda.gov/resources/education-and-teaching-materials/soil-texture-calculator).
+
+-   *sand_percent*, *silt_percent*, and *clay_percent* must:
+
+    -   Be between 0 and 100
+
+    -   Sum to 100 (± 1)
+
+    -   Include at least two values per sample (the third will be calculated as
+        100 minus the sum of the other two)
+
+-   Delete any columns for measurements not analyzed in your project.
+
+-   Add columns for any additional measurements you wish to include.
+
+    **Important: Measurement column names in the Data tab must match exactly
+    match the *column_name* values in the Data Dictionary tab. Update the Data
+    Dictionary tab after adding or removing measurements.**
 
 #### **How do I fill out the Data Dictionary tab?**
 
-Customize how the measurements appear in the Project Results section of the
-reports by editing the following columns:
+Use the Data Dictionary to control how measurements appear in the Project
+Results section of the report.
 
--   **measurement_group**: Defines how measurements are grouped into sections.
+-   **measurement_group**: Defines how measurements are grouped into report
+    sections.
 
-    -   Allowable values for English reports are "Physical", "Biological",
-        "Chemical", "Plant Essential Macro Nutrients", and "Plant Essential
-        Micro Nutrients".
+    -   **Only the following values are currently supported. Custom groups are
+        not allowed and will fail validation.**
 
-    -   Allowable values for Spanish reports are "Mediciones físicas",
-        "Mediciones biológicas", "Mediciones químicas", "Macronutrientes
-        esenciales para plantas", and "Micronutriente es esenciales para
-        plantas".
+        -   **English:** Physical, Biological, Chemical, Plant Essential Macro
+            Nutrients, Plant Essential Micro Nutrients
 
--   **column_name**: Links the **Data** tab to the **Data Dictionary** tab. Each
-    measurement column header in **Data** must have a corresponding row in the
-    column_name of **Data Dictionary**.
+        -   **Spanish:** Mediciones físicas, Mediciones biológicas, Mediciones
+            químicas, Macronutrientes esenciales para plantas, Micronutrientes
+            esenciales para plantas
 
--   **abbr**: Abbreviation used for the measurement in tables and plots.
+-   **column_name**: Links the Data tab to the Data Dictionary tab. Each
+    measurement column header in the Data tab must have a matching entry here.
+
+-   **abbr**: Abbreviation used in tables and plots. Shorter abbreviations
+    improve readability.
 
 -   **unit**: Unit of measurement displayed in tables and plots.
