@@ -71,19 +71,26 @@ Review the example structure and format your project data to match.
 
 **Measurement results** (columns J–AO: *texture* through *na_mg_kg*):
 
+-   All measurement columns **except *texture*** must be numeric. Non-numeric
+    values (e.g., ND, \<1) will be coerced to NA and may be omitted from
+    summaries, tables, and plots. Clean or recode censored values before
+    uploading.
+
+<!-- -->
+
 -   *texture* may be left blank. If at least two of *sand_percent*,
     *silt_percent*, and *clay_percent* are provided, *texture* will be
     classified using [USDA NRCS
     rules](https://www.nrcs.usda.gov/resources/education-and-teaching-materials/soil-texture-calculator).
 
--   *sand_percent*, *silt_percent*, and *clay_percent* must:
+    -   *sand_percent*, *silt_percent*, and *clay_percent* must:
 
-    -   Be between 0 and 100
+        -   Be between 0 and 100
 
-    -   Sum to 100 (± 1)
+        -   Sum to 100 (± 1)
 
-    -   Include at least two values per sample (the third will be calculated as
-        100 minus the sum of the other two)
+        -   Include at least two values per sample (the third will be calculated
+            as 100 minus the sum of the other two)
 
 -   Delete any columns for measurements not analyzed in your project.
 
@@ -98,8 +105,8 @@ Review the example structure and format your project data to match.
 Use the Data Dictionary to control how measurements appear in the Project
 Results section of the report.
 
--   **measurement_group**: Defines how measurements are grouped into report
-    sections.
+-   **measurement_group**: Defines how measurements are grouped. Groups appear
+    in the report in the order listed in the data dictionary.
 
     -   **Only the following values are currently supported. Custom groups are
         not allowed and will fail validation.**
@@ -111,10 +118,15 @@ Results section of the report.
             químicas, Macronutrientes esenciales para plantas, Micronutrientes
             esenciales para plantas
 
--   **column_name**: Links the Data tab to the Data Dictionary tab. Each
-    measurement column header in the Data tab must have a matching entry here.
+-   **column_name**: Links the Data tab to the Data Dictionary tab. Must exactly
+    match the column names of the soil measurements in your data. Within each
+    measurement group, measurements appear in the order listed in the data
+    dictionary.
 
 -   **abbr**: Abbreviation used in tables and plots. Shorter abbreviations
     improve readability.
 
 -   **unit**: Unit of measurement displayed in tables and plots.
+
+-   **abbr** + **unit**: Combination of abbreviation and unit must be unique for
+    each measurement.
