@@ -343,30 +343,42 @@ safe_rename_texture <- function(df) {
 }
 
 # Calculate averages by crop, county, and project
-crop_summary <- results_long |>
-  dplyr::filter(!is.na(crop)) |>
-  soils::summarize_by_var(producer_samples, var = crop) |>
-  dplyr::mutate(
-    `Field or Average` = gsub("Fields", tr("fields"), `Field or Average`),
-    `Field or Average` = gsub("Average", tr("average"), `Field or Average`)
-  ) |>
-  dplyr::rename(!!tr("field_or_average") := `Field or Average`) |>
-  safe_rename_texture()
+if (!soils::is_column_empty(results_long$crop)) {
+  crop_summary <- results_long |>
+    dplyr::filter(!is.na(crop)) |>
+    soils::summarize_by_var(producer_samples, var = crop) |>
+    dplyr::mutate(
+      `Field or Average` = gsub("Fields", tr("fields"), `Field or Average`),
+      `Field or Average` = gsub("Average", tr("average"), `Field or Average`)
+    ) |>
+    dplyr::rename(!!tr("field_or_average") := `Field or Average`) |>
+    safe_rename_texture()
+}
 
-county_summary <- results_long |>
-  dplyr::filter(!is.na(county)) |>
-  soils::summarize_by_var(producer_samples, var = county) |>
-  dplyr::mutate(
-    `Field or Average` = gsub("Fields", tr("fields"), `Field or Average`),
-    `Field or Average` = gsub("Average", tr("average"), `Field or Average`)
-  ) |>
-  dplyr::rename(!!tr("field_or_average") := `Field or Average`) |>
-  safe_rename_texture()
+if (!soils::is_column_empty(results_long$county)) {
+  county_summary <- results_long |>
+    dplyr::filter(!is.na(county)) |>
+    soils::summarize_by_var(producer_samples, var = county) |>
+    dplyr::mutate(
+      `Field or Average` = gsub("Fields", tr("fields"), `Field or Average`),
+      `Field or Average` = gsub("Average", tr("average"), `Field or Average`)
+    ) |>
+    dplyr::rename(!!tr("field_or_average") := `Field or Average`) |>
+    safe_rename_texture()
+}
 
 project_summary <- soils::summarize_by_project(results_long) |>
   dplyr::mutate(
-    `Field or Average` = gsub("Fields", tr("fields"), `Field or Average`),
-    `Field or Average` = gsub("Project Average", tr("project_average"), `Field or Average`)
+    `Field or Average` = gsub(
+      "Fields",
+      tr("fields"),
+      `Field or Average`
+    ),
+    `Field or Average` = gsub(
+      "Project Average",
+      tr("project_average"),
+      `Field or Average`
+    )
   ) |>
   dplyr::rename(!!tr("field_or_average") := `Field or Average`) |>
   safe_rename_texture()
@@ -387,14 +399,21 @@ producer_table <- producer_samples |>
   safe_rename_texture()
 
 # Bind together into one df and round values to 2 digits
-df_table <- dplyr::bind_rows(
-  producer_table,
-  crop_summary,
-  county_summary,
-  project_summary
+df_table <- c(
+  "producer_table",
+  "crop_summary",
+  "county_summary",
+  "project_summary"
 ) |>
+  # Get the names of the df's that exist
+  purrr::keep(~ exists(.x, envir = environment())) |>
+  # Get the actual df
+  purrr::map(~ get(.x, envir = environment())) |>
+  # Combine into one df
+  dplyr::bind_rows() |>
+  # Round the values
   dplyr::mutate(
-    value = as.numeric(formatC(value, 2, drop0trailing = TRUE))
+    value = as.numeric(base::formatC(value, 2, drop0trailing = TRUE))
   )
 ```
 
