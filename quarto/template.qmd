@@ -226,7 +226,7 @@ measurement_groups <- unique(dictionary$measurement_group)
 ```{r tidy-long}
 # OPTIONAL EDIT: If you have extra metadata columns in `data`, add them to this
 # vector. All other columns are assumed to be quantitative measurements and will
-# be coerced to numeric. Non-numeric values (e.g. "ND", "NA", "", "-", "<1")
+# be converted to numeric. Non-numeric values (e.g. "ND", "NA", "", "-", "<1")
 # will be converted to NA and excluded from tables and plots.
 metadata_cols <- c(
   "year",
@@ -246,9 +246,9 @@ measurement_cols <- data |>
   dplyr::select(-dplyr::any_of(metadata_cols)) |>
   colnames()
 
-# Coerce measurement columns to numeric. This will emit a warning of which
-# columns have coerced a value to NA.
-data <- soils::coerce_to_numeric(data, measurement_cols)
+# Convert measurement columns to numeric. This will emit a warning of which
+# columns have converted a value to NA.
+data <- soils::convert_to_numeric(data, measurement_cols)
 
 # Tidy data into long format and join with data dictionary
 results_long <- data |>
