@@ -174,14 +174,40 @@ distinct_selected_measure_types <- selected_measures |>
   dplyr::pull(section_name)
 
 ### READ IN DATA FILE
-data <- readxl::read_xlsx(params$data_file, sheet = "Data")
+data <- readxl::read_xlsx(params$data_file, sheet = "Data") |>
+  # Make sure sample_id and field_id are character
+  dplyr::mutate(dplyr::across(c(sample_id, field_id), as.character))
 
-dictionary <- readxl::read_xlsx(params$data_file, sheet = "Data Dictionary") |>
+dictionary <- readxl::read_xlsx(params$data_file, sheet = "Data Dictionary")
+```
+
+<!-- Texture validation and classification -->
+
+```{r texture-validate-classify}
+# Validate and classify soil texture (requires at least two of:
+# sand_percent, silt_percent, clay_percent)
+data <- soils::classify_texture(data)
+
+# Add texture and fraction rows to the dictionary if created during classification
+dictionary <- soils::sync_dictionary_texture(
+  data,
+  dictionary,
+  language = stringr::str_to_title(params$language)
+)
+```
+
+<!-- Format measurement labels and set ordering -->
+
+```{r process-dictionary}
+dictionary <- dictionary |>
   dplyr::mutate(
     # Concatenate abbr and unit with html break for the table and plot labels
-    abbr_unit = glue::glue("{abbr}<br>{unit}"),
-    # Remove NA if unit is blank
-    abbr_unit = gsub("<br>NA", "", abbr_unit),
+    abbr_unit = dplyr::if_else(
+      is.na(unit) | unit == "",
+      abbr,
+      glue::glue("{abbr}<br>{unit}")
+    ),
+    ,
     # Set the order of how measurement groups will appear within the report
     # based on the order found in the data dictionary
     group_order = dplyr::cur_group_id(),
@@ -195,23 +221,39 @@ dictionary <- readxl::read_xlsx(params$data_file, sheet = "Data Dictionary") |>
 measurement_groups <- unique(dictionary$measurement_group)
 ```
 
+<!-- Pivot data longer and join with data dictionary -->
 
 ```{r tidy-long}
-# Tidy data and join with dictionary
-num_cols <- ncol(data)
+# OPTIONAL EDIT: If you have extra metadata columns in `data`, add them to this
+# vector. All other columns are assumed to be quantitative measurements and will
+# be coerced to numeric. Non-numeric values (e.g. "ND", "NA", "", "-", "<1")
+# will be converted to NA and excluded from tables and plots.
+metadata_cols <- c(
+  "year",
+  "sample_id",
+  "farm_name",
+  "producer_id",
+  "field_id",
+  "county",
+  "crop",
+  "longitude",
+  "latitude",
+  "texture"
+)
+
+# Get measurement columns
+measurement_cols <- data |>
+  dplyr::select(-dplyr::any_of(metadata_cols)) |>
+  colnames()
+
+# Coerce measurement columns to numeric. This will emit a warning of which
+# columns have coerced a value to NA.
+data <- soils::coerce_to_numeric(data, measurement_cols)
 
 # Tidy data into long format and join with data dictionary
 results_long <- data |>
-  dplyr::mutate(
-    dplyr::across(
-      # EDIT: replace with the column range of your soil measurements
-      11:num_cols,
-      as.numeric
-    )
-  ) |>
   tidyr::pivot_longer(
-    # EDIT: replace with the column range of your soil measurements
-    cols = 11:num_cols,
+    cols = dplyr::all_of(measurement_cols),
     names_to = "measurement"
   ) |>
   dplyr::inner_join(dictionary, by = c("measurement" = "column_name")) |>
@@ -282,46 +324,53 @@ results_long <- results_long |>
 
 ```{r prep-gis-df}
 # Prep data for GIS table and map
-gis_df <- soils::prep_for_map(
-  producer_samples,
-  label_heading = field_id,
-  # If crop is empty, omit from popup
-  label_body = ifelse(!is.na(crop), crop, "")
-)
+gis_df <- producer_samples |>
+  dplyr::distinct(sample_id, .keep_all = TRUE) |>
+  dplyr::arrange(field_id) |>
+  soils::prep_for_map(
+    label_heading = field_id,
+    # If crop is empty, omit from popup
+    label_body = ifelse(!is.na(crop), crop, "")
+  )
 ```
 
 
 ```{r calculate-averages}
-# Calculate averages by crop, county, and project
-crop_summary <- results_long |>
-  dplyr::filter(!is.na(crop)) |>
-  soils::summarize_by_var(
-    producer_samples,
-    var = crop
-  ) |>
-  dplyr::mutate(
-    `Field or Average` = gsub("Fields", tr("fields"), `Field or Average`),
-    `Field or Average` = gsub("Average", tr("average"), `Field or Average`)
-  ) |>
-  dplyr::rename(
-    !!tr("field_or_average") := `Field or Average`,
-    !!tr("texture") := Texture
-  )
+# Helper to rename texture if it exists
+safe_rename_texture <- function(df) {
+  if ("Texture" %in% colnames(df)) {
+    df <- dplyr::rename(df, !!tr("texture") := Texture)
+  }
+  if ("texture" %in% colnames(df)) {
+    df <- dplyr::rename(df, !!tr("texture") := texture)
+  }
+  df
+}
 
-county_summary <- results_long |>
-  dplyr::filter(!is.na(county)) |>
-  soils::summarize_by_var(
-    producer_samples,
-    var = county
-  ) |>
-  dplyr::mutate(
-    `Field or Average` = gsub("Fields", tr("fields"), `Field or Average`),
-    `Field or Average` = gsub("Average", tr("average"), `Field or Average`)
-  ) |>
-  dplyr::rename(
-    !!tr("field_or_average") := `Field or Average`,
-    !!tr("texture") := Texture
-  )
+# Calculate averages by crop, county, and project
+if (!soils::is_column_empty(results_long$crop)) {
+  crop_summary <- results_long |>
+    dplyr::filter(!is.na(crop)) |>
+    soils::summarize_by_var(producer_samples, var = crop) |>
+    dplyr::mutate(
+      `Field or Average` = gsub("Fields", tr("fields"), `Field or Average`),
+      `Field or Average` = gsub("Average", tr("average"), `Field or Average`)
+    ) |>
+    dplyr::rename(!!tr("field_or_average") := `Field or Average`) |>
+    safe_rename_texture()
+}
+
+if (!soils::is_column_empty(results_long$county)) {
+  county_summary <- results_long |>
+    dplyr::filter(!is.na(county)) |>
+    soils::summarize_by_var(producer_samples, var = county) |>
+    dplyr::mutate(
+      `Field or Average` = gsub("Fields", tr("fields"), `Field or Average`),
+      `Field or Average` = gsub("Average", tr("average"), `Field or Average`)
+    ) |>
+    dplyr::rename(!!tr("field_or_average") := `Field or Average`) |>
+    safe_rename_texture()
+}
 
 project_summary <- soils::summarize_by_project(results_long) |>
   dplyr::mutate(
@@ -336,10 +385,8 @@ project_summary <- soils::summarize_by_project(results_long) |>
       `Field or Average`
     )
   ) |>
-  dplyr::rename(
-    !!tr("field_or_average") := `Field or Average`,
-    !!tr("texture") := Texture
-  )
+  dplyr::rename(!!tr("field_or_average") := `Field or Average`) |>
+  safe_rename_texture()
 ```
 
 ```{r combine-producer-and-summarize}
@@ -350,66 +397,87 @@ producer_table <- producer_samples |>
     abbr,
     value,
     !!tr("field_or_average") := field_id,
-    Textura = texture
-  )
+    dplyr::any_of(
+      if ("texture" %in% names(producer_samples)) "texture" else NULL
+    )
+  ) |>
+  safe_rename_texture()
 
 # Bind together into one df and round values to 2 digits
-df_table <- dplyr::bind_rows(
-  producer_table,
-  crop_summary,
-  county_summary,
-  project_summary
+df_table <- c(
+  "producer_table",
+  "crop_summary",
+  "county_summary",
+  "project_summary"
 ) |>
+  # Get the names of the df's that exist
+  purrr::keep(~ exists(.x, envir = environment())) |>
+  # Get the actual df
+  purrr::map(~ get(.x, envir = environment())) |>
+  # Combine into one df
+  dplyr::bind_rows() |>
+  # Round the values
   dplyr::mutate(
-    value = as.numeric(formatC(value, 2, drop0trailing = TRUE))
+    value = as.numeric(base::formatC(value, 2, drop0trailing = TRUE))
   )
 ```
 
 ```{r split-into-groups}
 # Split into list with each measurement group as its own df and pivot wider
-groups <- df_table |>
+tables <- df_table |>
   split(df_table$measurement_group) |>
   purrr::map(\(x) {
+    # Only include texture if present
+    id_cols <- if (tr("texture") %in% names(x)) {
+      c(tr("field_or_average"), tr("texture"))
+    } else {
+      tr("field_or_average")
+    }
+
     tidyr::pivot_wider(
       x,
-      id_cols = c(tr("field_or_average"), tr("texture")),
+      id_cols = dplyr::all_of(id_cols),
       names_from = abbr
     )
   })
 ```
 
-```{r physical-group-tweaks}
+```{r physical-group-texture}
 # Special wrangling for texture
 
-# Extract physical df from averages list
-physical <- setNames(
-  list(groups[[tr("physical_group")]]),
-  tr("physical_group")
-)
+# Only proceed if texture exists in any dataframe
+if (any(purrr::map_lgl(tables, ~ tr("texture") %in% names(.x)))) {
+  # Extract physical df from averages list
+  if (tr("physical_group") %in% names(tables)) {
+    physical <- setNames(
+      list(tables[[tr("physical_group")]]),
+      tr("physical_group")
+    )
+  } else {
+    physical <- list()
+  }
 
-# Remove texture from all dataframes except physical
-groups <- purrr::map(
-  subset(
-    groups,
-    !(names(groups) == tr("physical_group"))
-  ),
-  \(x) dplyr::select(x, -!!tr("texture"))
-)
+  # Remove texture from all dataframes except physical
+  tables <- purrr::map(
+    subset(
+      tables,
+      !(names(tables) == tr("physical_group"))
+    ),
+    \(x) dplyr::select(x, -!!tr("texture"))
+  )
 
-# Add physical df back to the averages list
-groups <- c(groups, physical)
-
-# Remove this intermediate variable from env
-rm(physical)
+  # Add physical df back to the averages list
+  tables <- c(tables, physical)
+}
 ```
 
 ```{r remove-rows-with-one-observation}
 # Delete any county or crop averages where n = 1 or county/crop is blank.
 
-# e.g. ^1 Fields)|NA or ^1 Campos)|NA
-search <- paste0("(^1 ", tr("fields"), ")|NA")
+# e.g. (1 Fields)|NA or (1 Campos)|NA
+search <- paste0("\\(1 ", tr("fields"), ")|NA")
 
-tables <- groups |>
+tables <- tables |>
   purrr::map(~ dplyr::filter(.x, !grepl(search, !!sym(tr("field_or_average")))))
 
 # Order list of tables based on how they appear in dictionary. Important that
@@ -443,6 +511,9 @@ table_list <- list2DF(
 ) |>
   purrr::pmap(\(table, header) {
     soils::make_ft(table, header) |>
+      soils::add_field_count_note(
+        language = stringr::str_to_title(params$language)
+      ) |>
       soils::format_ft_colors(
         lighter_color = lighter_color,
         darker_color = darker_color,
@@ -509,12 +580,6 @@ df_plot <- df_plot[order(df_plot$category, decreasing = TRUE), ]
 
 
 ```{r prep-texture-triangle}
-# Make sure dataset has sand, silt, and clay measurements
-texture <- dplyr::filter(
-  producer_samples,
-  abbr %in% c(tr("sand"), tr("silt"), tr("clay"))
-)
-
 # Select only the texture variables from the plot df and pivot so each texture
 # is in its own column
 texture_df <- df_plot |>
@@ -532,22 +597,21 @@ texture_df <- df_plot |>
     dplyr::contains("silt"),
     dplyr::contains("clay"),
     category
-  )
+  ) |>
+  # Filter out incomplete rows
+  tidyr::drop_na()
 
 # Split by category then drop category column
 texture_list <- split(texture_df, texture_df$category) |>
   purrr::map(\(df) dplyr::select(df, -category))
 
-# Does producer have sand, silt, and clay for at least 1 sample?
-producer_texture <- texture_df |>
+# Make texture triangle only if producer has sand, silt, and clay for at least
+# one sample
+make_tt <- texture_df |>
   dplyr::filter(category == tr("your_fields")) |>
-  dplyr::select(-category)
-
-make_tt <- all(grepl(
-  "sand|silt|clay",
-  colnames(producer_texture),
-  ignore.case = TRUE
-)) & ncol(producer_texture) == 3
+  soils::has_complete_row(
+    c("sand_percent", "silt_percent", "clay_percent")
+  )
 ```
 
 ```{r make-texture-triangle}
@@ -581,7 +645,7 @@ if (make_tt) {
     size = 1.36
   )
 
-  # Next add points for sampe crop
+  # Next add points for same crop
   soils::add_texture_points(
     texture_list[[tr("same_crop")]],
     color = glue::glue("#918D8D", "CC"),
@@ -866,19 +930,19 @@ gis_ft <- gis_df |>
     !!tr("crop") := crop,
     !!tr("longitude") := longitude,
     !!tr("latitude") := latitude
-  ) |> 
+  ) |>
   dplyr::distinct()
 
 # If crop is empty, remove the column from the printed table
-if (all(is.na(gis_ft[[tr("crop")]]))) {
-  gis_ft <- gis_ft |>
-    dplyr::select(-dplyr::all_of(tr("crop")))
+if (soils::is_column_empty(gis_ft[[tr("crop")]])) {
+  gis_ft <- gis_ft |> dplyr::select(-c(tr("crop")))
 }
+
 # If longitude or latitude are empty, remove the columns from the printed table
-if (all(is.na(gis_ft[[tr("longitude")]])) |
-  all(is.na(gis_ft[[tr("latitude")]]))) {
+if (soils::is_column_empty(gis_ft[[tr("longitude")]]) ||
+  soils::is_column_empty(gis_ft[[tr("latitude")]])) {
   gis_ft <- gis_ft |>
-    dplyr::select(-dplyr::any_of(c(tr("longitude"), tr("latitude"))))
+    dplyr::select(-(c(tr("longitude"), tr("latitude"))))
 }
 
 gis_ft |>
@@ -897,8 +961,8 @@ gis_ft |>
 ```{r html-map}
 #| eval: !expr out_type == "html"
 
-if (!NA %in% gis_df$longitude & !NA %in% gis_df$latitude) {
-  soils::make_leaflet(
+if (soils::has_complete_row(gis_df, c("latitude", "longitude"))) {
+  soils::make_interactive_map(
     gis_df,
     primary_color = primary_color
   )
@@ -909,41 +973,14 @@ if (!NA %in% gis_df$longitude & !NA %in% gis_df$latitude) {
 #| eval: !expr out_type == "docx"
 #| out-width: 6in
 
-if (!NA %in% gis_df$longitude & !NA %in% gis_df$latitude) {
-  df_sf <- sf::st_as_sf(
-    x = gis_df,
-    coords = c("longitude", "latitude"),
-    crs = "+proj=lonlat"
-  ) |>
-    sf::st_transform(3857)
-
-  # override get_zoom within get_tiles to avoid issue when total_tiles is less
-  # than 4. this grabs the max zoom with with < 10 tiles
-  res <- maptiles:::get_bbox_and_proj(df_sf)
-  gz <- slippymath::bbox_tile_query(res$bbox_lonlat)
-  zoom <- max(gz[gz$total_tiles < 10, "zoom"])
-
-  basetiles <- maptiles::get_tiles(
-    df_sf,
-    zoom = zoom,
+if (soils::has_complete_row(gis_df, c("latitude", "longitude"))) {
+  map <- soils::make_static_map(
+    gis_df,
+    label = field_id,
     provider = "Esri.WorldImagery",
-    cachedir = tempdir(),
-    retina = TRUE
+    body_font = body_font,
+    primary_color = primary_color
   )
-
-  map <- ggplot2::ggplot(df_sf) +
-    tidyterra::geom_spatraster_rgb(data = basetiles) +
-    ggplot2::geom_sf(color = primary_color, size = 3) +
-    ggrepel::geom_label_repel(
-      ggplot2::aes(label = field_id, geometry = geometry),
-      stat = "sf_coordinates",
-      family = body_font,
-      size = 3,
-      point.padding = 2,
-      min.segment.length = 0
-    ) +
-    ggplot2::coord_sf(crs = 3857) +
-    ggplot2::theme_void()
 
   ggplot2::ggsave(glue::glue("{path}/map.png"), map, dpi = 300)
 
