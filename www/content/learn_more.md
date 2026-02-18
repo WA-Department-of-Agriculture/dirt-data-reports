@@ -41,6 +41,10 @@ Soil scientists at Washington State Department of Agriculture (WSDA) and Washing
     -   An interactive HTML file that can be opened in a computer browser
 
     -   A static Microsoft Word document that can be printed or viewed on a computer
+    
+## **Does this tool store my data?**
+
+No. This application does **not** store any data you upload or enter. All inputs are processed in your browser session to generate reports. When you close the browser or refresh the page, your data are gone.
 
 ## **How can I further customize these reports?**
 
