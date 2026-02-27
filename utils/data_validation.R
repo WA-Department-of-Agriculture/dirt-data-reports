@@ -1,522 +1,527 @@
-library(rlang)
+# ============================================================================
+# data_validation.R — POC for soils package validation pattern
+#
+# This file demonstrates the proposed architecture for validation functions
+# that serve both CLI (soils package) and UI (Shiny app) consumers.
+#
+# Organization:
+#   1. Utilities  — new_issue(), format_output(), split_issues()
+#   2. Gate check — check_file_readable()
+#   3. Checks     — one function per validation check
+#
+# PROPOSED FOR SOILS PACKAGE: Everything in this file would eventually live
+# in the soils package as individual exported functions (one file per
+# function). The Shiny app would call them with output = "ui".
+#
+# For the POC, source this file and use the demo script to see both outputs.
+# ============================================================================
 
-validate_uniqueness <- function(data, req_fields) {
-  error_list <- list()
+# --- 1. Utilities -----------------------------------------------------------
 
-  unique_checks <- req_fields |> dplyr::filter(unique_by != "-")
+#' Create a validation issue
+#'
+#' @param severity "error" or "warning"
+#' @param message A character string describing the issue
+#'
+#' @return A named list with severity and message.
+new_issue <- function(severity = c("error", "warning"), message) {
+  severity <- match.arg(severity)
+  list(severity = severity, message = message)
+}
+
+#' Format validation issues for CLI or UI output
+#'
+#' For CLI: errors trigger cli_abort(), warnings trigger cli_warn().
+#' For UI: ANSI codes are stripped, issue list is returned with clean strings.
+#'
+#' @param issues List of issues created by new_issue().
+#' @param output "cli" (default) for console, "ui" for Shiny.
+#'
+#' @return For "ui", cleaned issue list. For "cli", invisible after
+#'   printing/aborting.
+format_output <- function(issues, output = c("cli", "ui")) {
+  output <- match.arg(output)
+
+  if (length(issues) == 0) return(issues)
+
+  if (output == "cli") {
+    errors <- Filter(\(x) x$severity == "error", issues)
+    warnings <- Filter(\(x) x$severity == "warning", issues)
+
+    if (length(errors) > 0) {
+      bullets <- cli::ansi_strip(
+        vapply(errors, \(x) x$message, character(1))
+      )
+      names(bullets) <- rep("*", length(bullets))
+      cli::cli_abort(c("x" = "Data validation failed.", bullets))
+    }
+
+    if (length(warnings) > 0) {
+      bullets <- cli::ansi_strip(
+        vapply(warnings, \(x) x$message, character(1))
+      )
+      names(bullets) <- rep("*", length(bullets))
+      cli::cli_warn(c(
+        "!" = "Data validation completed with warnings.",
+        bullets
+      ))
+    }
+
+    return(invisible(issues))
+  }
+
+  # UI: strip ANSI codes from messages
+  lapply(issues, \(x) {
+    x$message <- cli::ansi_strip(x$message)
+    x
+  })
+}
+
+#' Split validation issues into errors and warnings
+#'
+#' @param issues List of issues created by new_issue().
+#'
+#' @return Named list with $errors and $warnings.
+split_issues <- function(issues) {
+  list(
+    errors   = Filter(\(x) x$severity == "error", issues),
+    warnings = Filter(\(x) x$severity == "warning", issues)
+  )
+}
+
+
+# --- 2. Gate check ----------------------------------------------------------
+
+#' Check that a file is readable and return loaded data
+#'
+#' Runs the blocking checks in sequence: required sheets exist, no duplicate
+#' headers, both sheets load, and data has rows. If all pass, returns the
+#' loaded data frames. If any fail, returns the issue list.
+#'
+#' @param file Path to the .xlsx file.
+#' @param output "cli" (default) or "ui".
+#'
+#' @return On success: a named list with $data and $data_dict data frames.
+#'   On failure: a list of issues (same structure as other check functions).
+#'   Use is_gate_pass() to check which one you got back.
+check_file_readable <- function(file, output = c("cli", "ui")) {
+  output <- match.arg(output)
+  issues <- list()
+
+  # Check 1: Required sheets
+  sheets <- readxl::excel_sheets(file)
+  required <- c("Data", "Data Dictionary")
+  missing <- setdiff(required, sheets)
+
+  if (length(missing) > 0) {
+    msg <- cli::format_inline("Missing required sheets: {.val {missing}}")
+    issues <- c(issues, list(new_issue("error", msg)))
+    return(format_output(issues, output))
+  }
+
+  # Check 2: Duplicate headers in Data sheet
+  tryCatch({
+    headers <- as.character(
+      readxl::read_xlsx(file, sheet = "Data", col_names = FALSE, n_max = 1)[1, ]
+    )
+    headers <- headers[!is.na(headers)]
+    dups <- unique(headers[duplicated(headers)])
+
+    if (length(dups) > 0) {
+      msg <- cli::format_inline(
+        "Duplicate column headers in Data sheet: {.val {dups}}"
+      )
+      issues <- c(issues, list(new_issue("error", msg)))
+    }
+  }, error = function(e) NULL)
+
+  # Check 2b: Duplicate headers in Data Dictionary sheet
+  tryCatch({
+    headers <- as.character(
+      readxl::read_xlsx(
+        file, sheet = "Data Dictionary", col_names = FALSE, n_max = 1
+      )[1, ]
+    )
+    headers <- headers[!is.na(headers)]
+    dups <- unique(headers[duplicated(headers)])
+
+    if (length(dups) > 0) {
+      msg <- cli::format_inline(
+        "Duplicate column headers in Data Dictionary sheet: {.val {dups}}"
+      )
+      issues <- c(issues, list(new_issue("error", msg)))
+    }
+  }, error = function(e) NULL)
+
+  if (length(issues) > 0) return(format_output(issues, output))
+
+  # Check 3: Load both sheets
+  data <- tryCatch(
+    readxl::read_excel(file, sheet = "Data"),
+    error = function(e) NULL
+  )
+  data_dict <- tryCatch(
+    readxl::read_excel(file, sheet = "Data Dictionary"),
+    error = function(e) NULL
+  )
+
+  if (is.null(data) || is.null(data_dict)) {
+    msg <- cli::format_inline(
+      "Could not read Data or Data Dictionary sheet."
+    )
+    issues <- c(issues, list(new_issue("error", msg)))
+    return(format_output(issues, output))
+  }
+
+  # Check 4: Data has rows
+  if (nrow(data) == 0) {
+    msg <- cli::format_inline(
+      "The Data sheet contains headers but no data rows. Please add your measurement data."
+    )
+    issues <- c(issues, list(new_issue("error", msg)))
+    return(format_output(issues, output))
+  }
+
+  # All gates passed — return the loaded data
+  list(data = data, data_dict = data_dict)
+}
+
+#' Check if the gate returned loaded data (pass) or issues (fail)
+#'
+#' @param gate_result The return value from check_file_readable().
+#'
+#' @return TRUE if the gate passed (data frames returned), FALSE if issues.
+is_gate_pass <- function(gate_result) {
+  !is.null(gate_result$data) && !is.null(gate_result$data_dict)
+}
+
+
+# --- 3. Independent checks (ERRORS) ----------------------------------------
+
+#' Check 3: Required columns in Data
+check_required_columns <- function(data, req_fields_data, output = c("cli", "ui")) {
+  output <- match.arg(output)
+  issues <- list()
+
+  required <- req_fields_data$var
+  missing <- setdiff(required, colnames(data))
+
+  if (length(missing) > 0) {
+    msg <- cli::format_inline(
+      "Missing required columns in Data: {.val {missing}}"
+    )
+    issues <- c(issues, list(new_issue("error", msg)))
+  }
+
+  format_output(issues, output)
+}
+
+#' Check 4: Required fields in Data Dictionary
+check_required_dict_fields <- function(data_dict, req_fields_dd,
+                                       output = c("cli", "ui")) {
+  output <- match.arg(output)
+  issues <- list()
+
+  required <- req_fields_dd$var
+  missing <- setdiff(required, colnames(data_dict))
+
+  if (length(missing) > 0) {
+    msg <- cli::format_inline(
+      "Missing required fields in Data Dictionary: {.val {missing}}"
+    )
+    issues <- c(issues, list(new_issue("error", msg)))
+  }
+
+  format_output(issues, output)
+}
+
+#' Check 5: Uniqueness constraints
+check_uniqueness <- function(data, req_fields_data, output = c("cli", "ui")) {
+  output <- match.arg(output)
+  issues <- list()
+
+  unique_checks <- req_fields_data |> dplyr::filter(unique_by != "-")
 
   for (i in seq_len(nrow(unique_checks))) {
     var_name <- unique_checks$var[i]
 
-    # Improved parsing to handle R syntax: c("var1", "var2") and simple comma-separated: var1, var2
     group_by_vars <- if (
       stringr::str_detect(unique_checks$unique_by[i], "^c\\(")
     ) {
-      # Handle R syntax: c("var1", "var2")
-      stringr::str_extract_all(unique_checks$unique_by[i], '"([^"]+)"')[[1]] %>%
+      stringr::str_extract_all(
+        unique_checks$unique_by[i], '"([^"]+)"'
+      )[[1]] |>
         stringr::str_remove_all('"')
     } else {
-      # Handle simple comma-separated: var1, var2
       stringr::str_split(unique_checks$unique_by[i], ",\\s*")[[1]]
     }
 
-    # Ensure all columns exist in the data
     if (
-      var_name %in% colnames(data) && all(group_by_vars %in% colnames(data))
+      !var_name %in% colnames(data) ||
+        !all(group_by_vars %in% colnames(data))
     ) {
-      if (length(group_by_vars) == 1 && group_by_vars == var_name) {
-        # Case where var_name itself must be unique (e.g., sample_id is globally unique)
-        duplicates <- data %>%
-          dplyr::count(!!sym(var_name)) %>%
-          dplyr::filter(n > 1)
+      next
+    }
 
-        if (nrow(duplicates) > 0) {
-          error_list[[var_name]] <- paste(
-            "Duplicate values found in",
-            var_name,
-            "which should be unique:",
-            paste(duplicates[[var_name]], collapse = ", ")
-          )
-        }
-      } else {
-        # Case where var_name must be unique within a grouping of multiple columns
-        # Check for actual duplicates within each group
-        duplicates <- data %>%
-          dplyr::group_by(dplyr::across(dplyr::all_of(group_by_vars))) %>%
-          dplyr::add_count(!!sym(var_name), name = "field_count") %>%
-          dplyr::filter(field_count > 1) %>%
-          dplyr::distinct(dplyr::across(dplyr::all_of(c(
-            group_by_vars,
-            var_name
-          )))) %>%
-          dplyr::ungroup()
+    if (length(group_by_vars) == 1 && group_by_vars == var_name) {
+      # Globally unique
+      duplicates <- data |>
+        dplyr::count(!!rlang::sym(var_name)) |>
+        dplyr::filter(n > 1)
 
-        if (nrow(duplicates) > 0) {
-          # Create a readable summary of the groups with duplicates
-          dup_summary <- duplicates %>%
-            dplyr::group_by(dplyr::across(dplyr::all_of(group_by_vars))) %>%
-            dplyr::summarise(
-              duplicate_values = paste(
-                unique(!!sym(var_name)),
-                collapse = ", "
-              ),
-              .groups = "drop"
-            )
+      if (nrow(duplicates) > 0) {
+        dup_vals <- duplicates[[var_name]]
+        msg <- cli::format_inline(
+          "Duplicate values in {.field {var_name}} (must be unique): {.val {head(dup_vals, 5)}}"
+        )
+        issues <- c(issues, list(new_issue("error", msg)))
+      }
 
-          error_list[[var_name]] <- paste(
-            "Duplicate values found in",
-            var_name,
-            "within grouping of",
-            paste(group_by_vars, collapse = ", "),
-            ". Affected groups:",
-            paste(
-              apply(dup_summary, 1, function(row) {
-                paste(
-                  "(",
-                  paste(
-                    group_by_vars,
-                    "=",
-                    row[group_by_vars],
-                    collapse = ", "
-                  ),
-                  ") has duplicate",
-                  var_name,
-                  "values:",
-                  row[["duplicate_values"]]
-                )
-              }),
-              collapse = "; "
-            )
-          )
-        }
+    } else {
+      # Unique within groups
+      duplicates <- data |>
+        dplyr::group_by(dplyr::across(dplyr::all_of(group_by_vars))) |>
+        dplyr::add_count(!!rlang::sym(var_name), name = "field_count") |>
+        dplyr::filter(field_count > 1) |>
+        dplyr::distinct(
+          dplyr::across(dplyr::all_of(c(group_by_vars, var_name)))
+        ) |>
+        dplyr::ungroup()
+
+      if (nrow(duplicates) > 0) {
+        group_str <- paste(group_by_vars, collapse = ", ")
+        msg <- cli::format_inline(
+          "Duplicate values in {.field {var_name}} within grouping ({group_str}). {nrow(duplicates)} duplicate row{?s} found."
+        )
+        issues <- c(issues, list(new_issue("error", msg)))
       }
     }
   }
 
-  return(error_list)
+  format_output(issues, output)
 }
 
-validate_measurement_groups <- function(data_dict, language) {
-  # Named list of valid measurement groups by language
+#' Check 7: Data types match requirements
+check_data_types <- function(data, req_fields_data, output = c("cli", "ui")) {
+  output <- match.arg(output)
+  issues <- list()
+
+  map_r_type <- function(data_type) {
+    dplyr::case_when(
+      data_type == "int"    ~ "integer",
+      data_type == "double" ~ "double",
+      data_type == "char"   ~ "character",
+      data_type == "-"      ~ "any",
+      TRUE                  ~ "unknown"
+    )
+  }
+
+  check_fields <- req_fields_data |>
+    dplyr::filter(var %in% colnames(data), var_type != "-")
+
+  if (nrow(check_fields) == 0) return(format_output(issues, output))
+
+  non_blank <- sapply(
+    data[check_fields$var],
+    \(col) !all(is.na(col))
+  )
+
+  if (!any(non_blank)) return(format_output(issues, output))
+
+  actual_types <- sapply(
+    data[, names(non_blank)[non_blank], drop = FALSE],
+    typeof
+  )
+
+  mismatched <- check_fields |>
+    dplyr::filter(var %in% names(actual_types)) |>
+    dplyr::filter(map_r_type(var_type) != actual_types[var]) |>
+    dplyr::mutate(actual_type = actual_types[var])
+
+  if (nrow(mismatched) > 0) {
+    for (i in seq_len(nrow(mismatched))) {
+      r <- mismatched[i, ]
+      msg <- cli::format_inline(
+        "{.field {r$var}} has wrong data type (expected {.val {r$var_type}}, found {.val {r$actual_type}})."
+      )
+      issues <- c(issues, list(new_issue("error", msg)))
+    }
+  }
+
+  format_output(issues, output)
+}
+
+#' Check 8: Missing values in required columns
+check_missing_values <- function(data, req_fields_data,
+                                 output = c("cli", "ui")) {
+  output <- match.arg(output)
+  issues <- list()
+
+  required_cols <- req_fields_data |>
+    dplyr::filter(missing_allowed == "FALSE") |>
+    dplyr::filter(var %in% colnames(data)) |>
+    dplyr::pull(var)
+
+  for (col in required_cols) {
+    n_missing <- sum(is.na(data[[col]]))
+
+    if (n_missing > 0) {
+      msg <- cli::format_inline(
+        "{.field {col}} has {n_missing} missing value{?s}. This column does not allow blank values."
+      )
+      issues <- c(issues, list(new_issue("error", msg)))
+    }
+  }
+
+  format_output(issues, output)
+}
+
+
+# --- 3. Independent checks (WARNINGS) --------------------------------------
+
+#' Check 6: Data has at least one column beyond required fields
+check_additional_columns <- function(data, req_fields_data,
+                                     output = c("cli", "ui")) {
+  output <- match.arg(output)
+  issues <- list()
+
+  required <- req_fields_data$var
+  additional <- setdiff(colnames(data), required)
+
+  if (length(additional) < 1) {
+    msg <- cli::format_inline(
+      "The Data sheet has no columns beyond the required fields. Add at least one measurement column."
+    )
+    issues <- c(issues, list(new_issue("warning", msg)))
+  }
+
+  format_output(issues, output)
+}
+
+#' Check 8.5: Percent columns within 0-100
+check_percent_range <- function(data, output = c("cli", "ui")) {
+  output <- match.arg(output)
+  issues <- list()
+  
+  percent_cols <- intersect(
+    c("sand_percent", "silt_percent", "clay_percent"),
+    colnames(data)
+  )
+  
+  for (col in percent_cols) {
+    bad <- !is.na(data[[col]]) & (data[[col]] < 0 | data[[col]] > 100)
+    
+    if (any(bad)) {
+      if ("sample_id" %in% colnames(data)) {
+        bad_ids <- data$sample_id[bad]
+        bad_ids <- bad_ids[!is.na(bad_ids)]
+      } else {
+        bad_ids <- character(0)
+      }
+      
+      if (length(bad_ids) > 0 && length(bad_ids) <= 5) {
+        msg <- cli::format_inline(
+          "{.field {col}} has values outside [0, 100]. Check sample IDs: {.val {bad_ids}}"
+        )
+      } else if (length(bad_ids) > 5) {
+        msg <- cli::format_inline(
+          "{.field {col}} has values outside [0, 100]. {length(bad_ids)} samples are out of range."
+        )
+      } else {
+        msg <- cli::format_inline(
+          "{.field {col}} has values outside [0, 100]. {sum(bad)} row{?s} affected."
+        )
+      }
+      
+      issues <- c(issues, list(new_issue("warning", msg)))
+    }
+  }
+  
+  format_output(issues, output)
+}
+
+
+check_dict_mismatch <- function(data, data_dict, req_fields_data,
+                                output = c("cli", "ui")) {
+  output <- match.arg(output)
+  issues <- list()
+  
+  # Guard: can't run this check without column_name in the dictionary
+  if (!"column_name" %in% colnames(data_dict)) {
+    return(format_output(issues, output))
+  }
+  
+  required <- req_fields_data$var
+  additional <- setdiff(colnames(data), required)
+  dict_names <- data_dict$column_name
+
+  missing_in_dict <- setdiff(additional, dict_names)
+  missing_in_data <- setdiff(dict_names, colnames(data))
+
+  if (length(missing_in_dict) > 0) {
+    msg <- cli::format_inline(
+      "Columns in Data not documented in Data Dictionary: {.val {missing_in_dict}}"
+    )
+    issues <- c(issues, list(new_issue("warning", msg)))
+  }
+
+  if (length(missing_in_data) > 0) {
+    msg <- cli::format_inline(
+      "Columns in Data Dictionary not found in Data: {.val {missing_in_data}}"
+    )
+    issues <- c(issues, list(new_issue("warning", msg)))
+  }
+
+  format_output(issues, output)
+}
+
+#' Check 10: Valid measurement groups
+check_measurement_groups <- function(data_dict, language = "english",
+                                     output = c("cli", "ui")) {
+  output <- match.arg(output)
+  issues <- list()
+
   measurement_groups <- list(
     english = c(
-      "Physical",
-      "Biological",
-      "Chemical",
+      "Physical", "Biological", "Chemical",
       "Plant Essential Macro Nutrients",
       "Plant Essential Micro Nutrients"
     ),
     spanish = c(
-      "Mediciones físicas",
-      "Mediciones biológicas",
-      "Mediciones químicas",
+      "Mediciones f\u00edsicas", "Mediciones biol\u00f3gicas",
+      "Mediciones qu\u00edmicas",
       "Macronutrientes esenciales para plantas",
       "Micronutriente es esenciales para plantas"
     )
   )
 
-  # Normalize language key (just in case)
   language <- tolower(language)
-
   if (!language %in% names(measurement_groups)) {
-    warning(paste("No measurement groups defined for language:", language))
-    return(list())
+    return(format_output(issues, output))
   }
 
-  valid_groups <- enc2native(measurement_groups[[language]])
+  valid <- enc2native(measurement_groups[[language]])
 
   if (!"measurement_group" %in% colnames(data_dict)) {
-    return(list(
-      measurement_groups = "Missing 'measurement_group' column in Data Dictionary"
-    ))
-  }
-
-  actual_groups <- data_dict$measurement_group[
-    !is.na(data_dict$measurement_group)
-  ]
-  actual_groups <- enc2native(actual_groups)
-
-  invalid_groups <- setdiff(actual_groups, valid_groups)
-
-  if (length(invalid_groups) > 0) {
-    error_msg <- paste(
-      "Invalid measurement_group values found in Data Dictionary:",
-      paste(invalid_groups, collapse = ", "),
-      ". Valid options for",
-      stringr::str_to_title(language),
-      "are:",
-      paste(valid_groups, collapse = ", ")
+    msg <- cli::format_inline(
+      "Missing {.field measurement_group} column in Data Dictionary."
     )
-    return(list(measurement_groups = error_msg))
+    issues <- c(issues, list(new_issue("warning", msg)))
+    return(format_output(issues, output))
   }
 
-  return(list())
-}
-
-check_raw_duplicate_headers <- function(file) {
-  duplicate_info <- list(
-    data_duplicates = character(0),
-    dict_duplicates = character(0),
-    has_duplicates = FALSE
+  actual <- enc2native(
+    data_dict$measurement_group[!is.na(data_dict$measurement_group)]
   )
+  invalid <- setdiff(actual, valid)
 
-  # Check Data sheet headers
-  tryCatch(
-    {
-      data_headers <- read_xlsx(
-        file,
-        sheet = "Data",
-        col_names = FALSE,
-        n_max = 1
-      )
-      data_headers <- as.character(data_headers[1, ])
-      data_headers <- data_headers[!is.na(data_headers)] # Remove NA headers
-
-      data_dups <- data_headers[duplicated(data_headers)]
-      if (length(data_dups) > 0) {
-        duplicate_info$data_duplicates <- unique(data_dups)
-        duplicate_info$has_duplicates <- TRUE
-      }
-    },
-    error = function(e) {
-      # If can't read, we'll catch this later in main validation
-    }
-  )
-
-  # Check Data Dictionary sheet headers
-  tryCatch(
-    {
-      dict_headers <- readxl::read_xlsx(
-        file,
-        sheet = "Data Dictionary",
-        col_names = FALSE,
-        n_max = 1
-      )
-      dict_headers <- as.character(dict_headers[1, ])
-      dict_headers <- dict_headers[!is.na(dict_headers)] # Remove NA headers
-
-      dict_dups <- dict_headers[duplicated(dict_headers)]
-      if (length(dict_dups) > 0) {
-        duplicate_info$dict_duplicates <- unique(dict_dups)
-        duplicate_info$has_duplicates <- TRUE
-      }
-    },
-    error = function(e) {
-      # If can't read, we'll catch this later in main validation
-    }
-  )
-
-  return(duplicate_info)
-}
-
-validate_data_file <- function(file, req_fields, language = "english") {
-  req_fields_data <- req_fields |> dplyr::filter(sheet == "Data")
-  req_fields_dd <- req_fields |> dplyr::filter(sheet == "Data Dictionary")
-
-  error_list <- list()
-
-  ### Check 1: Does the xlsx file have 'Data' and 'Data Dictionary' tabs?
-  sheets_present <- readxl::excel_sheets(file)
-  required_sheets <- c("Data", "Data Dictionary")
-  check1 <- all(required_sheets %in% sheets_present)
-
-  if (!check1) {
-    error_list$check1 <-
-      paste(
-        "Missing sheets:",
-        paste(setdiff(required_sheets, sheets_present), collapse = ", ")
-      )
-    return(error_list) # Critical failure, stop further checks
-  }
-
-  ### Check 2: Check for duplicate column headers in raw Excel file
-  duplicate_info <- check_raw_duplicate_headers(file)
-  duplicated_columns <- character(0) # Track which columns have duplicates for later checks
-
-  if (duplicate_info$has_duplicates) {
-    dup_errors <- list()
-
-    if (length(duplicate_info$data_duplicates) > 0) {
-      dup_errors$duplicate_data_headers <- paste(
-        "Duplicate column headers found in Data sheet:",
-        paste(duplicate_info$data_duplicates, collapse = ", ")
-      )
-      duplicated_columns <- c(
-        duplicated_columns,
-        duplicate_info$data_duplicates
-      )
-    }
-
-    if (length(duplicate_info$dict_duplicates) > 0) {
-      dup_errors$duplicate_dict_headers <- paste(
-        "Duplicate column headers found in Data Dictionary sheet:",
-        paste(duplicate_info$dict_duplicates, collapse = ", ")
-      )
-    }
-
-    error_list$check2 <- dup_errors
-    return(error_list) # Critical failure, stop further checks
-  }
-
-  # Load the sheets (readxl will auto-fix duplicate names)
-  data <- tryCatch(
-    readxl::read_excel(file, sheet = "Data"),
-    error = function(e) {
-      error_list$check1 <- paste("Error reading Data sheet:", e$message)
-      return(NULL)
-    }
-  )
-  data_dict <- tryCatch(
-    readxl::read_excel(file, sheet = "Data Dictionary"),
-    error = function(e) {
-      error_list$check1 <-
-        paste("Error reading Data Dictionary sheet:", e$message)
-      return(NULL)
-    }
-  )
-
-  if (is.null(data) || is.null(data_dict)) {
-    return(error_list) # Stop further validation if sheets couldn't be loaded
-  }
-
-  ### Check 2.5: Does Data sheet have actual data rows?
-  if (nrow(data) == 0) {
-    error_list$check2_5 <- "The Data sheet contains headers but no data rows. Please add your measurement data."
-    return(error_list) # Stop validation if no data to validate
-  }
-
-  ### Check 3: Does 'Data' have required columns?
-  required_columns <- req_fields_data$var
-  # Only check for required columns that don't have duplicates
-  required_columns_to_check <- setdiff(required_columns, duplicated_columns)
-
-  check3 <- all(required_columns_to_check %in% colnames(data))
-
-  if (!check3) {
-    missing_cols <- setdiff(required_columns_to_check, colnames(data))
-    error_list$check3 <-
-      paste("Missing columns in Data:", paste(missing_cols, collapse = ", "))
-  }
-
-  # Check if any required columns were duplicated (separate error)
-  duplicated_required <- intersect(required_columns, duplicated_columns)
-  if (length(duplicated_required) > 0) {
-    if (is.null(error_list$check3)) {
-      error_list$check3 <- list()
-    }
-    error_list$check3$duplicated_required <- paste(
-      "Required columns have duplicate headers (fix duplicates before proceeding):",
-      paste(duplicated_required, collapse = ", ")
+  if (length(invalid) > 0) {
+    lang_label <- stringr::str_to_title(language)
+    msg <- cli::format_inline(
+      "Invalid measurement_group values: {.val {invalid}}. Valid options for {lang_label}: {.val {valid}}"
     )
+    issues <- c(issues, list(new_issue("warning", msg)))
   }
 
-  ### Check 4: Does 'Data Dictionary' have required fields?
-  required_dict_fields <- req_fields_dd$var
-  check4 <- all(required_dict_fields %in% colnames(data_dict))
-
-  if (!check4) {
-    error_list$check4 <-
-      paste(
-        "Missing fields in Data Dictionary:",
-        paste(
-          setdiff(
-            required_dict_fields,
-            colnames(data_dict)
-          ),
-          collapse = ", "
-        )
-      )
-  }
-
-  ## Check 5: Are required unique columns truly unique?
-  # Only check uniqueness for columns that exist and don't have header duplicates
-  available_req_fields <- req_fields_data %>%
-    dplyr::filter(var %in% colnames(data)) %>% # Only check columns that exist
-    dplyr::filter(!var %in% duplicated_columns)
-
-  if (nrow(available_req_fields) > 0) {
-    unique_check <- validate_uniqueness(data, available_req_fields)
-    if (length(unique_check) > 0) {
-      error_list$check5 <- unique_check
-    }
-  }
-
-  ### Check 6: Does 'Data' have at least one additional column? (Moved before Check 9)
-  if (length(colnames(data)) > 0) {
-    # If we have any columns
-    additional_columns <- setdiff(colnames(data), required_columns)
-    if (length(additional_columns) < 1) {
-      error_list$check6 <-
-        "The Data sheet must have at least one additional column beyond the required fields."
-    }
-  }
-
-  ### Check 7: Are all required columns the right data type?
-  # Only check data types for columns that exist and don't have header duplicates
-  available_req_fields_for_types <- req_fields_data %>%
-    dplyr::filter(var %in% colnames(data)) %>% # Only check columns that exist
-    dplyr::filter(!var %in% duplicated_columns)
-
-  if (nrow(available_req_fields_for_types) > 0) {
-    map_r_type <- function(data_type) {
-      dplyr::case_when(
-        data_type == "int" ~ "integer",
-        data_type == "double" ~ "double",
-        data_type == "char" ~ "character",
-        data_type == "-" ~ "any",
-        TRUE ~ "unknown"
-      )
-    }
-
-    # skip check of data type if ALL records are blank for column, gets interpreted as logical type (default)
-    non_blank_vars <- sapply(
-      data[available_req_fields_for_types$var],
-      function(col) !all(is.na(col))
-    )
-
-    if (any(non_blank_vars)) {
-      actual_types <- sapply(
-        data[, names(non_blank_vars)[non_blank_vars], drop = FALSE],
-        typeof
-      )
-
-      mismatched_types <- available_req_fields_for_types %>%
-        dplyr::filter(var_type != "-") %>%
-        dplyr::filter(var %in% names(actual_types)) %>%
-        dplyr::filter(map_r_type(var_type) != actual_types[var]) %>%
-        dplyr::mutate(actual_type = actual_types[var])
-
-      if (nrow(mismatched_types) > 0) {
-        error_list$check7 <- paste(
-          "Error with data types:",
-          paste(
-            mismatched_types$var,
-            "(expected:",
-            mismatched_types$var_type,
-            ", found:",
-            mismatched_types$actual_type,
-            ")",
-            collapse = "; "
-          )
-        )
-      }
-    }
-  }
-
-  ### Check 8: Are there any missing values in required columns?
-  # Only check missing values for columns that exist and don't have header duplicates
-  required_value_columns <-
-    req_fields_data |>
-    dplyr::filter(missing_allowed == "FALSE") |>
-    dplyr::filter(var %in% colnames(data)) |> # Only check columns that exist
-    dplyr::filter(!var %in% duplicated_columns) |> # Skip duplicated columns
-    dplyr::pull(var)
-
-  if (length(required_value_columns) > 0) {
-    missing_values <- data %>%
-      dplyr::select(dplyr::all_of(required_value_columns)) %>%
-      dplyr::summarise(dplyr::across(
-        dplyr::everything(),
-        ~ sum(is.na(.)),
-        .names = "{.col}"
-      ))
-
-    missing_cols <-
-      names(missing_values)[colSums(missing_values) > 0]
-
-    if (length(missing_cols) > 0) {
-      error_list$check8 <-
-        paste(
-          "Missing values found in columns:",
-          paste(missing_cols, collapse = ", ")
-        )
-    }
-  }
-
-  ### Check 8.5: Validate percent columns are within 0-100 range, add sample IDs, truncate if more than 5
-  percent_columns <- c("sand_percent", "silt_percent", "clay_percent")
-  present_percent_cols <- intersect(percent_columns, colnames(data))
-
-  if (length(present_percent_cols) > 0) {
-    for (col in present_percent_cols) {
-      # Find rows with out of range values
-      out_of_range_mask <- data[[col]] < 0 |
-        data[[col]] > 100
-
-      if (any(out_of_range_mask, na.rm = TRUE)) {
-        bad_sample_ids <- data$sample_id[out_of_range_mask]
-        bad_sample_ids <- bad_sample_ids[!is.na(bad_sample_ids)]
-
-        if (length(bad_sample_ids) > 0) {
-          if (length(bad_sample_ids) <= 5) {
-            sample_msg <- paste0(
-              "Check sample IDs: ",
-              paste(bad_sample_ids, collapse = ", ")
-            )
-          } else {
-            sample_msg <- "More than 5 samples have out of range values"
-          }
-
-          error_list[[paste0("check8_5_", col)]] <- paste0(
-            col,
-            " values should be between 0 and 100. ",
-            sample_msg
-          )
-        }
-      }
-    }
-  }
-
-  ### Check 9: Do additional columns in 'Data' match values in 'Data Dictionary'? (Moved after Check 6)
-  if (check4 && length(colnames(data)) > 0) {
-    # If dictionary is valid and we have data columns
-    additional_columns <- setdiff(colnames(data), required_columns)
-    all_data_columns <- colnames(data)
-    dict_column_names <- data_dict$column_name
-
-    # Check 1: Additional columns should be documented in Data Dictionary
-    missing_in_dict <- setdiff(additional_columns, dict_column_names)
-
-    # Check 2: Data Dictionary entries should correspond to actual columns (required or additional)
-    missing_in_data <- setdiff(dict_column_names, all_data_columns)
-
-    if (
-      length(missing_in_dict) > 0 ||
-        length(missing_in_data) > 0
-    ) {
-      error_messages <- c()
-
-      if (length(missing_in_dict) > 0) {
-        error_messages <- c(
-          error_messages,
-          paste(
-            "Additional columns in Data not documented in Data Dictionary:",
-            paste(missing_in_dict, collapse = ", ")
-          )
-        )
-      }
-
-      if (length(missing_in_data) > 0) {
-        error_messages <- c(
-          error_messages,
-          paste(
-            "Columns in Data Dictionary not found in Data:",
-            paste(missing_in_data, collapse = ", ")
-          )
-        )
-      }
-
-      error_list$check9 <- paste(error_messages, collapse = " ")
-    }
-  }
-
-  ### Check 10: Validate measurement groups for the selected language
-  if (check4) {
-    measurement_group_check <- validate_measurement_groups(data_dict, language)
-    if (length(measurement_group_check) > 0) {
-      error_list$check10 <- measurement_group_check
-    }
-  }
-
-  return(error_list)
+  format_output(issues, output)
 }
