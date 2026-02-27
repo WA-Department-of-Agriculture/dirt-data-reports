@@ -43,13 +43,23 @@ mod_step_2_upload_ui <- function(id, state) {
     br(),
     uploaded_msg,
     fileInput(ns("upload_file"), "Upload Data (.xlsx)", accept = ".xlsx"),
-    div(id = ns("error_message"))
+    div(id = ns("error_message")),
+    shinyjs::hidden(
+      downloadButton(ns("download_errors"), "Download file with errors",
+                     class = "btn-outline-danger")
+    )
   )
 }
 
 mod_step_2_upload_server <- function(id, state) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+    # Store values the download handler needs
+    upload_path <- reactiveVal(NULL)
+    upload_name <- reactiveVal(NULL)
+    validation_issues <- reactiveVal(NULL)
+    stored_req_fields_data <- reactiveVal(NULL)
     
     observeEvent(input$requirement_info, {
       show_modal(
@@ -64,12 +74,15 @@ mod_step_2_upload_server <- function(id, state) {
       req_fields_data <- req_fields |> dplyr::filter(sheet == "Data")
       req_fields_dd   <- req_fields |> dplyr::filter(sheet == "Data Dictionary")
       
-      # Remove previous messages
+      # Remove previous messages and hide download button
       removeUI(
         selector = paste0("#", ns("error_message"), " > *"),
         immediate = TRUE,
         multiple = TRUE
       )
+      shinyjs::hide("download_errors")
+      validation_issues(NULL)
+      stored_req_fields_data(NULL)
       
       # Get current language from state (default to english if not set)
       current_language <- "english"
@@ -99,6 +112,13 @@ mod_step_2_upload_server <- function(id, state) {
             tags$ul(lapply(results$errors, \(e) tags$li(e$message)))
           )
         )
+        
+        # Show download with gate errors
+        upload_path(file_path)
+        upload_name(input$upload_file$name)
+        validation_issues(gate_result)
+        stored_req_fields_data(req_fields_data)
+        shinyjs::show("download_errors")
         
         state$step_2_valid <- FALSE
         return()
@@ -169,6 +189,13 @@ mod_step_2_upload_server <- function(id, state) {
           where = "beforeEnd",
           ui = tagList(cards)
         )
+        
+        # Show download button
+        upload_path(file_path)
+        upload_name(input$upload_file$name)
+        validation_issues(all_issues)
+        stored_req_fields_data(req_fields_data)
+        shinyjs::show("download_errors")
       }
       
       # --- Update state ---
@@ -188,5 +215,16 @@ mod_step_2_upload_server <- function(id, state) {
         state$data_dictionary <- data_dict
       }
     })
+    
+    # --- Download handler ---
+    output$download_errors <- downloadHandler(
+      filename = function() {
+        paste0("errors_", upload_name())
+      },
+      content = function(file) {
+        create_error_xlsx(upload_path(), file, validation_issues(),
+                          stored_req_fields_data())
+      }
+    )
   })
 }

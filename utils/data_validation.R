@@ -525,3 +525,146 @@ check_measurement_groups <- function(data_dict, language = "english",
 
   format_output(issues, output)
 }
+
+create_error_xlsx <- function(input_path, output_path, issues,
+                              req_fields_data = NULL) {
+  wb <- openxlsx::loadWorkbook(input_path)
+  
+  # --- Errors tab ---
+  
+  error_df <- data.frame(
+    Severity = vapply(issues, \(x) x$severity, character(1)),
+    Message  = vapply(issues, \(x) x$message, character(1)),
+    stringsAsFactors = FALSE
+  )
+  
+  openxlsx::addWorksheet(wb, "Errors")
+  openxlsx::writeData(wb, "Errors", error_df)
+  
+  # Style the header row
+  header_style <- openxlsx::createStyle(
+    textDecoration = "bold",
+    border = "Bottom",
+    borderStyle = "thin"
+  )
+  openxlsx::addStyle(
+    wb, "Errors",
+    style = header_style,
+    rows = 1,
+    cols = 1:2
+  )
+  
+  # Style error rows (red fill)
+  error_rows <- which(error_df$Severity == "error") + 1
+  if (length(error_rows) > 0) {
+    error_style <- openxlsx::createStyle(
+      fontColour = "#9C0006"
+    )
+    openxlsx::addStyle(
+      wb, "Errors",
+      style = error_style,
+      rows = error_rows,
+      cols = 1:2,
+      gridExpand = TRUE
+    )
+  }
+  
+  # Style warning rows (yellow fill)
+  warning_rows <- which(error_df$Severity == "warning") + 1
+  if (length(warning_rows) > 0) {
+    warning_style <- openxlsx::createStyle(
+      fontColour = "#9C6500"    )
+    openxlsx::addStyle(
+      wb, "Errors",
+      style = warning_style,
+      rows = warning_rows,
+      cols = 1:2,
+      gridExpand = TRUE
+    )
+  }
+  
+  openxlsx::setColWidths(wb, "Errors", cols = 1, widths = 12)
+  openxlsx::setColWidths(wb, "Errors", cols = 2, widths = 80)
+  
+  # --- Conditional formatting on Data sheet ---
+  
+  if (!is.null(req_fields_data) && "Data" %in% names(wb)) {
+    # Get column headers from Data sheet to map names to positions
+    data_headers <- openxlsx::read.xlsx(wb, sheet = "Data", rows = 1,
+                                        colNames = FALSE)
+    data_headers <- as.character(data_headers[1, ])
+    
+    # Number of data rows (excluding header)
+    n_rows <- wb$worksheets[[which(names(wb) == "Data")]]$sheet_data$rows
+    max_row <- max(as.numeric(n_rows), na.rm = TRUE)
+    if (max_row < 2) max_row <- 1000  # fallback
+    
+    # Helper to get column index by name
+    col_index <- function(col_name) {
+      which(data_headers == col_name)
+    }
+    
+    #1. Blanks in required columns (missing_allowed == FALSE)
+    required_cols <- req_fields_data |>
+      dplyr::filter(missing_allowed == "FALSE", var %in% data_headers) |>
+      dplyr::pull(var)
+    
+    for (col_name in required_cols) {
+      idx <- col_index(col_name)
+      if (length(idx) == 1) {
+        openxlsx::conditionalFormatting(
+          wb, "Data",
+          cols = idx,
+          rows = 2:max_row,
+          type = "blanks"
+        )
+      }
+    }
+    
+    # 2. Percent columns outside 0-100
+    percent_cols <- intersect(
+      c("sand_percent", "silt_percent", "clay_percent"),
+      data_headers
+    )
+    
+    for (col_name in percent_cols) {
+      idx <- col_index(col_name)
+      if (length(idx) == 1) {
+        col_letter <- openxlsx::int2col(idx)
+        
+        # Values < 0
+        openxlsx::conditionalFormatting(
+          wb, "Data",
+          cols = idx,
+          rows = 2:max_row,
+          type = "expression",
+          rule = paste0(col_letter, "2<0")
+        )
+        
+        # Values > 100
+        openxlsx::conditionalFormatting(
+          wb, "Data",
+          cols = idx,
+          rows = 2:max_row,
+          type = "expression",
+          rule = paste0(col_letter, "2>100")
+        )
+      }
+    }
+    
+    # 3. Duplicate sample_id
+    if ("sample_id" %in% data_headers) {
+      idx <- col_index("sample_id")
+      if (length(idx) == 1) {
+        openxlsx::conditionalFormatting(
+          wb, "Data",
+          cols = idx,
+          rows = 2:max_row,
+          type = "duplicates"
+        )
+      }
+    }
+  }
+  
+  openxlsx::saveWorkbook(wb, output_path, overwrite = TRUE)
+}
