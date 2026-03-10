@@ -22,6 +22,11 @@ mod_footer_ui <- function(id) {
           href = "https://arcg.is/1zPbbL1",
           class = "footer-link",
           "Report Issue"
+        ),
+        actionLink(
+          inputId = ns("footer_privacy_policy"),
+          label = "Privacy Policy",
+          class = "footer-link"
         )
       ),
       tags$div(
@@ -102,6 +107,15 @@ mod_footer_server <- function(id) {
         session$rootScope(),
         "main_page",
         selected = "page_learn_more"
+      )
+    })
+
+    # redirect to Privacy Policy Page - use rootScope to use parent level ids
+    observeEvent(input$footer_privacy_policy, {
+      updateNavbarPage(
+        session$rootScope(),
+        "main_page",
+        selected = "page_privacy_policy"
       )
     })
   })
