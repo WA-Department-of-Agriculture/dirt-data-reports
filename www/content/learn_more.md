@@ -48,20 +48,6 @@ No. This application does **not** collect or retain any data you enter. Data upl
 
 This tool uses Google Analytics to collect anonymous, aggregated data about tool usage. The data you enter is not collected through this process. Usage data is subject to [Google’s Privacy Policy](https://policies.google.com/technologies/partner-sites).
 
-## **How can I further customize these reports?**
-
-This tool prioritizes user-friendliness by limiting content and branding customization. Microsoft Word reports can be generated and then edited manually to suit your specific needs, while HTML reports require direct editing of the HTML code for more customization. If you have experience with R and Quarto, you can use the [{soils} R package](https://github.com/WA-Department-of-Agriculture/soils/) to fully adapt the underlying code for maximum flexibility and personalization.
-
-## **What’s next?**
-
-Future updates include expanding the types of comparisons a user can make (e.g. between sample depths or experimental treatments). The team also plans to collect user feedback to understand how these reports influence soil health perceptions, knowledge, and management practices.
-
-## **Where can I see the source code & provide feedback?**
-
-To view the source code, explore the WSDA [GitHub repository](https://github.com/WA-Department-of-Agriculture/soil-health-report-generator). 
-
-We welcome your feedback as we continue improving the tool and adding new features. Feel free to share your experience using it and how people respond to the reports through this [form](https://arcg.is/1zPbbL1), or by emailing us at [washi@agr.wa.gov](mailto:washi@agr.wa.gov?subject=Dirt%20Data%20Reports%20).
-
 ## **Can I see examples of the reports?**
 
 ### Example HTML
@@ -76,3 +62,21 @@ Below is an example of an HTML output. You can also access it here on this [site
     <iframe src="https://drive.google.com/file/d/1oCIhlzok_2xHjnREjhEwGaBkouLb8YNB/preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;">
     </iframe>
 </div>
+
+## **How can I further customize these reports?**
+
+This tool prioritizes user-friendliness by limiting content and branding customization. Microsoft Word reports can be generated and then edited manually to suit your specific needs, while HTML reports require direct editing of the HTML code for more customization. If you have experience with R and Quarto, you can use the [{soils} R package](https://github.com/WA-Department-of-Agriculture/soils/) to fully adapt the underlying code for maximum flexibility and personalization.
+
+## **What’s next?**
+
+Future updates include expanding the types of comparisons a user can make (e.g. between sample depths or experimental treatments). The team also plans to collect user feedback to understand how these reports influence soil health perceptions, knowledge, and management practices.
+
+## **Where can I see the source code & provide feedback?**
+
+To view the source code, explore the WSDA [GitHub repository](https://github.com/WA-Department-of-Agriculture/dirt-data-reports). 
+
+We welcome your feedback as we continue improving the tool and adding new features. Feel free to share your experience using it and how people respond to the reports through this [form](https://arcg.is/1zPbbL1), or by emailing us at [washi@agr.wa.gov](mailto:washi@agr.wa.gov?subject=Dirt%20Data%20Reports%20).
+
+## **Related tools**
+
+This application is part of the Washington Soil Health Initiative app ecosystem. To see the full range of apps developed by WaSHI, visit the [WaSHI Tool Gallery](https://wsda.quarto.pub/washi-gallery/).
