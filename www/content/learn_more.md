@@ -1,18 +1,18 @@
-## What is this tool?
+## **What is this tool?**
 
 This interactive tool creates customized soil health reports for participants in your soil sampling project. These reports distill the latest soil health research and provide comparisons of each participant’s samples with others from the same crop and county. The goal is to make complex soils data more accessible and actionable, empowering participants to better understand and manage soil health.
 
-## How can it help me?
+## **How can it help me?**
 
 Generating customized and comprehensive soil health reports for numerous participants can be complex, time-consuming, and require specialized expertise in soil science and data automation. This tool simplifies this process by offering a no-code solution to automatically create reports and provides technical assistance providers with a valuable resource to enhance soil health outreach and extension efforts within their communities.
 
-## How do I use it?
+## **How do I use it?**
 
 Customized soil health reports can be generated in four steps. Be prepared to spend the most time on steps 1 and 2 as you adjust your data to match the template format.
 
 ![Step 1: Download the Excel template & replace example data with your own. Step 2: Upload and validate your data file. Step 3: Customize with project-specific information. Step 4: Generate custom reports for all participants.](steps.png)
 
-## **Why was this tool created**?
+## **Why was this tool created?**
 
 This tool was developed as part of the [Washington Soil Health Initiative’s State of the Soils Assessment](https://washingtonsoilhealthinitiative.com/state-of-the-soils/), which analyzed over 1,100 samples and provided customized reports to more than 400 participants. To make this process accessible to others, this user-friendly, no-code Shiny app was developed. This app helps users automate the creation of comprehensive soil health reports without advanced programming skills.
 
@@ -44,7 +44,9 @@ Soil scientists at Washington State Department of Agriculture (WSDA) and Washing
     
 ## **Does this tool store my data?**
 
-No. This application does **not** store any data you upload or enter. All inputs are processed in your browser session to generate reports. When you close the browser or refresh the page, your data are gone.
+No. This application does **not** collect or retain any data you enter. Data uploaded in Step 2 and information entered in Step 3 are held temporarily in your browser session to generate the reports. When you close the browser or refresh the page, your data are gone.
+
+This tool uses Google Analytics to collect anonymous, aggregated data about tool usage. The data you enter is not collected through this process. Usage data is subject to [Google’s Privacy Policy](https://policies.google.com/technologies/partner-sites).
 
 ## **How can I further customize these reports?**
 
@@ -58,7 +60,7 @@ Future updates include expanding the types of comparisons a user can make (e.g. 
 
 To view the source code, explore the WSDA [GitHub repository](https://github.com/WA-Department-of-Agriculture/soil-health-report-generator). 
 
-Your feedback is welcome as the team works on updates and new features. You are encouraged to share your experience using the tool and how recipients respond to these reports through this [form](https://arcg.is/1zPbbL1).
+We welcome your feedback as we continue improving the tool and adding new features. Feel free to share your experience using it and how people respond to the reports through this [form](https://arcg.is/1zPbbL1), or by emailing us at [washi@agr.wa.gov](mailto:washi@agr.wa.gov?subject=Dirt%20Data%20Reports%20).
 
 ## **Can I see examples of the reports?**
 

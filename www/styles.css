@@ -400,6 +400,10 @@ h1, h2, h3 {
   display: none;
 }
 
+.navbar-default .navbar-nav>li>a[data-value="page_privacy_policy"] {
+  display: none;
+}
+
 .navbar-brand {
   width: 249px;
   padding:5px 15px!important;
@@ -407,7 +411,7 @@ h1, h2, h3 {
 
 .navbar > .container-fluid:first-child {
   padding:0px 15px;}
-  
+ 
 /* -----------------------------------------
    Filter Options
 ----------------------------------------- */
@@ -427,7 +431,7 @@ h1, h2, h3 {
 ----------------------------------------- */
 .custom-footer {
   background-color: var(--deep-green);
-  padding: 4rem 1.5rem;
+  padding: 3rem 1.5rem;
   color: white;
   position: relative;
   flex-shrink: 0; /* Don't shrink the footer */
@@ -457,6 +461,10 @@ h1, h2, h3 {
   color: #ffffff;
 }
 
+.footer-link:focus {
+  color: #a4c3ff;
+}
+
 .footer-social {
   display: flex;
   justify-content: center;
@@ -475,7 +483,7 @@ h1, h2, h3 {
 }
 
 .footer-copy {
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: #d1d5db;
 }
 
@@ -688,8 +696,8 @@ z-index: 1;
 }
 
 .home-btn:hover {
-  background-color: #FCB040;
-  color: white;
+  background-color: white;
+  color: #1a1a1a;
 }
 
 .secondary-btn {

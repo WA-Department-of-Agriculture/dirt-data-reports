@@ -1,65 +1,69 @@
 # Load packages and modules
 source("global.R")
 
-ui <- navbarPage(
-  title = actionLink(
-    inputId = "title",
-    tags$div(
-      style = "display:flex;gap:8px;align-items:center",
-      tags$img(
-        src = "pictures/ddr-logo.png",
-        style = "height:40px"
-      ),
+ui <- tagList(
+  navbarPage(
+    title = actionLink(
+      inputId = "title",
       tags$div(
-        class = "title-name",
-        style = "font-size:16px",
-        "Dirt Data Reports"
+        style = "display:flex;gap:8px;align-items:center",
+        tags$img(
+          src = "pictures/ddr-logo.png",
+          style = "height:40px"
+        ),
+        tags$div(
+          class = "title-name",
+          style = "font-size:16px",
+          "Dirt Data Reports"
+        )
       )
+    ),
+    windowTitle = "Dirt Data Reports",
+    id = "main_page",
+    collapsible = TRUE,
+    selected = "page_home",
+    header = tags$head(
+      includeHTML("www/scripts/google-analytics.html"),
+      tags$link(
+        rel = "stylesheet",
+        href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      ),
+      tags$link(
+        rel = "stylesheet",
+        type = "text/css",
+        href = "styles.css"
+      ),
+      tags$link(
+        rel = "shortcut icon",
+        href = "pictures/ddr-logo.png"
+      ),
+      tags$script(src = "scripts/toc.js"),
+      tags$script(src = "scripts/stepper.js"),
+      shinyjs::useShinyjs(),
+      sever::useSever()
+    ),
+    tabPanel(
+      title = "Home",
+      value = "page_home",
+      mod_home_ui("home")
+    ),
+    tabPanel(
+      title = "Build Reports",
+      value = "page_build_reports",
+      mod_build_reports_ui("build")
+    ),
+    tabPanel(
+      title = "Learn More",
+      value = "page_learn_more",
+      mod_learn_more_ui("learn")
+    ),
+    tabPanel(
+      title = "Privacy Policy",
+      value = "page_privacy_policy",
+      mod_privacy_policy_ui("privacy")
     )
   ),
-  windowTitle = "Dirt Data Reports",
-  id = "main_page",
-  collapsible = TRUE,
-  selected = "page_home",
-  header = tags$head(
-    # Google Tag Manager
-    includeHTML("www/scripts/google-analytics.html"),
-    # fontawesome css, replace this with latest if needed
-    tags$link(
-      rel = "stylesheet",
-      href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-    ),
-    tags$link(
-      rel = "stylesheet",
-      type = "text/css",
-      href = "styles.css"
-    ),
-    tags$link(
-      rel = "shortcut icon", # favicon
-      href = "pictures/ddr-logo.png"
-    ),
-    # javascript
-    tags$script(src = "scripts/toc.js"),
-    tags$script(src = "scripts/stepper.js"),
-    shinyjs::useShinyjs(),
-    sever::useSever()
-  ),
-  tabPanel(
-    title = "Home",
-    value = "page_home",
-    mod_home_ui("home")
-  ),
-  tabPanel(
-    title = "Build Reports",
-    value = "page_build_reports",
-    mod_build_reports_ui("build")
-  ),
-  tabPanel(
-    title = "Learn More",
-    value = "page_learn_more",
-    mod_learn_more_ui("learn")
-  ),
-  mod_footer_ui("footer") # Add the footer here
+  mod_footer_ui("footer")
 )
 
 server <- function(input, output, session) {
@@ -77,6 +81,7 @@ server <- function(input, output, session) {
   mod_home_server("home")
   mod_build_reports_server("build")
   mod_learn_more_server("learn")
+  mod_privacy_policy_server("privacy")
   mod_footer_server("footer")
 
   # Redirect when logo/title is clicked
