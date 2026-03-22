@@ -19,7 +19,7 @@ spreadsheet.
 
     -   Measurement results (e.g., *texture*, *om_percent*, etc.). All
         measurement results (except *texture*) must be numeric. **Non-numeric
-        values will be coerced to NA**. Clean your data of common character
+        values will be converted to NA**. Clean your data of common character
         values (e.g., ND, \<1) before uploading.
 
 -   Each row should represent **one unique soil sample**, identified by a unique
@@ -72,7 +72,7 @@ Review the example structure and format your project data to match.
 **Measurement results** (columns J–AO: *texture* through *na_mg_kg*):
 
 -   All measurement columns **except *texture*** must be numeric. Non-numeric
-    values (e.g., ND, \<1) will be coerced to NA and may be omitted from
+    values (e.g., ND, \<1) will be converted to NA and may be omitted from
     summaries, tables, and plots. Clean or recode censored values before
     uploading.
 
