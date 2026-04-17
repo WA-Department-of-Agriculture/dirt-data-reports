@@ -554,7 +554,7 @@ create_error_xlsx <- function(input_path, output_path, issues,
     cols = 1:2
   )
   
-  # Style error rows (red fill)
+  # Style error rows 
   error_rows <- which(error_df$Severity == "error") + 1
   if (length(error_rows) > 0) {
     error_style <- openxlsx::createStyle(
@@ -569,7 +569,7 @@ create_error_xlsx <- function(input_path, output_path, issues,
     )
   }
   
-  # Style warning rows (yellow fill)
+  # Style warning rows
   warning_rows <- which(error_df$Severity == "warning") + 1
   if (length(warning_rows) > 0) {
     warning_style <- openxlsx::createStyle(
@@ -586,7 +586,7 @@ create_error_xlsx <- function(input_path, output_path, issues,
   openxlsx::setColWidths(wb, "Errors", cols = 1, widths = 12)
   openxlsx::setColWidths(wb, "Errors", cols = 2, widths = 80)
   
-  # --- Conditional formatting on Data sheet ---
+  # Conditional formatting on Data tab
   
   if (!is.null(req_fields_data) && "Data" %in% names(wb)) {
     # Get column headers from Data sheet to map names to positions
@@ -594,7 +594,6 @@ create_error_xlsx <- function(input_path, output_path, issues,
                                         colNames = FALSE)
     data_headers <- as.character(data_headers[1, ])
     
-    # Number of data rows (excluding header)
     n_rows <- wb$worksheets[[which(names(wb) == "Data")]]$sheet_data$rows
     max_row <- max(as.numeric(n_rows), na.rm = TRUE)
     if (max_row < 2) max_row <- 1000  # fallback

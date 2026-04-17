@@ -42,6 +42,8 @@ all_issues <- c(
 
 results <- split_issues(all_issues)
 
+results
+
 if (length(all_issues) == 0) {
   cli_alert_success("All checks passed!")
 } else {

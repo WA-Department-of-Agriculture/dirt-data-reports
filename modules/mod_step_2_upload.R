@@ -134,9 +134,11 @@ mod_step_2_upload_server <- function(id, state) {
         check_required_columns(data, req_fields_data, output = "ui"),
         check_required_dict_fields(data_dict, req_fields_dd, output = "ui"),
         check_uniqueness(data, req_fields_data, output = "ui"),
+        check_uniqueness(data_dict, req_fields_dd, output = "ui"),
         check_data_types(data, req_fields_data, output = "ui"),
+        check_data_types(data_dict, req_fields_dd, output="ui"),
         check_missing_values(data, req_fields_data, output = "ui"),
-        # Warnings
+        check_missing_values(data_dict, req_fields_dd, output="ui"),
         check_additional_columns(data, req_fields_data, output = "ui"),
         check_percent_range(data, output = "ui"),
         check_dict_mismatch(data, data_dict, req_fields_data, output = "ui"),
