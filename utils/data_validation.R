@@ -41,13 +41,13 @@ new_issue <- function(severity = c("error", "warning"), message) {
 #'   printing/aborting.
 format_output <- function(issues, output = c("cli", "ui")) {
   output <- match.arg(output)
-
+  
   if (length(issues) == 0) return(issues)
-
+  
   if (output == "cli") {
     errors <- Filter(\(x) x$severity == "error", issues)
     warnings <- Filter(\(x) x$severity == "warning", issues)
-
+    
     if (length(errors) > 0) {
       bullets <- cli::ansi_strip(
         vapply(errors, \(x) x$message, character(1))
@@ -55,7 +55,7 @@ format_output <- function(issues, output = c("cli", "ui")) {
       names(bullets) <- rep("*", length(bullets))
       cli::cli_abort(c("x" = "Data validation failed.", bullets))
     }
-
+    
     if (length(warnings) > 0) {
       bullets <- cli::ansi_strip(
         vapply(warnings, \(x) x$message, character(1))
@@ -66,10 +66,10 @@ format_output <- function(issues, output = c("cli", "ui")) {
         bullets
       ))
     }
-
+    
     return(invisible(issues))
   }
-
+  
   # UI: strip ANSI codes from messages
   lapply(issues, \(x) {
     x$message <- cli::ansi_strip(x$message)
@@ -107,18 +107,18 @@ split_issues <- function(issues) {
 check_file_readable <- function(file, output = c("cli", "ui")) {
   output <- match.arg(output)
   issues <- list()
-
+  
   # Check 1: Required sheets
   sheets <- readxl::excel_sheets(file)
   required <- c("Data", "Data Dictionary")
   missing <- setdiff(required, sheets)
-
+  
   if (length(missing) > 0) {
     msg <- cli::format_inline("Missing required sheets: {.val {missing}}")
     issues <- c(issues, list(new_issue("error", msg)))
     return(format_output(issues, output))
   }
-
+  
   # Check 2: Duplicate headers in Data sheet
   tryCatch({
     headers <- as.character(
@@ -126,7 +126,7 @@ check_file_readable <- function(file, output = c("cli", "ui")) {
     )
     headers <- headers[!is.na(headers)]
     dups <- unique(headers[duplicated(headers)])
-
+    
     if (length(dups) > 0) {
       msg <- cli::format_inline(
         "Duplicate column headers in Data sheet: {.val {dups}}"
@@ -134,7 +134,7 @@ check_file_readable <- function(file, output = c("cli", "ui")) {
       issues <- c(issues, list(new_issue("error", msg)))
     }
   }, error = function(e) NULL)
-
+  
   # Check 2b: Duplicate headers in Data Dictionary sheet
   tryCatch({
     headers <- as.character(
@@ -144,7 +144,7 @@ check_file_readable <- function(file, output = c("cli", "ui")) {
     )
     headers <- headers[!is.na(headers)]
     dups <- unique(headers[duplicated(headers)])
-
+    
     if (length(dups) > 0) {
       msg <- cli::format_inline(
         "Duplicate column headers in Data Dictionary sheet: {.val {dups}}"
@@ -152,9 +152,9 @@ check_file_readable <- function(file, output = c("cli", "ui")) {
       issues <- c(issues, list(new_issue("error", msg)))
     }
   }, error = function(e) NULL)
-
+  
   if (length(issues) > 0) return(format_output(issues, output))
-
+  
   # Check 3: Load both sheets
   data <- tryCatch(
     readxl::read_excel(file, sheet = "Data"),
@@ -164,7 +164,7 @@ check_file_readable <- function(file, output = c("cli", "ui")) {
     readxl::read_excel(file, sheet = "Data Dictionary"),
     error = function(e) NULL
   )
-
+  
   if (is.null(data) || is.null(data_dict)) {
     msg <- cli::format_inline(
       "Could not read Data or Data Dictionary sheet."
@@ -172,7 +172,7 @@ check_file_readable <- function(file, output = c("cli", "ui")) {
     issues <- c(issues, list(new_issue("error", msg)))
     return(format_output(issues, output))
   }
-
+  
   # Check 4: Data has rows
   if (nrow(data) == 0) {
     msg <- cli::format_inline(
@@ -181,7 +181,7 @@ check_file_readable <- function(file, output = c("cli", "ui")) {
     issues <- c(issues, list(new_issue("error", msg)))
     return(format_output(issues, output))
   }
-
+  
   # All gates passed — return the loaded data
   list(data = data, data_dict = data_dict)
 }
@@ -202,17 +202,17 @@ is_gate_pass <- function(gate_result) {
 check_required_columns <- function(data, req_fields_data, output = c("cli", "ui")) {
   output <- match.arg(output)
   issues <- list()
-
+  
   required <- req_fields_data$var
   missing <- setdiff(required, colnames(data))
-
+  
   if (length(missing) > 0) {
     msg <- cli::format_inline(
       "Missing required columns in Data: {.val {missing}}"
     )
     issues <- c(issues, list(new_issue("error", msg)))
   }
-
+  
   format_output(issues, output)
 }
 
@@ -221,17 +221,17 @@ check_required_dict_fields <- function(data_dict, req_fields_dd,
                                        output = c("cli", "ui")) {
   output <- match.arg(output)
   issues <- list()
-
+  
   required <- req_fields_dd$var
   missing <- setdiff(required, colnames(data_dict))
-
+  
   if (length(missing) > 0) {
     msg <- cli::format_inline(
       "Missing required fields in Data Dictionary: {.val {missing}}"
     )
     issues <- c(issues, list(new_issue("error", msg)))
   }
-
+  
   format_output(issues, output)
 }
 
@@ -239,12 +239,12 @@ check_required_dict_fields <- function(data_dict, req_fields_dd,
 check_uniqueness <- function(data, req_fields_data, output = c("cli", "ui")) {
   output <- match.arg(output)
   issues <- list()
-
+  
   unique_checks <- req_fields_data |> dplyr::filter(unique_by != "-")
-
+  
   for (i in seq_len(nrow(unique_checks))) {
     var_name <- unique_checks$var[i]
-
+    
     group_by_vars <- if (
       stringr::str_detect(unique_checks$unique_by[i], "^c\\(")
     ) {
@@ -255,20 +255,20 @@ check_uniqueness <- function(data, req_fields_data, output = c("cli", "ui")) {
     } else {
       stringr::str_split(unique_checks$unique_by[i], ",\\s*")[[1]]
     }
-
+    
     if (
       !var_name %in% colnames(data) ||
-        !all(group_by_vars %in% colnames(data))
+      !all(group_by_vars %in% colnames(data))
     ) {
       next
     }
-
+    
     if (length(group_by_vars) == 1 && group_by_vars == var_name) {
       # Globally unique
       duplicates <- data |>
         dplyr::count(!!rlang::sym(var_name)) |>
         dplyr::filter(n > 1)
-
+      
       if (nrow(duplicates) > 0) {
         dup_vals <- duplicates[[var_name]]
         msg <- cli::format_inline(
@@ -276,7 +276,7 @@ check_uniqueness <- function(data, req_fields_data, output = c("cli", "ui")) {
         )
         issues <- c(issues, list(new_issue("error", msg)))
       }
-
+      
     } else {
       # Unique within groups
       duplicates <- data |>
@@ -287,7 +287,7 @@ check_uniqueness <- function(data, req_fields_data, output = c("cli", "ui")) {
           dplyr::across(dplyr::all_of(c(group_by_vars, var_name)))
         ) |>
         dplyr::ungroup()
-
+      
       if (nrow(duplicates) > 0) {
         group_str <- paste(group_by_vars, collapse = ", ")
         msg <- cli::format_inline(
@@ -297,7 +297,7 @@ check_uniqueness <- function(data, req_fields_data, output = c("cli", "ui")) {
       }
     }
   }
-
+  
   format_output(issues, output)
 }
 
@@ -305,7 +305,7 @@ check_uniqueness <- function(data, req_fields_data, output = c("cli", "ui")) {
 check_data_types <- function(data, req_fields_data, output = c("cli", "ui")) {
   output <- match.arg(output)
   issues <- list()
-
+  
   map_r_type <- function(data_type) {
     dplyr::case_when(
       data_type == "int"    ~ "integer",
@@ -315,29 +315,29 @@ check_data_types <- function(data, req_fields_data, output = c("cli", "ui")) {
       TRUE                  ~ "unknown"
     )
   }
-
+  
   check_fields <- req_fields_data |>
     dplyr::filter(var %in% colnames(data), var_type != "-")
-
+  
   if (nrow(check_fields) == 0) return(format_output(issues, output))
-
+  
   non_blank <- sapply(
     data[check_fields$var],
     \(col) !all(is.na(col))
   )
-
+  
   if (!any(non_blank)) return(format_output(issues, output))
-
+  
   actual_types <- sapply(
     data[, names(non_blank)[non_blank], drop = FALSE],
     typeof
   )
-
+  
   mismatched <- check_fields |>
     dplyr::filter(var %in% names(actual_types)) |>
     dplyr::filter(map_r_type(var_type) != actual_types[var]) |>
     dplyr::mutate(actual_type = actual_types[var])
-
+  
   if (nrow(mismatched) > 0) {
     for (i in seq_len(nrow(mismatched))) {
       r <- mismatched[i, ]
@@ -347,7 +347,7 @@ check_data_types <- function(data, req_fields_data, output = c("cli", "ui")) {
       issues <- c(issues, list(new_issue("error", msg)))
     }
   }
-
+  
   format_output(issues, output)
 }
 
@@ -356,15 +356,15 @@ check_missing_values <- function(data, req_fields_data,
                                  output = c("cli", "ui")) {
   output <- match.arg(output)
   issues <- list()
-
+  
   required_cols <- req_fields_data |>
     dplyr::filter(missing_allowed == "FALSE") |>
     dplyr::filter(var %in% colnames(data)) |>
     dplyr::pull(var)
-
+  
   for (col in required_cols) {
     n_missing <- sum(is.na(data[[col]]))
-
+    
     if (n_missing > 0) {
       msg <- cli::format_inline(
         "{.field {col}} has {n_missing} missing value{?s}. This column does not allow blank values."
@@ -372,7 +372,7 @@ check_missing_values <- function(data, req_fields_data,
       issues <- c(issues, list(new_issue("error", msg)))
     }
   }
-
+  
   format_output(issues, output)
 }
 
@@ -384,17 +384,17 @@ check_additional_columns <- function(data, req_fields_data,
                                      output = c("cli", "ui")) {
   output <- match.arg(output)
   issues <- list()
-
+  
   required <- req_fields_data$var
   additional <- setdiff(colnames(data), required)
-
+  
   if (length(additional) < 1) {
     msg <- cli::format_inline(
       "The Data sheet has no columns beyond the required fields. Add at least one measurement column."
     )
     issues <- c(issues, list(new_issue("warning", msg)))
   }
-
+  
   format_output(issues, output)
 }
 
@@ -454,24 +454,24 @@ check_dict_mismatch <- function(data, data_dict, req_fields_data,
   required <- req_fields_data$var
   additional <- setdiff(colnames(data), required)
   dict_names <- data_dict$column_name
-
+  
   missing_in_dict <- setdiff(additional, dict_names)
   missing_in_data <- setdiff(dict_names, colnames(data))
-
+  
   if (length(missing_in_dict) > 0) {
     msg <- cli::format_inline(
       "Columns in Data not documented in Data Dictionary: {.val {missing_in_dict}}"
     )
     issues <- c(issues, list(new_issue("warning", msg)))
   }
-
+  
   if (length(missing_in_data) > 0) {
     msg <- cli::format_inline(
       "Columns in Data Dictionary not found in Data: {.val {missing_in_data}}"
     )
     issues <- c(issues, list(new_issue("warning", msg)))
   }
-
+  
   format_output(issues, output)
 }
 
@@ -480,7 +480,7 @@ check_measurement_groups <- function(data_dict, language = "english",
                                      output = c("cli", "ui")) {
   output <- match.arg(output)
   issues <- list()
-
+  
   measurement_groups <- list(
     english = c(
       "Physical", "Biological", "Chemical",
@@ -494,14 +494,14 @@ check_measurement_groups <- function(data_dict, language = "english",
       "Micronutriente es esenciales para plantas"
     )
   )
-
+  
   language <- tolower(language)
   if (!language %in% names(measurement_groups)) {
     return(format_output(issues, output))
   }
-
+  
   valid <- enc2native(measurement_groups[[language]])
-
+  
   if (!"measurement_group" %in% colnames(data_dict)) {
     msg <- cli::format_inline(
       "Missing {.field measurement_group} column in Data Dictionary."
@@ -509,12 +509,12 @@ check_measurement_groups <- function(data_dict, language = "english",
     issues <- c(issues, list(new_issue("warning", msg)))
     return(format_output(issues, output))
   }
-
+  
   actual <- enc2native(
     data_dict$measurement_group[!is.na(data_dict$measurement_group)]
   )
   invalid <- setdiff(actual, valid)
-
+  
   if (length(invalid) > 0) {
     lang_label <- stringr::str_to_title(language)
     msg <- cli::format_inline(
@@ -522,13 +522,12 @@ check_measurement_groups <- function(data_dict, language = "english",
     )
     issues <- c(issues, list(new_issue("warning", msg)))
   }
-
+  
   format_output(issues, output)
 }
-
 create_error_xlsx <- function(input_path, output_path, issues,
                               req_fields_data = NULL) {
-  wb <- openxlsx::loadWorkbook(input_path)
+  wb <- openxlsx2::wb_load(input_path)
   
   # --- Errors tab ---
   
@@ -538,64 +537,60 @@ create_error_xlsx <- function(input_path, output_path, issues,
     stringsAsFactors = FALSE
   )
   
-  openxlsx::addWorksheet(wb, "Errors")
-  openxlsx::writeData(wb, "Errors", error_df)
+  wb$add_worksheet("Errors")
+  wb$add_data(sheet = "Errors", x = error_df)
   
-  # Style the header row
-  header_style <- openxlsx::createStyle(
-    textDecoration = "bold",
-    border = "Bottom",
-    borderStyle = "thin"
+  # Style the header row (bold + bottom border)
+  wb$add_font(
+    sheet = "Errors",
+    dims = "A1:B1",
+    bold = TRUE
   )
-  openxlsx::addStyle(
-    wb, "Errors",
-    style = header_style,
-    rows = 1,
-    cols = 1:2
+  wb$add_border(
+    sheet = "Errors",
+    dims = "A1:B1",
+    bottom_border = "thin"
   )
   
-  # Style error rows 
+  # Style error rows
   error_rows <- which(error_df$Severity == "error") + 1
   if (length(error_rows) > 0) {
-    error_style <- openxlsx::createStyle(
-      fontColour = "#9C0006"
-    )
-    openxlsx::addStyle(
-      wb, "Errors",
-      style = error_style,
-      rows = error_rows,
-      cols = 1:2,
-      gridExpand = TRUE
+    error_dims <- openxlsx2::wb_dims(rows = error_rows, cols = 1:2)
+    wb$add_font(
+      sheet = "Errors",
+      dims = error_dims,
+      color = openxlsx2::wb_color(hex = "9C0006")
     )
   }
   
   # Style warning rows
   warning_rows <- which(error_df$Severity == "warning") + 1
   if (length(warning_rows) > 0) {
-    warning_style <- openxlsx::createStyle(
-      fontColour = "#9C6500"    )
-    openxlsx::addStyle(
-      wb, "Errors",
-      style = warning_style,
-      rows = warning_rows,
-      cols = 1:2,
-      gridExpand = TRUE
+    warning_dims <- openxlsx2::wb_dims(rows = warning_rows, cols = 1:2)
+    wb$add_font(
+      sheet = "Errors",
+      dims = warning_dims,
+      color = openxlsx2::wb_color(hex = "9C6500")
     )
   }
   
-  openxlsx::setColWidths(wb, "Errors", cols = 1, widths = 12)
-  openxlsx::setColWidths(wb, "Errors", cols = 2, widths = 80)
+  wb$set_col_widths(sheet = "Errors", cols = 1, widths = 12)
+  wb$set_col_widths(sheet = "Errors", cols = 2, widths = 80)
   
-  # Conditional formatting on Data tab
+  # --- Conditional formatting on Data tab ---
   
-  if (!is.null(req_fields_data) && "Data" %in% names(wb)) {
+  if (!is.null(req_fields_data) && "Data" %in% wb$sheet_names) {
     # Get column headers from Data sheet to map names to positions
-    data_headers <- openxlsx::read.xlsx(wb, sheet = "Data", rows = 1,
-                                        colNames = FALSE)
-    data_headers <- as.character(data_headers[1, ])
+    data_headers <- openxlsx2::wb_to_df(
+      wb, sheet = "Data",
+      rows = 1,
+      col_names = FALSE
+    )
+    data_headers <- as.character(unlist(data_headers[1, ]))
     
-    n_rows <- wb$worksheets[[which(names(wb) == "Data")]]$sheet_data$rows
-    max_row <- max(as.numeric(n_rows), na.rm = TRUE)
+    # Figure out how many rows are in the Data sheet
+    data_full <- openxlsx2::wb_to_df(wb, sheet = "Data", col_names = TRUE)
+    max_row <- nrow(data_full) + 1  # +1 because row 1 is the header
     if (max_row < 2) max_row <- 1000  # fallback
     
     # Helper to get column index by name
@@ -603,7 +598,7 @@ create_error_xlsx <- function(input_path, output_path, issues,
       which(data_headers == col_name)
     }
     
-    #1. Blanks in required columns (missing_allowed == FALSE)
+    # 1. Blanks in required columns (missing_allowed == FALSE)
     required_cols <- req_fields_data |>
       dplyr::filter(missing_allowed == "FALSE", var %in% data_headers) |>
       dplyr::pull(var)
@@ -611,11 +606,10 @@ create_error_xlsx <- function(input_path, output_path, issues,
     for (col_name in required_cols) {
       idx <- col_index(col_name)
       if (length(idx) == 1) {
-        openxlsx::conditionalFormatting(
-          wb, "Data",
-          cols = idx,
-          rows = 2:max_row,
-          type = "blanks"
+        wb$add_conditional_formatting(
+          sheet = "Data",
+          dims = openxlsx2::wb_dims(rows = 2:max_row, cols = idx),
+          type = "containsBlanks"
         )
       }
     }
@@ -629,23 +623,19 @@ create_error_xlsx <- function(input_path, output_path, issues,
     for (col_name in percent_cols) {
       idx <- col_index(col_name)
       if (length(idx) == 1) {
-        col_letter <- openxlsx::int2col(idx)
+        col_letter <- openxlsx2::int2col(idx)
         
         # Values < 0
-        openxlsx::conditionalFormatting(
-          wb, "Data",
-          cols = idx,
-          rows = 2:max_row,
-          type = "expression",
+        wb$add_conditional_formatting(
+          sheet = "Data",
+          dims = openxlsx2::wb_dims(rows = 2:max_row, cols = idx),
           rule = paste0(col_letter, "2<0")
         )
         
         # Values > 100
-        openxlsx::conditionalFormatting(
-          wb, "Data",
-          cols = idx,
-          rows = 2:max_row,
-          type = "expression",
+        wb$add_conditional_formatting(
+          sheet = "Data",
+          dims = openxlsx2::wb_dims(rows = 2:max_row, cols = idx),
           rule = paste0(col_letter, "2>100")
         )
       }
@@ -655,15 +645,14 @@ create_error_xlsx <- function(input_path, output_path, issues,
     if ("sample_id" %in% data_headers) {
       idx <- col_index("sample_id")
       if (length(idx) == 1) {
-        openxlsx::conditionalFormatting(
-          wb, "Data",
-          cols = idx,
-          rows = 2:max_row,
-          type = "duplicates"
+        wb$add_conditional_formatting(
+          sheet = "Data",
+          dims = openxlsx2::wb_dims(rows = 2:max_row, cols = idx),
+          type = "duplicatedValues"
         )
       }
     }
   }
   
-  openxlsx::saveWorkbook(wb, output_path, overwrite = TRUE)
+  openxlsx2::wb_save(wb, output_path, overwrite = TRUE)
 }

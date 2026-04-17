@@ -28,7 +28,7 @@ library(tidyr)
 library(tidyterra)
 library(writexl)
 library(zip)
-library(openxlsx)
+library(openxlsx2)
 
 #for shinyapps.io deployment, make sure soils package is included (not on CRAN)
 options(
