@@ -73,9 +73,9 @@ mod_step_2_upload_server <- function(id, state) {
     })
 
     observeEvent(input$upload_file, {
-      req_fields <- read.csv("files/required-fields.csv")
-      req_fields_data <- req_fields |> dplyr::filter(sheet == "Data")
-      req_fields_dd <- req_fields |> dplyr::filter(sheet == "Data Dictionary")
+      req_fields <- soils:::required_fields
+      req_fields_data <- req_fields |> dplyr::filter(type == "Data")
+      req_fields_dd <- req_fields |> dplyr::filter(type == "Data Dictionary")
 
       # Remove previous messages and hide download button
       removeUI(
@@ -230,7 +230,7 @@ mod_step_2_upload_server <- function(id, state) {
     # --- Download handler ---
     output$download_errors <- downloadHandler(
       filename = function() {
-        paste0("errors_", upload_name())
+        paste0("issues", upload_name())
       },
       content = function(file) {
         create_issue_xlsx(
