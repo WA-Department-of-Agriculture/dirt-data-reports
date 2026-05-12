@@ -140,3 +140,33 @@ show_modal <- function(title, id, md) {
     )
   )
 }
+
+#' Render validation issues as HTML list items
+#'
+#' @param issues A list of issue objects with a `message` field
+#'
+#' @return HTML `<ul>` tag with formatted issues
+#' @export
+render_issue_list <- function(issues) {
+  tags$ul(
+    lapply(issues, function(e) {
+      message <- cli::ansi_strip(e$message)
+
+      if (length(message) > 1) {
+        first_line <- message[1]
+        remaining <- message[-1]
+
+        tags$li(
+          class = "mb-2",
+          tags$div(tags$strong(first_line)),
+          lapply(remaining, tags$div)
+        )
+      } else {
+        tags$li(
+          class = "mb-2",
+          message
+        )
+      }
+    })
+  )
+}

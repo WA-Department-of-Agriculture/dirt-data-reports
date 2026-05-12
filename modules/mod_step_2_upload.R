@@ -1,6 +1,3 @@
-# Note: This module assumes data_validation.R has been sourced
-# Make sure to source("utils/data_validation.R") before using this module
-
 mod_step_2_upload_ui <- function(id, state) {
   ns <- NS(id)
 
@@ -61,8 +58,7 @@ mod_step_2_upload_server <- function(id, state) {
     # Store values the download handler needs
     upload_path <- reactiveVal(NULL)
     upload_name <- reactiveVal(NULL)
-    validation_issues <- reactiveVal(NULL)
-    stored_req_fields_data <- reactiveVal(NULL)
+    validation_result <- reactiveVal(NULL)
 
     observeEvent(input$requirement_info, {
       show_modal(
@@ -84,8 +80,7 @@ mod_step_2_upload_server <- function(id, state) {
         multiple = TRUE
       )
       shinyjs::hide("download_errors")
-      validation_issues(NULL)
-      stored_req_fields_data(NULL)
+      validation_result(NULL)
 
       # Get current language from state (default to english if not set)
       current_language <- "english"
@@ -99,11 +94,12 @@ mod_step_2_upload_server <- function(id, state) {
 
       file_path <- input$upload_file$datapath
 
-      # --- Gate check ---
-      gate_result <- check_file_readable(file_path, output = "ui")
+      # --- Load data ---
+      input <- soils::read_soils_input(file_path)
 
-      if (!is_gate_pass(gate_result)) {
-        results <- split_issues(gate_result)
+      if (isFALSE(input$passed)) {
+        results <- soils::format_issues(input$issues, output = "ui") |>
+          soils:::split_issues()
 
         insertUI(
           selector = paste0("#", ns("error_message")),
@@ -111,48 +107,50 @@ mod_step_2_upload_server <- function(id, state) {
           ui = div(
             class = "alert alert-danger",
             shiny::icon("circle-exclamation", style = "margin-right:2px"),
-            tags$strong("Errors (must fix before proceeding):"),
-            tags$ul(lapply(results$errors, \(e) tags$li(e$message)))
+            tags$strong("Errors (must fix to continue):"),
+            render_issue_list(results$errors)
           )
         )
-
-        # Show download with gate errors
-        upload_path(file_path)
-        upload_name(input$upload_file$name)
-        validation_issues(gate_result)
-        stored_req_fields_data(req_fields_data)
-        shinyjs::show("download_errors")
 
         state$step_2_valid <- FALSE
         return()
       }
 
-      # Gate passed — data is loaded
-      data <- gate_result$data
-      data_dict <- gate_result$data_dict
+      # --- Gate check ---
+      gate_result <- soils::check_input_structure(input)
+
+      if (isFALSE(gate_result$passed)) {
+        results <- soils::format_issues(gate_result$issues, output = "ui") |>
+          soils:::split_issues()
+
+        insertUI(
+          selector = paste0("#", ns("error_message")),
+          where = "beforeEnd",
+          ui = div(
+            class = "alert alert-danger",
+            shiny::icon("circle-exclamation", style = "margin-right:2px"),
+            tags$strong("Errors (must fix to continue):"),
+            render_issue_list(results$errors)
+          )
+        )
+
+        state$step_2_valid <- FALSE
+        return()
+      }
 
       # --- Independent checks ---
-      all_issues <- c(
-        # Errors
-        check_required_columns(data, req_fields_data, output = "ui"),
-        check_required_dict_fields(data_dict, req_fields_dd, output = "ui"),
-        check_uniqueness(data, req_fields_data, output = "ui"),
-        check_uniqueness(data_dict, req_fields_dd, output = "ui"),
-        check_data_types(data, req_fields_data, output = "ui"),
-        check_data_types(data_dict, req_fields_dd, output = "ui"),
-        check_missing_values(data, req_fields_data, output = "ui"),
-        check_missing_values(data_dict, req_fields_dd, output = "ui"),
-        check_additional_columns(data, req_fields_data, output = "ui"),
-        check_percent_range(data, output = "ui"),
-        check_dict_mismatch(data, data_dict, req_fields_data, output = "ui"),
-        check_measurement_groups(data_dict, current_language, output = "ui")
+      validation_result <- soils::run_all_checks(
+        gate_result,
+        language = stringr::str_to_title(state$language())
       )
 
-      results <- split_issues(all_issues)
+      results <- soils::format_issues(
+        validation_result$issues,
+        output = "ui"
+      ) |>
+        soils:::split_issues()
 
-      # --- Render results ---
-
-      if (length(all_issues) == 0) {
+      if (length(validation_result$issues) == 0) {
         # All checks passed
         insertUI(
           selector = paste0("#", ns("error_message")),
@@ -174,8 +172,8 @@ mod_step_2_upload_server <- function(id, state) {
               div(
                 class = "alert alert-danger",
                 shiny::icon("circle-exclamation", style = "margin-right:2px"),
-                tags$strong("Errors (must fix before proceeding):"),
-                tags$ul(lapply(results$errors, \(e) tags$li(e$message)))
+                tags$strong("Errors (must fix to continue):"),
+                render_issue_list(results$errors)
               )
             )
           )
@@ -189,7 +187,7 @@ mod_step_2_upload_server <- function(id, state) {
                 class = "alert alert-warning",
                 shiny::icon("triangle-exclamation", style = "margin-right:2px"),
                 tags$strong("Warnings (review recommended):"),
-                tags$ul(lapply(results$warnings, \(w) tags$li(w$message)))
+                render_issue_list(results$warnings)
               )
             )
           )
@@ -204,12 +202,14 @@ mod_step_2_upload_server <- function(id, state) {
         # Show download button
         upload_path(file_path)
         upload_name(input$upload_file$name)
-        validation_issues(all_issues)
-        stored_req_fields_data(req_fields_data)
+        validation_result(validation_result)
         shinyjs::show("download_errors")
       }
 
       # --- Update state ---
+
+      data <- gate_result$data
+      data_dict <- gate_result$data_dict
 
       if (length(results$errors) > 0) {
         # Errors present — block progression
@@ -230,14 +230,13 @@ mod_step_2_upload_server <- function(id, state) {
     # --- Download handler ---
     output$download_errors <- downloadHandler(
       filename = function() {
-        paste0("issues", upload_name())
+        paste0("soil-data-issues", upload_name(), ".xlsx")
       },
       content = function(file) {
-        create_issue_xlsx(
-          upload_path(),
+        soils::create_issue_xlsx(
+          validation_result(),
           file,
-          validation_issues(),
-          stored_req_fields_data()
+          language = stringr::str_to_title(state$language())
         )
       }
     )
