@@ -229,7 +229,7 @@ mod_step_4_build_reports_server <- function(id, state) {
             "%Y-%m-%d_%H-%M-%S"
           )
         }
-        paste0("soil_reports_", local_time, ".zip")
+        paste0("soil-reports_", local_time, ".zip")
       },
       content = function(file) {
         # Show modal with no close option initially
@@ -394,12 +394,9 @@ mod_step_4_build_reports_server <- function(id, state) {
         file.copy("www/fonts/Arial-Italic.ttf", fonts_dest)
         file.copy("www/fonts/Arial-Bold-Italic.ttf", fonts_dest)
 
-        writexl::write_xlsx(
-          list(
-            "Data" = state$data,
-            "Data Dictionary" = state$data_dictionary
-          ),
-          path = file.path(temp_dir, "data.xlsx")
+        saveRDS(
+          state$data_processed,
+          file = file.path(temp_dir, "data-processed.rds")
         )
 
         Sys.sleep(5)
@@ -421,7 +418,7 @@ mod_step_4_build_reports_server <- function(id, state) {
             )
 
             params <- list(
-              data_file = "data.xlsx",
+              data_file = "data-processed.rds",
               year = year,
               producer_id = row$producer_id,
               language = language,

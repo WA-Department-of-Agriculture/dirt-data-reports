@@ -208,20 +208,27 @@ mod_step_2_upload_server <- function(id, state) {
 
       # --- Update state ---
 
-      data <- gate_result$data
-      data_dict <- gate_result$data_dict
-
-      if (length(results$errors) > 0) {
+      if (isFALSE(validation_result$passed)) {
         # Errors present — block progression
         state$step_2_valid <- FALSE
       } else {
         # No errors (passed or warnings only) — allow progression
         state$step_2_valid <- TRUE
         state$step_2_vals$file_name <- input$upload_file$name
+
+        data_processed <- soils::process_data(
+          validation_result,
+          language = stringr::str_to_title(state$language())
+        )
+
+        data <- data_processed$results_wide
+        data_dict <- data_processed$data_dict
+
         state$step_2_vals$data <- data
 
         state$years <- sort(unique(data$year), decreasing = TRUE)
         state$producer_ids <- data |> dplyr::distinct(year, producer_id)
+        state$data_processed <- data_processed
         state$data <- data
         state$data_dictionary <- data_dict
       }
@@ -230,7 +237,7 @@ mod_step_2_upload_server <- function(id, state) {
     # --- Download handler ---
     output$download_errors <- downloadHandler(
       filename = function() {
-        paste0("soil-data-issues", upload_name(), ".xlsx")
+        paste0("soil-data-issues.xlsx")
       },
       content = function(file) {
         soils::create_issue_xlsx(

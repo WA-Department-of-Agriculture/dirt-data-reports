@@ -30,9 +30,9 @@ fig-width: 6
 fig-height: 3.5
 fig-dpi: 300
 params:
-  data_file: "spanish-test.xlsx"
+  data_file: "data-processed.rds"
   year: "2024"
-  language: "spanish"
+  language: "english"
   producer_id: "GEH01"
   project_name: "Sample Project"
   project_results: "Intro to the project results section."
@@ -174,108 +174,11 @@ distinct_selected_measure_types <- selected_measures |>
   dplyr::pull(section_name)
 
 ### READ IN DATA FILE
-data <- readxl::read_xlsx(params$data_file, sheet = "Data") |>
-  # Make sure sample_id and field_id are character
-  dplyr::mutate(dplyr::across(c(sample_id, field_id), as.character))
-
-dictionary <- readxl::read_xlsx(params$data_file, sheet = "Data Dictionary")
-```
-
-<!-- Texture validation and classification -->
-
-```{r texture-validate-classify}
-# Validate and classify soil texture (requires at least two of:
-# sand_percent, silt_percent, clay_percent)
-data <- soils::classify_texture(data)
-
-# Add texture and fraction rows to the dictionary if created during classification
-dictionary <- soils::sync_dictionary_texture(
-  data,
-  dictionary,
-  language = stringr::str_to_title(params$language)
-)
-```
-
-<!-- Format measurement labels and set ordering -->
-
-```{r process-dictionary}
-dictionary <- dictionary |>
-  dplyr::mutate(
-    # Concatenate abbr and unit with html break for the table and plot labels
-    abbr_unit = dplyr::if_else(
-      is.na(unit) | unit == "",
-      abbr,
-      glue::glue("{abbr}<br>{unit}")
-    ),
-    ,
-    # Set the order of how measurement groups will appear within the report
-    # based on the order found in the data dictionary
-    group_order = dplyr::cur_group_id(),
-    # Set the order of how measurements will appear within each measurement
-    # group based on the order found in the data dictionary
-    measurement_order = seq_along(column_name),
-    .by = measurement_group
-  )
-
-# Get vector of measurement groups from dictionary
+input <- readRDS(params$data_file)
+results_wide <- input$results_wide
+results_long <- input$results_long
+dictionary <- input$data_dict
 measurement_groups <- unique(dictionary$measurement_group)
-```
-
-<!-- Pivot data longer and join with data dictionary -->
-
-```{r tidy-long}
-# OPTIONAL EDIT: If you have extra metadata columns in `data`, add them to this
-# vector. All other columns are assumed to be quantitative measurements and will
-# be converted to numeric. Non-numeric values (e.g. "ND", "NA", "", "-", "<1")
-# will be converted to NA and excluded from tables and plots.
-metadata_cols <- c(
-  "year",
-  "sample_id",
-  "farm_name",
-  "producer_id",
-  "field_id",
-  "county",
-  "crop",
-  "longitude",
-  "latitude",
-  "texture"
-)
-
-# Get measurement columns
-measurement_cols <- data |>
-  dplyr::select(-dplyr::any_of(metadata_cols)) |>
-  colnames()
-
-# Convert measurement columns to numeric. This will emit a warning of which
-# columns have converted a value to NA.
-data <- soils::convert_to_numeric(data, measurement_cols)
-
-# Tidy data into long format and join with data dictionary
-results_long <- data |>
-  tidyr::pivot_longer(
-    cols = dplyr::all_of(measurement_cols),
-    names_to = "measurement"
-  ) |>
-  dplyr::inner_join(dictionary, by = c("measurement" = "column_name")) |>
-  dplyr::mutate(
-    group_order = factor(
-      group_order,
-      levels = unique(dictionary$group_order),
-      ordered = unique(is.ordered(dictionary$group_order))
-    ),
-    abbr = factor(
-      abbr,
-      levels = dictionary$abbr,
-      ordered = is.ordered(dictionary$measurement_order)
-    ),
-    abbr_unit = factor(
-      abbr_unit,
-      levels = dictionary$abbr_unit,
-      ordered = is.ordered(dictionary$measurement_order)
-    )
-  ) |>
-  dplyr::arrange(group_order, measurement_order) |>
-  dplyr::filter(!is.na(value))
 ```
 
 ```{r get-producer-info}
@@ -1025,7 +928,7 @@ cat("##", tr("download_data"))
 
 # Add a data download button if downloadthis is installed
 list(
-  results = dplyr::filter(data, producer_id == params$producer_id),
+  results = dplyr::filter(results_wide, producer_id == params$producer_id),
   measurement_dictionary = dictionary[
     ,
     c(
