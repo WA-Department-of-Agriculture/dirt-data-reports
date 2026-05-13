@@ -345,33 +345,28 @@ tables <- df_table |>
   })
 ```
 
-```{r physical-group-texture}
-# Special wrangling for texture
+```{r texture-group-tweaks}
+# Determine which measurement group contains texture variables
+texture_group <- soils::get_texture_group(dictionary)
+texture_col <- tr("texture")
 
-# Only proceed if texture exists in any dataframe
-if (any(purrr::map_lgl(tables, ~ tr("texture") %in% names(.x)))) {
-  # Extract physical df from averages list
-  if (tr("physical_group") %in% names(tables)) {
-    physical <- setNames(
-      list(tables[[tr("physical_group")]]),
-      tr("physical_group")
-    )
-  } else {
-    physical <- list()
-  }
-
-  # Remove texture from all dataframes except physical
-  tables <- purrr::map(
-    subset(
-      tables,
-      !(names(tables) == tr("physical_group"))
-    ),
-    \(x) dplyr::select(x, -!!tr("texture"))
+# Keep texture column only in the texture measurement group table
+if (!is.null(texture_group) && "Textura" %in% names(df_table)) {
+  tables <- purrr::imap(
+    tables,
+    \(x, group_name) {
+      if (group_name != texture_group &&
+        texture_col %in% names(x)) {
+        x <- dplyr::select(x, -dplyr::all_of(texture_col))
+      }
+      x
+    }
   )
-
-  # Add physical df back to the averages list
-  tables <- c(tables, physical)
 }
+
+# Order list of tables based on how they appear in dictionary. Important that
+# tables and headers are in the same order for the make-flextables chunk.
+tables <- tables[measurement_groups]
 ```
 
 ```{r remove-rows-with-one-observation}
@@ -382,10 +377,6 @@ search <- paste0("\\(1 ", tr("fields"), ")|NA")
 
 tables <- tables |>
   purrr::map(~ dplyr::filter(.x, !grepl(search, !!sym(tr("field_or_average")))))
-
-# Order list of tables based on how they appear in dictionary. Important that
-# tables and headers are in the same order for the make-flextables chunk.
-tables <- tables[measurement_groups]
 ```
 
 ```{r get-headers-for-flextable}

@@ -76,8 +76,6 @@ Review the example structure and format your project data to match.
     summaries, tables, and plots. Clean or recode censored values before
     uploading.
 
-<!-- -->
-
 -   *texture* may be left blank. If at least two of *sand_percent*,
     *silt_percent*, and *clay_percent* are provided, *texture* will be
     classified using [USDA NRCS
@@ -105,18 +103,10 @@ Review the example structure and format your project data to match.
 Use the Data Dictionary to control how measurements appear in the Project
 Results section of the report.
 
--   **measurement_group**: Defines how measurements are grouped. Groups appear
-    in the report in the order listed in the data dictionary.
-
-    -   **Only the following values are currently supported. Custom groups are
-        not allowed and will fail validation.**
-
-        -   **English:** Physical, Biological, Chemical, Plant Essential Macro
-            Nutrients, Plant Essential Micro Nutrients
-
-        -   **Spanish:** Mediciones físicas, Mediciones biológicas, Mediciones
-            químicas, Macronutrientes esenciales para plantas, Micronutrientes
-            esenciales para plantas
+-   **measurement_group**: Controls how measurements are grouped in the Project
+    Results section of the report. To maintain readable tables and figures, each
+    measurement group should contain no more than 8 measurements. Larger groups
+    may result in overcrowded plots and tables.
 
 -   **column_name**: Links the Data tab to the Data Dictionary tab. Must exactly
     match the column names of the soil measurements in your data. Within each

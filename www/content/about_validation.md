@@ -1,98 +1,156 @@
-### What happens when you upload your .xlsx file?
+### What happens when you upload your Excel file?
 
-The app automatically runs a series of data validation checks to ensure your file is complete and formatted correctly.
+When you upload your file, the app automatically runs a series of validation
+checks to ensure your data is complete, consistent, and ready for generating
+soil health reports.
 
----
+Validation happens in two stages:
 
-### 1. File Structure Check
+1.   The **Valid File Structure Check** confirms the Excel file can be read and
+    contains the required sheets and headers
 
-Your file must contain **two tabs**:
+2.   The remaining checks validate the contents of your data and data dictionary
+    for errors and warnings
 
-- **Data** — your main soil data  
-- **Data Dictionary** — definitions and metadata for each column
+**❌ Errors must be resolved before continuing.\
+⚠️ Warnings should be reviewed carefully.**
 
-❌ *If either tab is missing, the upload will fail.*
+If your file passes the **Valid File Structure** check, an Excel issues file
+will be generated whenever errors or warnings are found. This downloadable file
+includes:
 
----
+-    An **Issues** sheet summarizing all problems
 
-### 2. Required Columns Check
+-    Conditional formatting that highlights affected rows and values directly in
+    your data
 
-We verify that all required columns exist in both the **Data** tab and the **Data Dictionary** tab.
+If your file fails the **Valid File Structure** check, the app cannot generate
+the issues Excel file.
 
-❌  *Any missing required columns will be listed in an error message.*
+--------------------------------------------------------------------------------
 
----
+#### **Valid File Structure Check (❌Error)**
 
-### 3. Unique Identifier Check
+Before running detailed validation, the app checks the basic file structure.
 
-- **sample_id** must be **unique across the entire dataset**
-- **field_id** must be **unique for each** combination of **year** and **producer_id**  
-  (e.g., Producer A cannot have two “Field 01” entries in 2023)
+Your file must:
 
-⚠️ *Any duplicate values will be listed in an error message.*
+-   Contain both a **Data** sheet and a **Data Dictionary** sheet
 
----
+-   Have no duplicate column headers
 
-### 4. Measurement Columns Check
+-   Contain at least one row under the headers in each sheet
 
-Your **Data** tab must contain at least **one measurement column** beyond the required fields  
-(columns A–J: year → texture).
+--------------------------------------------------------------------------------
 
-✅ *This ensures there are actual lab results to visualize and report.*
+#### **Duplicate Identifiers (❌Error)**
 
----
+Identifiers must be unique and consistent:
 
-### 5. Data Type Validation
+-   **sample_id** must be unique across the entire dataset
+
+-   **field_id** must be unique for each combination of *year* and
+    *producer_id*\
+    (e.g., Producer A cannot have two “Field 01” entries in 2023)
+
+--------------------------------------------------------------------------------
+
+#### **No Measurement Columns (❌Error)**
+
+Your **Data** sheet must include at least one measurement column beyond the
+required metadata columns.
+
+--------------------------------------------------------------------------------
+
+#### **Unexpected Data Types (❌Error)**
 
 Each column is checked against its expected data type:
 
-- **Numeric** columns must contain only numbers  
-- **Character** columns must contain text
+-   **Numeric** columns must contain only numbers
 
-⚠️ *Any mismatched values will be flagged and listed.*
+-   **Character** columns must contain text
 
----
+--------------------------------------------------------------------------------
 
-### 6. Missing Required Values Check
+#### **Missing Required Values (❌Error)**
 
-Columns shown in **bold** in the templates must not contain blank cells.
+Required columns must not contain blank values.
 
-❌ *Any missing values will be listed in an error message.*
+-   **Data** sheet required columns:
 
----
+    -   *year*
 
-### 7. Consistency with Data Dictionary
+    -   *sample_id*
 
-All **measurement columns** (after column J) in **Data** must match the column names listed in the **Data Dictionary**.
+    -   *producer_id*
 
-⚠️ *Any extra or mismatched columns will be listed.*
+    -   *field_id*
 
----
+-   **Data Dictionary** sheet required columns:
 
-### 8. Valid Range Check (Texture Measurements)
+    -   *measurement_group*
 
-**sand_percent**, **silt_percent**, and **clay_percent** must each be between **0 and 100**.
+    -   *column_name*
 
-⚠️ *Any values outside this range will be listed as errors.*
+    -   *abbr*
 
----
+--------------------------------------------------------------------------------
 
-### 9. Measurement Group Validation
+#### **Invalid Coordinates (❌Error)**
 
-Values in the **measurement_group** column of the **Data Dictionary** must match the valid group names:
+Latitude and longitude must be valid decimal degrees:
 
-**English reports**  
-- Physical  
-- Biological  
-- Chemical  
-- Plant Essential Macro Nutrients  
-- Plant Essential Micro Nutrients  
+-   *latitude*: -90 to 90
 
-**Spanish reports**  
-- Mediciones físicas  
-- Mediciones biológicas  
-- Mediciones químicas  
-- Macronutrientes esenciales para plantas  
-- Micronutrientes esenciales para plantas  
+-    *longitude*: -180 to 180
 
-⚠️ *Any invalid entries will be listed in an error message.*
+Incomplete coordinate pairs (e.g., missing latitude but present longitude) will
+also trigger errors.
+
+--------------------------------------------------------------------------------
+
+#### **Invalid Texture Fractions (❌ Error)**
+
+*sand_percent*, *silt_percent*, or *clay_percent* must be between **0 and 100.**
+
+The sum of the three fractions must equal **100 ± 1.**
+
+--------------------------------------------------------------------------------
+
+#### **Texture Fraction Computation (⚠️Warning)**
+
+At least two texture fractions (*sand_percent*, *silt_percent*, or
+*clay_percent)* must be provided to enable texture classification.
+
+If one texture fraction is missing, it will be computed as 100 minus the sum of
+the other two fractions.
+
+--------------------------------------------------------------------------------
+
+#### **Data / Data Dictionary Inconsistency (⚠️ Warning)**
+
+Measurement columns in the **Data** sheet should match the **Data Dictionary**:
+
+-    Every *column_name* in the **Data Dictionary** should exist in **Data**
+
+-    Extra or missing columns will be flagged
+
+--------------------------------------------------------------------------------
+
+#### **Non-Numeric Values in Measurement Columns (⚠️Warning)**
+
+All measurement columns (except *texture*) must be numeric.
+
+Values like “ND” or “\<1” will be converted to NA and may be excluded from
+summaries, tables, and plots.
+
+Clean or recode non-numeric values before uploading for best results.
+
+--------------------------------------------------------------------------------
+
+#### **Large Measurement Group Size (⚠️Warning)**
+
+Each measurement group (e.g., Physical, Biological, Chemical) should contain no
+more than 8 measurements.
+
+This helps ensure reports remain readable and figures are not overcrowded.

@@ -139,10 +139,7 @@ mod_step_2_upload_server <- function(id, state) {
       }
 
       # --- Independent checks ---
-      validation_result <- soils::run_all_checks(
-        gate_result,
-        language = stringr::str_to_title(state$language())
-      )
+      validation_result <- soils::run_all_checks(gate_result)
 
       results <- soils::format_issues(
         validation_result$issues,
@@ -216,10 +213,8 @@ mod_step_2_upload_server <- function(id, state) {
         state$step_2_valid <- TRUE
         state$step_2_vals$file_name <- input$upload_file$name
 
-        data_processed <- soils::process_data(
-          validation_result,
-          language = stringr::str_to_title(state$language())
-        )
+        # Run data processing
+        data_processed <- soils::process_data(validation_result)
 
         data <- data_processed$results_wide
         data_dict <- data_processed$data_dict
@@ -240,11 +235,7 @@ mod_step_2_upload_server <- function(id, state) {
         paste0("soil-data-issues_", Sys.Date(), ".xlsx")
       },
       content = function(file) {
-        soils::create_issue_xlsx(
-          validation_result(),
-          file,
-          language = stringr::str_to_title(state$language())
-        )
+        soils::create_issue_xlsx(validation_result(), file)
       }
     )
   })
