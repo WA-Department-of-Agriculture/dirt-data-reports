@@ -95,10 +95,10 @@ mod_step_2_upload_server <- function(id, state) {
       file_path <- input$upload_file$datapath
 
       # --- Load data ---
-      input <- soils::read_soils_input(file_path)
+      input_data <- soils::read_soils_input(file_path)
 
       if (isFALSE(input$passed)) {
-        results <- soils::format_issues(input$issues, output = "ui") |>
+        results <- soils::format_issues(input_data$issues, output = "ui") |>
           soils:::split_issues()
 
         insertUI(
@@ -117,7 +117,7 @@ mod_step_2_upload_server <- function(id, state) {
       }
 
       # --- Gate check ---
-      gate_result <- soils::check_input_structure(input)
+      gate_result <- soils::check_input_structure(input_data)
 
       if (isFALSE(gate_result$passed)) {
         results <- soils::format_issues(gate_result$issues, output = "ui") |>
@@ -237,7 +237,7 @@ mod_step_2_upload_server <- function(id, state) {
     # --- Download handler ---
     output$download_errors <- downloadHandler(
       filename = function() {
-        paste0("soil-data-issues.xlsx")
+        paste0("soil-data-issues_", Sys.Date(), ".xlsx")
       },
       content = function(file) {
         soils::create_issue_xlsx(

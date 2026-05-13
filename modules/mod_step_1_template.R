@@ -133,6 +133,7 @@ mod_step_1_template_server <- function(id, state) {
       # Note: Intentionally NOT clearing state$step_3_vals to preserve text inputs
 
       # Clear data-dependent state
+      state$data_processed <- NULL
       state$data <- NULL
       state$data_dictionary <- NULL
       state$years <- NULL
@@ -156,7 +157,7 @@ mod_step_1_template_server <- function(id, state) {
     # Template download logic
     output$download_template <- downloadHandler(
       filename = function() {
-        paste0("soil-data-template-", input$language, "-", Sys.Date(), ".xlsx")
+        paste0("soil-data-template-", input$language, "_", Sys.Date(), ".xlsx")
       },
       content = function(file) {
         template_file <- if (input$language == "spanish") {
