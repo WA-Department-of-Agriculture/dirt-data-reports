@@ -6,10 +6,10 @@ soil health reports.
 
 Validation happens in two stages:
 
-1.   The **Valid File Structure Check** confirms the Excel file can be read and
+1.  The **Valid File Structure Check** confirms the Excel file can be read and
     contains the required sheets and headers
 
-2.   The remaining checks validate the contents of your data and data dictionary
+2.  The remaining checks validate the contents of your data and data dictionary
     for errors and warnings
 
 **❌ Errors must be resolved before continuing.\
@@ -19,9 +19,9 @@ If your file passes the **Valid File Structure** check, an Excel issues file
 will be generated whenever errors or warnings are found. This downloadable file
 includes:
 
--    An **Issues** sheet summarizing all problems
+-   An **Issues** sheet summarizing all problems
 
--    Conditional formatting that highlights affected rows and values directly in
+-   Conditional formatting that highlights affected rows and values directly in
     your data
 
 If your file fails the **Valid File Structure** check, the app cannot generate
@@ -102,7 +102,7 @@ Latitude and longitude must be valid decimal degrees:
 
 -   *latitude*: -90 to 90
 
--    *longitude*: -180 to 180
+-   *longitude*: -180 to 180
 
 Incomplete coordinate pairs (e.g., missing latitude but present longitude) will
 also trigger errors.
@@ -131,9 +131,9 @@ the other two fractions.
 
 Measurement columns in the **Data** sheet should match the **Data Dictionary**:
 
--    Every *column_name* in the **Data Dictionary** should exist in **Data**
+-   Every *column_name* in the **Data Dictionary** should exist in **Data**
 
--    Extra or missing columns will be flagged
+-   Extra or missing columns will be flagged
 
 --------------------------------------------------------------------------------
 

@@ -55,6 +55,9 @@ mod_step_2_upload_server <- function(id, state) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
+    # Store values for preview table
+    data_processed <- reactiveVal(NULL)
+
     # Store values the download handler needs
     upload_path <- reactiveVal(NULL)
     upload_name <- reactiveVal(NULL)
@@ -97,7 +100,7 @@ mod_step_2_upload_server <- function(id, state) {
       # --- Load data ---
       input_data <- soils::read_soils_input(file_path)
 
-      if (isFALSE(input$passed)) {
+      if (isFALSE(input_data$passed)) {
         results <- soils::format_issues(input_data$issues, output = "ui") |>
           soils:::split_issues()
 
@@ -203,6 +206,11 @@ mod_step_2_upload_server <- function(id, state) {
         shinyjs::show("download_errors")
       }
 
+      # --- Process data ---
+      data_processed <- soils::process_data(validation_result)
+
+      data_processed(data_processed)
+
       # --- Update state ---
 
       if (isFALSE(validation_result$passed)) {
@@ -212,9 +220,6 @@ mod_step_2_upload_server <- function(id, state) {
         # No errors (passed or warnings only) — allow progression
         state$step_2_valid <- TRUE
         state$step_2_vals$file_name <- input$upload_file$name
-
-        # Run data processing
-        data_processed <- soils::process_data(validation_result)
 
         data <- data_processed$results_wide
         data_dict <- data_processed$data_dict
