@@ -75,7 +75,8 @@ del suelo, vea ["Comprender las pruebas de suelo"](https://youtu.be/-ED-gGk4yb8?
 
 <!--section:acknowledgements-->
 ## Reconocimiento
-Este informe se generó con la herramienta [Dirt Data Reports tool](https://wsda.shinyapps.io/dirt-data-reports/). El Departamento de Agricultura del Estado de Washington (WSDA) desarrolló con base en [el paquete R {soils}](https://wa-department-of-agriculture.github.io/soils/), creado por el WSDA y la Universidad Estatal de Washington como parte de la [Iniciativa sobre la Salud del Suelo de Washington](https://washingtonsoilhealthinitiative.com/). El contenido y las figuras fueron adaptadas de la publicación de estension universitaria de el estado de Washington [#FS378E Soil Health in Washington Vineyards](https://pubs.extension.wsu.edu/soil-health-in-washington-vineyards).
+Este informe se generó con la herramienta [Dirt Data Reports tool](https://wsda.shinyapps.io/dirt-data-reports/). El Departamento de Agricultura del Estado de Washington (WSDA) desarrolló con base en [el paquete R {soils}](https://wa-department-of-agriculture.github.io/soils/), creado por el WSDA y la Universidad Estatal de Washington como parte de la [Iniciativa sobre la Salud del Suelo de Washington (WaSHI)](https://washingtonsoilhealthinitiative.com/). El contenido y las figuras fueron adaptadas de la publicación de estension universitaria de el estado de Washington [#FS378E Soil Health in Washington Vineyards](https://pubs.extension.wsu.edu/soil-health-in-washington-vineyards). Para ver la gama completa de aplicaciones desarrolladas por WaSHI, visite la [Galería de herramientas de WaSHI](https://wsda.quarto.pub/washi-gallery/).
+
 
 El texto del reporte y las imágenes fueron traducidas por Erica Tello, Eber Rivera, y Kate Smith con WSU Food Systems y Skagit County Extension como parte del programa de USDA NRCS Innovación en la conservación, dirigido por Viva Farms (grant number NR22-13G004).
 

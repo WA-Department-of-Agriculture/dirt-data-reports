@@ -14,7 +14,7 @@ Customized soil health reports can be generated in four steps. Be prepared to sp
 
 ## **Why was this tool created?**
 
-This tool was developed as part of the [Washington Soil Health Initiative’s State of the Soils Assessment](https://washingtonsoilhealthinitiative.com/state-of-the-soils/), which analyzed over 1,100 samples and provided customized reports to more than 400 participants. To make this process accessible to others, this user-friendly, no-code Shiny app was developed. This app helps users automate the creation of comprehensive soil health reports without advanced programming skills.
+This tool was developed as part of the [Washington Soil Health Initiative’s (WaSHI) State of the Soils Assessment](https://washingtonsoilhealthinitiative.com/state-of-the-soils/), which analyzed over 1,100 samples and provided customized reports to more than 400 participants. To make this process accessible to others, this user-friendly, no-code Shiny app was developed. This app helps users automate the creation of comprehensive soil health reports without advanced programming skills.
 
 ## **Who developed it?**
 
@@ -79,4 +79,4 @@ We welcome your feedback as we continue improving the tool and adding new featur
 
 ## **Related tools**
 
-This application is part of the Washington Soil Health Initiative app ecosystem. To see the full range of apps developed by WaSHI, visit the [WaSHI Tool Gallery](https://wsda.quarto.pub/washi-gallery/).
+This application is part of the WaSHI app ecosystem. To see the full range of apps developed by WaSHI, visit the [WaSHI Tool Gallery](https://wsda.quarto.pub/washi-gallery/).
