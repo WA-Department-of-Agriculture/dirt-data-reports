@@ -351,7 +351,7 @@ texture_group <- soils::get_texture_group(dictionary)
 texture_col <- tr("texture")
 
 # Keep texture column only in the texture measurement group table
-if (!is.null(texture_group) && "Textura" %in% names(df_table)) {
+if (!is.null(texture_group) && texture_col %in% names(df_table)) {
   tables <- purrr::imap(
     tables,
     \(x, group_name) {
