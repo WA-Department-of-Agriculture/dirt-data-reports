@@ -207,12 +207,14 @@ mod_step_2_upload_server <- function(id, state) {
       }
 
       # --- Process data ---
-      data_processed <- soils::process_data(
-        validation_result,
-        language = stringr::str_to_title(current_language)
-      )
+      if (isTRUE(validation_result$passed)) {
+        data_processed <- soils::process_data(
+          validation_result,
+          language = stringr::str_to_title(current_language)
+        )
 
-      data_processed(data_processed)
+        data_processed(data_processed)
+      }
 
       # --- Update state ---
 
